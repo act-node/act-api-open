@@ -18,7 +18,7 @@ paths:
         required: true
         schema:
           type: string
-          description: Group groupCode
+          description: Group Code
       - in: path
         name: Key
         required: true
@@ -105,7 +105,7 @@ paths:
         required: true
         schema:
           type: string
-          description: Group groupCode
+          description: Group Code
       - in: path
         name: Key
         required: true
