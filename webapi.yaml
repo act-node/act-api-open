@@ -46,6 +46,9 @@ paths:
                   format: date-time
                 location:
                   type: object
+                  required:
+                    - lat
+                    - lng
                   properties:
                     lat:
                       type: string
@@ -113,21 +116,28 @@ paths:
             schema:
               type: object 
               required:
-                - value
+                - type
+                - info
               properties:
                 type:
                   type: string
-                name:
-                  type: string
-                value:
-                  type: number
-                unit:
-                  type: string
-                time:
-                  type: string
-                location:
+                info:
                   type: object
-
+                  required:
+                    - device
+                    - time
+                  properties:
+                    device:
+                      type: string
+                    time:
+                      type: integer
+                      description: UNIX Time
+                data:
+                  type: array
+              example:
+                type: sensor_data
+                info: { device: 11130231756A0021, time: 1550647733}
+                data: [ { masterPort: 1, expandPort: 5, name: ph, value: 9.71}, { masterPort: 1, expandPort: 4, name: water_do, value: 13.89}]
       responses:
         '200':
           description: Successfully post sensor data
