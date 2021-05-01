@@ -7,10 +7,105 @@ servers:
   - url: https://hooks.act-node.com/service/v1
     description: ACT cloud webhook APIs
 paths:
-  /{group_code}/{key}:
+  /{groupCode}/{Key}:
     post:
       summary: post sensor data.
       description: sensor data send to ACT.cloud.
+      parameters:
+      - in: path
+        name: "groupCode"
+        required: true
+        schema:
+          type: string
+          description: Group groupCode
+      - in: path
+        name: Key
+        required: true
+        schema:
+          type: string
+          description: Whebhook Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object 
+              required:
+                - value
+              properties:
+                type:
+                  type: string
+                name:
+                  type: string
+                value:
+                  type: number
+                unit:
+                  type: string
+                time:
+                  type: string
+                  format: date-time
+                location:
+                  type: object
+                  properties:
+                    lat:
+                      type: string
+                    lng:
+                      type: string
+              example:
+                type: env
+                name: temp
+                value: 23.4
+                unit: ℃
+                time: 2021-01-10T09:12:34.56789Z
+                location: {lat: 35.391133800000006, lng: 139.55841339999998}
+      responses:
+        '200':
+          description: Successfully post sensor data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  type:
+                    type: string
+                  name:
+                    type: string
+                  value:
+                    type: number
+                  unit:
+                    type: string
+                  time: 
+                    type: string
+                    format: date-time
+                  location:
+                    type: object
+                    properties:
+                      lat:
+                        type: string
+                      lng:
+                        type: string
+        '400':
+          description: Bad Request. Incorect request.
+        '403':
+          description: Forbidden. webhook URL NOT exist or expired
+
+  /dcmhka/{groupCode}/{key}:
+    post:
+      summary: post Docomo Hatake Assist sensor data.
+      description: post Docomo Hatake Assist sensor data send to ACT.cloud.
+      parameters:
+      - in: path
+        name: "groupCode"
+        required: true
+        schema:
+          type: string
+          description: Group groupCode
+      - in: path
+        name: Key
+        required: true
+        schema:
+          type: string
+          description: Whebhook Key
       requestBody:
         required: true
         content:
@@ -36,8 +131,6 @@ paths:
       responses:
         '200':
           description: Successfully post sensor data
-        '400':
-          description: Invalid request
           content:
             application/json:
               schema:
@@ -45,3 +138,7 @@ paths:
                 properties:   
                   message:
                     type: string
+        '400':
+          description: Bad Request. Incorect request.
+        '403':
+          description: Forbidden. webhook URL NOT exist or expired
