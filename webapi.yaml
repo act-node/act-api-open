@@ -4,12 +4,12 @@ info:
   description: ACT cloud sensor data post API.
   version: 0.1.0
 servers:
-  - url: https://hooks.act-node.com/service/v1
+  - url: https://hooks.act-node.com/sensor/v1
     description: ACT cloud webhook APIs
 paths:
-  /{groupCode}/{Key}:
+  /common/{groupCode}/{Key}:
     post:
-      summary: post sensor data.
+      summary: Post sensor data. (standard)
       description: sensor data send to ACT.cloud.
       parameters:
       - in: path
@@ -61,6 +61,7 @@ paths:
                 unit: ℃
                 time: 2021-01-10T09:12:34.56789Z
                 location: {lat: 35.391133800000006, lng: 139.55841339999998}
+
       responses:
         '200':
           description: Successfully post sensor data
@@ -118,6 +119,7 @@ paths:
               required:
                 - type
                 - info
+                - data
               properties:
                 type:
                   type: string
@@ -134,6 +136,31 @@ paths:
                       description: UNIX Time
                 data:
                   type: array
+                  items:
+                    type: object
+                    required:
+                      - masterPort
+                      - name
+                      - value
+                    properties:
+                      masterPote:
+                        type: string
+                      expandPort:
+                        type: string
+                        # A1, A2
+                        # 接続口A1開拓口1, 接続口A1開拓口2, 接続口A1開拓口3, 接続口A1開拓口4, 接続口A1開拓口5
+                        # 接続口A2開拓口1, 接続口A2開拓口2, 接続口A2開拓口3, 接続口A2開拓口4, 接続口A2開拓口5
+                      name:
+                        type: string
+                        # air_temperature: 気温, air_humidity: 空気湿度,
+                        # soil_temperature: 土壌温度, soil_humidity: 土壌水分, soil_ec: 土壌EC,
+                        # leaf_temperature: 葉面温度, leaf_humidity: 葉面湿度,
+                        # co2_concentrations: 二酸化炭素濃度
+                        # illumination: 照度, par: 光合成有効放射,
+                        # ph: pH値, water_ec: 水EC値, water_do: 水溶存酸素, water_temperature: 水温
+                      value:
+                        type: string
+                        # ℃, %, ℃, %, dS/m, ℃, %, ppm, Lux, μmol/m2·s, ,mS/cm, mg/L, ℃
               example:
                 type: sensor_data
                 info: { device: 11130231756A0021, time: 1550647733}
@@ -144,10 +171,46 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:   
-                  message:
-                    type: string
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    name:
+                      type: string
+                    value:
+                      type: number
+                    unit:
+                      type: string
+                    time: 
+                      type: string
+                      format: date-time
+                    location:
+                      type: object
+                      properties:
+                        lat:
+                          type: string
+                        lng:
+                          type: string
+              example: [
+                {
+                  type: env,
+                  name: ph,
+                  value: 9.71,
+                  unit: ,
+                  time: 2021-01-10T09:12:34.56789Z,
+                  location: {lat: 35.391133800000006, lng: 139.55841339999998}
+                },
+                {
+                  type: env,
+                  name: water_do,
+                  value: 13.89,
+                  unit: mg/L,
+                  time: 2021-01-10T09:12:34.56789Z,
+                  location: {lat: 35.391133800000006, lng: 139.55841339999998}
+                }
+              ]
         '400':
           description: Bad Request. Incorect request.
         '403':
