@@ -94,11 +94,11 @@ paths:
         '403':
           description: Forbidden. webhook URL NOT exist or expired
 
-  # Docomo Hatake Assist
-  /dcmhka/{groupCode}/{key}:
+  # ZETA Techsor Sensor API
+  /techsor/{groupCode}/{key}:
     post:
-      summary: post sensor data. (Docomo Hatake Assist)
-      description: post Docomo Hatake Assist sensor data send to ACT.cloud.
+      summary: post sensor data. (from ZETA Techser API)
+      description: post ZETA techser sensor data send to ACT.cloud.
       parameters:
       - in: path
         name: "groupCode"
