@@ -92,6 +92,69 @@ paths:
                         type: string
                       lng:
                         type: string
+              example: {
+                "statusCode": 200,
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "body": {
+                  "type": "env",
+                  "value": 23.4,
+                  "name": "温度",
+                  "data_name": "temperature",
+                  "unit": "℃",
+                  "time": "2021-05-26T11:35:23.045Z",
+                  "location": {
+                    "lng": 139.56031134283484,
+                    "lat": 35.39041839643905
+                  }
+                }
+              }
+        '400':
+          description: Bad Request. Incorect request.
+        '403':
+          description: Forbidden. webhook URL NOT exist or expired
+  # ZETA Techsor Sensor API
+  /data_check/{groupCode}/{Key}:
+    get:
+      summary: Test API for Get sensor data in 24hr
+      description: sensor data get
+      parameters:
+      - in: path
+        name: "groupCode"
+        required: true
+        schema:
+          type: string
+          description: Group Code
+      - in: path
+        name: Key
+        required: true
+        schema:
+          type: string
+          description: Whebhook Key
+ 
+      responses:
+        '200':
+          description: Successfully get sensor data for test
+          content:
+            application/json:
+              schema:
+                type: array
+                properties:   
+                  gid:
+                    type: string
+                  device_id:
+                    type: string
+                  measure_name:
+                    type: string
+                  measure_value:
+                    type: number
+                  time: 
+                    type: string
+                    format: date-time
+              example: [
+                "{gid=369eddb5-d09c-48e4-8bc2-84a36e84eb8d, device_id=470ffec6-e10d-59f5-9cd3-95b47f95fc9e, measure_value::double=30.5, measure_name=temperature, time=2021-05-26 12:32:40.244000000}"
+              ]
         '400':
           description: Bad Request. Incorect request.
         '403':
