@@ -57,10 +57,11 @@ paths:
                       type: string
               example:
                 type: env
-                name: air_temperature
+                name: "温度"
+                data-name: "temperature"
                 value: 23.4
                 unit: ℃
-                time: 2021-01-10T09:12:34.56789Z
+                time: 2021-05-10T09:12:34.56789Z
                 location: {lat: 35.391133800000006, lng: 139.55841339999998}
 
       responses:
@@ -74,6 +75,8 @@ paths:
                   type:
                     type: string
                   name:
+                    type: string
+                  data-name:
                     type: string
                   value:
                     type: number
@@ -180,6 +183,8 @@ paths:
                     type:
                       type: string
                     name:
+                      type: string
+                    data-name:
                       type: string
                     value:
                       type: number
