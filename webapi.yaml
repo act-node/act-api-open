@@ -114,7 +114,8 @@ paths:
           description: Bad Request. Incorect request.
         '403':
           description: Forbidden. webhook URL NOT exist or expired
-  # ZETA Techsor Sensor API
+
+  # TEST Sensor Data Get
   /data_check/{groupCode}/{Key}:
     get:
       summary: Test API for Get sensor data in 24hr
