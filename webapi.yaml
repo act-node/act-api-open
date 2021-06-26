@@ -164,34 +164,36 @@ paths:
                       type: string
                 data:
                   type: array
-                  required:
-                    - value
-                  properties:
-                    index:
-                      type: string
-                    type:
-                      type: string
-                    name:
-                      type: string
-                    data-name:
-                      type: string
-                    value:
-                      type: number
-                    unit:
-                      type: string
-                    time:
-                      type: string
-                      format: date-time
-                    location:
-                      type: object
-                      required:
-                        - lat
-                        - lng
-                      properties:
-                        lat:
-                          type: string
-                        lng:
-                          type: string
+                  items:
+                    type: object
+                    required:
+                      - value
+                    properties:
+                      index:
+                        type: string
+                      type:
+                        type: string
+                      name:
+                        type: string
+                      data-name:
+                        type: string
+                      value:
+                        type: number
+                      unit:
+                        type: string
+                      time:
+                        type: string
+                        format: date-time
+                      location:
+                        type: object
+                        required:
+                          - lat
+                          - lng
+                        properties:
+                          lat:
+                            type: string
+                          lng:
+                            type: string
               example:
                 type: env
                 name: "温湿度"
@@ -328,10 +330,6 @@ paths:
           description: Bad Request. Incorect request.
         '403':
           description: Forbidden. webhook URL NOT exist or expired
-
-
-
-
 
   # ZETA Techsor Sensor API ################################################################
   /techsor/{groupCode}/{key}:
