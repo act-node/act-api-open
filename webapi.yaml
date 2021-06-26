@@ -356,9 +356,16 @@ paths:
                     time: 
                       type: string
                       format: date-time
-              example: [
-                "{gid=369eddb5-d09c-48e4-8bc2-84a36e84eb8d, device_id=470ffec6-e10d-59f5-9cd3-95b47f95fc9e, measure_value::double=30.5, measure_name=temperature, time=2021-05-26 12:32:40.244000000}"
-              ]
+              example:
+                [
+                  {
+                    gid: "369eddb5-d09c-48e4-8bc2-84a36e84eb8d",
+                    device_id: "470ffec6-e10d-59f5-9cd3-95b47f95fc9e",
+                    measure_value: 30.5,
+                    measure_name: "temperature",
+                    time: "2021-05-26 12:32:40.244000000"
+                  }
+                ]
         '400':
           description: Bad Request. Incorect request.
         '403':
