@@ -144,7 +144,9 @@ paths:
         content:
           application/json:
             schema:
-              type: object 
+              type: object
+              required:
+                - data
               properties:
                 type:
                   type: string
