@@ -342,18 +342,20 @@ paths:
             application/json:
               schema:
                 type: array
-                properties:   
-                  gid:
-                    type: string
-                  device_id:
-                    type: string
-                  measure_name:
-                    type: string
-                  measure_value:
-                    type: number
-                  time: 
-                    type: string
-                    format: date-time
+                items:
+                  type: object
+                  properties:   
+                    gid:
+                      type: string
+                    device_id:
+                      type: string
+                    measure_name:
+                      type: string
+                    measure_value:
+                      type: number
+                    time: 
+                      type: string
+                      format: date-time
               example: [
                 "{gid=369eddb5-d09c-48e4-8bc2-84a36e84eb8d, device_id=470ffec6-e10d-59f5-9cd3-95b47f95fc9e, measure_value::double=30.5, measure_name=temperature, time=2021-05-26 12:32:40.244000000}"
               ]
