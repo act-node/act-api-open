@@ -2,16 +2,16 @@ openapi: 3.0.0
 info:
   title: ACT.cloud webhook API
   description: ACT cloud sensor data post API.
-  version: 0.1.0
+  version: 0.1.1
 servers:
   - url: https://hooks.act-node.com/sensor/v1
     description: ACT cloud webhook APIs
 paths:
-  # Standard
+  # Standard #####################################################################################
   /common/{groupCode}/{Key}:
     post:
-      summary: Post sensor data. (standard)
-      description: sensor data send to ACT.cloud.
+      summary: Post single sensor data. (Standard)
+      description: Single sensor data send to ACT.cloud.
       parameters:
       - in: path
         name: "groupCode"
@@ -38,6 +38,8 @@ paths:
                   type: string
                 name:
                   type: string
+                data-name:
+                  type: string
                 value:
                   type: number
                 unit:
@@ -47,22 +49,24 @@ paths:
                   format: date-time
                 location:
                   type: object
-                  required:
-                    - lat
-                    - lng
                   properties:
                     lat:
                       type: string
                     lng:
                       type: string
+                    name:
+                      type: string
               example:
-                type: env
+                type: "env"
                 name: "温度"
                 data-name: "temperature"
                 value: 23.4
-                unit: ℃
-                time: 2021-05-10T09:12:34.56789Z
-                location: {lat: 35.391133800000006, lng: 139.55841339999998}
+                unit: "°C"
+                time: "2021-05-10T09:12:34.56789Z"
+                location: {
+                  lat: 35.391133800000006,
+                  lng: 139.55841339999998
+                }
 
       responses:
         '200':
@@ -92,21 +96,23 @@ paths:
                         type: string
                       lng:
                         type: string
+                      name:
+                        type: string
               example: {
-                "statusCode": 200,
-                "headers": {
-                  "Content-Type": "application/json"
+                statusCode: 200,
+                headers: {
+                  Content-Type: "application/json"
                 },
-                "body": {
-                  "type": "env",
-                  "value": 23.4,
-                  "name": "温度",
-                  "data_name": "temperature",
-                  "unit": "℃",
-                  "time": "2021-05-26T11:35:23.045Z",
-                  "location": {
-                    "lng": 139.56031134283484,
-                    "lat": 35.39041839643905
+                body: {
+                  type: "env",
+                  value: 23.4,
+                  name: "温度",
+                  data_name: "temperature",
+                  unit: "°C",
+                  time: "2021-05-26T11:35:23.045Z",
+                  location: {
+                    lng: 139.56031134283484,
+                    lat: 35.39041839643905
                   }
                 }
               }
@@ -115,7 +121,169 @@ paths:
         '403':
           description: Forbidden. webhook URL NOT exist or expired
 
-  # TEST Sensor Data Get
+  # Standard Multi Data ############################################################################
+  /common_multi/{groupCode}/{Key}:
+    post:
+      summary: Post multi sensor data. (Standard)
+      description: Multi sensor data send to ACT.cloud.
+      parameters:
+      - in: path
+        name: "groupCode"
+        required: true
+        schema:
+          type: string
+          description: Group Code
+      - in: path
+        name: Key
+        required: true
+        schema:
+          type: string
+          description: Whebhook Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object 
+              properties:
+                type:
+                  type: string
+                name:
+                  type: string
+                time:
+                  type: string
+                  format: date-time
+                location:
+                  type: object
+                  properties:
+                    lat:
+                      type: string
+                    lng:
+                      type: string
+                    name:
+                      type: string
+                data:
+                  type: array
+                  required:
+                    - value
+                  properties:
+                    index:
+                      type: string
+                    type:
+                      type: string
+                    name:
+                      type: string
+                    data-name:
+                      type: string
+                    value:
+                      type: number
+                    unit:
+                      type: string
+                    time:
+                      type: string
+                      format: date-time
+                    location:
+                      type: object
+                      required:
+                        - lat
+                        - lng
+                      properties:
+                        lat:
+                          type: string
+                        lng:
+                          type: string
+              example:
+                type: env
+                name: "温湿度"
+                time: "2021-05-10T09:12:34.56789Z"
+                location: {
+                  lng: 139.56031134283484,
+                  lat: 35.39041839643905
+                }
+                data: [
+                  {
+                    type: "env",
+                    value: 23.4,
+                    name: "温度",
+                    data_name: "temperature",
+                    unit: "°C",
+                  },
+                  {
+                    type: "env",
+                    value: 50,
+                    name: "湿度",
+                    data_name: "relative_humidity",
+                    unit: "%"
+                  }
+                ]
+
+      responses:
+        '200':
+          description: Successfully post sensor data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  type:
+                    type: string
+                  name:
+                    type: string
+                  data-name:
+                    type: string
+                  value:
+                    type: number
+                  unit:
+                    type: string
+                  time: 
+                    type: string
+                    format: date-time
+                  location:
+                    type: object
+                    properties:
+                      lat:
+                        type: string
+                      lng:
+                        type: string
+                      name:
+                        type: string
+              example: {
+                statusCode: 200,
+                headers: {
+                  Content-Type: "application/json"
+                },
+                body: {
+                  time: "2021-05-26T11:35:23.045Z",
+                  location: {
+                    lng: 139.56031134283484,
+                    lat: 35.39041839643905
+                  },
+                  data: [
+                    {
+                      index: "0",
+                      type: "env",
+                      value: 23.4,
+                      name: "温度",
+                      data_name: "temperature",
+                      unit: "°C",
+                    },
+                    {
+                      index: "1",
+                      type: "env",
+                      value: 50,
+                      name: "湿度",
+                      data_name: "temperature",
+                      unit: "%",
+                    }
+                  ]
+                }
+              }
+        '400':
+          description: Bad Request. Incorect request.
+        '403':
+          description: Forbidden. webhook URL NOT exist or expired
+
+  # TEST Sensor Data Get ########################################################################
   /data_check/{groupCode}/{Key}:
     get:
       summary: Test API for Get sensor data in 24hr
@@ -161,7 +329,11 @@ paths:
         '403':
           description: Forbidden. webhook URL NOT exist or expired
 
-  # ZETA Techsor Sensor API
+
+
+
+
+  # ZETA Techsor Sensor API ################################################################
   /techsor/{groupCode}/{key}:
     post:
       summary: post sensor data. (from ZETA Techser API)
