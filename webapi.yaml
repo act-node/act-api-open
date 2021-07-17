@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: ACT.cloud webhook API
   description: ACT cloud sensor data post API.
-  version: 0.1.1
+  version: 0.1.2
 servers:
   - url: https://hooks.act-node.com/sensor/v1
     description: ACT cloud webhook APIs
@@ -31,8 +31,6 @@ paths:
           application/json:
             schema:
               type: object 
-              required:
-                - value
               properties:
                 type:
                   type: string
@@ -56,8 +54,42 @@ paths:
                       type: string
                     name:
                       type: string
+                data:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - value
+                    properties:
+                      index:
+                        type: string
+                      type:
+                        type: string
+                      name:
+                        type: string
+                      data-name:
+                        type: string
+                      value:
+                        type: number
+                      unit:
+                        type: string
+                      time:
+                        type: string
+                        format: date-time
+                      location:
+                        type: object
+                        required:
+                          - lat
+                          - lng
+                        properties:
+                          lat:
+                            type: string
+                          lng:
+                            type: string
+                          name:
+                            type: string
               example:
-                type: "env"
+              - type: "env"
                 name: "温度"
                 data-name: "temperature"
                 value: 23.4
@@ -67,6 +99,29 @@ paths:
                   lat: 35.391133800000006,
                   lng: 139.55841339999998
                 }
+              - type: env
+                name: "温湿度"
+                time: "2021-05-10T09:12:34.56789Z"
+                location: {
+                  lng: 139.56031134283484,
+                  lat: 35.39041839643905
+                }
+                data: [
+                  {
+                    type: "env",
+                    value: 23.4,
+                    name: "温度",
+                    data_name: "temperature",
+                    unit: "°C",
+                  },
+                  {
+                    type: "env",
+                    value: 50,
+                    name: "湿度",
+                    data_name: "relative_humidity",
+                    unit: "%"
+                  }
+                ]
 
       responses:
         '200':
@@ -98,24 +153,89 @@ paths:
                         type: string
                       name:
                         type: string
-              example: {
-                statusCode: 200,
-                headers: {
-                  Content-Type: "application/json"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        index:
+                          type: string
+                        type:
+                          type: string
+                        name:
+                          type: string
+                        data-name:
+                          type: string
+                        value:
+                          type: number
+                        unit:
+                          type: string
+                        time:
+                          type: string
+                          format: date-time
+                        location:
+                          type: object
+                          required:
+                            - lat
+                            - lng
+                          properties:
+                            lat:
+                              type: string
+                            lng:
+                              type: string
+                            name:
+                              type: string
+              example: [
+                {
+                  statusCode: 200,
+                  headers: {
+                    Content-Type: "application/json"
+                  },
+                  body: {
+                    type: "env",
+                    value: 23.4,
+                    name: "温度",
+                    data_name: "temperature",
+                    unit: "°C",
+                    time: "2021-05-26T11:35:23.045Z",
+                    location: {
+                      lng: 139.56031134283484,
+                      lat: 35.39041839643905
+                    }
+                  }
                 },
-                body: {
-                  type: "env",
-                  value: 23.4,
-                  name: "温度",
-                  data_name: "temperature",
-                  unit: "°C",
-                  time: "2021-05-26T11:35:23.045Z",
-                  location: {
-                    lng: 139.56031134283484,
-                    lat: 35.39041839643905
+                {
+                  statusCode: 200,
+                  headers: {
+                    Content-Type: "application/json"
+                  },
+                  body: {
+                    time: "2021-05-26T11:35:23.045Z",
+                    location: {
+                      lng: 139.56031134283484,
+                      lat: 35.39041839643905
+                    },
+                    data: [
+                      {
+                        index: "0",
+                        type: "env",
+                        value: 23.4,
+                        name: "温度",
+                        data_name: "temperature",
+                        unit: "°C",
+                      },
+                      {
+                        index: "1",
+                        type: "env",
+                        value: 50,
+                        name: "湿度",
+                        data_name: "temperature",
+                        unit: "%",
+                      }
+                    ]
                   }
                 }
-              }
+              ]
         '400':
           description: Bad Request. Incorect request.
         '403':
