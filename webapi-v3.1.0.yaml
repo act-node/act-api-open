@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: ACT.cloud webhook API
   description: ACT cloud sensor data post API.
@@ -185,28 +185,77 @@ paths:
                               type: string
                             name:
                               type: string
-              example: {
-                statusCode: 200,
-                headers: {
-                  Content-Type: "application/json"
-                },
-                body: {
-                  type: "env",
-                  value: 23.4,
-                  name: "温度",
-                  data_name: "temperature",
-                  unit: "°C",
-                  time: "2021-05-26T11:35:23.045Z",
-                  location: {
-                    lng: 139.56031134283484,
-                    lat: 35.39041839643905
-                  }
-                }
-              }
-        '400':
-          description: Bad Request. Incorect request.
-        '403':
-          description: Forbidden. webhook URL NOT exist or expired
+              examples:
+                success:
+                  - statusCode: 200
+                    headers: { Content-Type: "application/json" }
+                    body: {
+                      type: "env",
+                      value: 23.4,
+                      name: "温度",
+                      data_name: "temperature",
+                      unit: "°C",
+                      time: "2021-05-26T11:35:23.045Z",
+                      location: {
+                        lng: 139.56031134283484,
+                        lat: 35.39041839643905
+                      }
+                    }
+                  - statusCode: 200
+                    headers: { Content-Type: "application/json" }
+                    body: {
+                      time: "2021-05-26T11:35:23.045Z",
+                      location: {
+                        lng: 139.56031134283484,
+                        lat: 35.39041839643905
+                      },
+                      data: [
+                        {
+                          index: "0",
+                          type: "env",
+                          value: 23.4,
+                          name: "温度",
+                          data_name: "temperature",
+                          unit: "°C",
+                        },
+                        {
+                          index: "1",
+                          type: "env",
+                          value: 50,
+                          name: "湿度",
+                          data_name: "temperature",
+                          unit: "%",
+                        }
+                      ]
+                    }
+                  - statusCode: 201
+                    explain: Success sensor device registration.
+                    headers: { Content-Type: "application/json" }
+                    body: {
+                      type: "env",
+                      value: 23.4,
+                      name: "温度",
+                      data_name: "temperature",
+                      unit: "°C",
+                      time: "2021-05-26T11:35:23.045Z",
+                      location: {
+                        lng: 139.56031134283484,
+                        lat: 35.39041839643905
+                      }
+                    }
+                error:
+                  - statusCode: 400
+                    description: Bad Request. Incorect request.
+                  - statusCode: 403
+                    description: Forbidden. webhook URL NOT exist or expired.
+                  - statusCode: 406
+                    description: Not Acceptable. Request source IP address changed before.
+                  - statusCode: 412
+                    description: Number of Sensor data exceed connection limit.
+                  - statusCode: 500
+                    description: Internal Server Error.
+                  - statusCode: 503
+                    description: Service Unavailable. The connection is suspended or disabled.
 
   # Standard Multi Data ############################################################################
   /common_multi/{groupCode}/{Key}:
