@@ -235,7 +235,8 @@ paths:
               type: object 
               properties:
                 time:
-                  type: number
+                  type: integer
+                  description: UNIX Time
                 deviceTypeId:
                   type: string
                 device:
@@ -498,7 +499,15 @@ paths:
         '400':
           description: Bad Request. Incorect request.
         '403':
-          description: Forbidden. webhook URL NOT exist or expired
+          description: Forbidden. webhook URL NOT exist or expired.
+        '406':
+          description: Not Acceptable. Request source IP address changed before.
+        '412':
+          description: Number of Sensor data exceed connection limit.
+        '500':
+          description: Internal Server Error.
+        '503':
+          description: Service Unavailable. The connection is suspended or disabled.
 
   # TEST Sensor Data Get ########################################################################
   /data_check/{groupCode}/{Key}:
