@@ -370,8 +370,8 @@ paths:
   # ZETA Techsor Sensor API ################################################################
   /techsor/{groupCode}/{key}:
     post:
-      summary: post sensor data. (from ZETA Techser API)
-      description: post ZETA techser sensor data send to ACT.cloud.
+      summary: post sensor data. (from ZETA Techsor API)
+      description: post ZETA techsor sensor data send to ACT.cloud.
       parameters:
       - in: path
         name: "groupCode"
@@ -512,7 +512,7 @@ paths:
   # TEST Sensor Data Get ########################################################################
   /data_check/{groupCode}/{Key}:
     get:
-      summary: Test API for Get sensor data in 24hr
+      summary: Test API for Get sensor data in 50 days
       description: sensor data get
       parameters:
       - in: path
