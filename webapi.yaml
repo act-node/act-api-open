@@ -201,7 +201,7 @@ paths:
         '403':
           description: Forbidden. webhook URL NOT exist or expired.
         '406':
-          description: Not Acceptable. Request source IP address changed before.
+          description: Not Acceptable. Request source IP address changed from before.
         '412':
           description: Number of Sensor data exceed connection limit.
         '500':
@@ -359,7 +359,7 @@ paths:
         '403':
           description: Forbidden. webhook URL NOT exist or expired.
         '406':
-          description: Not Acceptable. Request source IP address changed before.
+          description: Not Acceptable. Request source IP address changed from before.
         '412':
           description: Number of Sensor data exceed connection limit.
         '500':
@@ -501,7 +501,7 @@ paths:
         '403':
           description: Forbidden. webhook URL NOT exist or expired.
         '406':
-          description: Not Acceptable. Request source IP address changed before.
+          description: Not Acceptable. Request source IP address changed from before.
         '412':
           description: Number of Sensor data exceed connection limit.
         '500':
