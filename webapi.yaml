@@ -89,18 +89,14 @@ paths:
                           name:
                             type: string
               example:
-              - type: "env"
-                name: "温度"
-                data-name: "temperature"
-                value: 23.4
-                unit: "°C"
-                time: "2021-05-10T09:12:34.56789Z"
+              - time: "2021-05-10T09:12:34.56789Z"
                 location: {
                   lat: 35.391133800000006,
                   lng: 139.55841339999998
                 }
                 data: [
                   {
+                    index: "0",
                     type: "env",
                     value: 23.4,
                     name: "温度",
@@ -108,6 +104,7 @@ paths:
                     unit: "°C",
                   },
                   {
+                    index: "1",
                     type: "env",
                     value: 50,
                     name: "湿度",
