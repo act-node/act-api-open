@@ -206,12 +206,18 @@ paths:
         '503':
           description: Service Unavailable. The connection is suspended or disabled.
 
-  # Standard #####################################################################################
-  /sigfox/{groupCode}/{Key}:
+  # Sigfox #####################################################################################
+  /sigfox/{deviceType}/{groupCode}/{Key}:
     post:
       summary: Post Sigfox sensor data.
       description: Sigfox sensor data send to ACT.cloud.
       parameters:
+      - in: path
+        name: "deviceType"
+        required: true
+        schema:
+          type: string
+          description: Device Type
       - in: path
         name: "groupCode"
         required: true
