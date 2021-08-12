@@ -371,7 +371,7 @@ paths:
           description: Service Unavailable. The connection is suspended or disabled.
 
   # ZETA Techsor Sensor API ################################################################
-  /techsor/{groupCode}/{key}:
+  /zeta_techsor/{groupCode}/{key}:
     post:
       summary: Post sensor data. (from ZETA Techsor API)
       description: Post ZETA techsor sensor data send to ACT.cloud.
