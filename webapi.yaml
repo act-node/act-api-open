@@ -2,9 +2,9 @@ openapi: 3.0.0
 info:
   title: ACT.cloud webhook API
   description: ACT cloud sensor data post API.
-  version: 0.1.2
+  version: 0.2.0
 servers:
-  - url: https://hooks.act-node.com/sensor/v1
+  - url: https://hooks.act-app.io/v1
     description: ACT cloud webhook APIs
 paths:
   # Standard #####################################################################################
