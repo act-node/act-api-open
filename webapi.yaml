@@ -401,7 +401,6 @@ paths:
                 payload:
                   type: object
                   required:
-                    - device
                     - data
                   properties:
                     device:
@@ -499,25 +498,57 @@ paths:
                             name:
                               type: string
               example:
-                data: [
-                  {
-                    type: env,
-                    name: ph,
-                    data_name: ph,
-                    value: 9.71,
-                    unit: ,
-                    time: 2021-01-10T09:12:34.56789Z,
-                    location: {lat: 35.391133800000006, lng: 139.55841339999998}
-                  },
-                  {
-                    type: env,
-                    name: water_do,
-                    data_name: water_do,
-                    value: 13.89,
-                    unit: mg/L,
-                    time: 2021-01-10T09:12:34.56789Z,
-                    location: {lat: 35.391133800000006, lng: 139.55841339999998}
-                  }
+                [
+                    {
+                        "type": "env",
+                        "name": "water_oxygen",
+                        "data_name": "water_oxygen",
+                        "value": 15.51,
+                        "unit": "℃",
+                        "time": "2021-12-18T09:13:53.276Z"
+                    },
+                    {
+                        "type": "env",
+                        "name": "water_temp",
+                        "data_name": "water_temp",
+                        "value": 22,
+                        "unit": "℃",
+                        "time": "2021-12-18T09:13:53.276Z"
+                    },
+                    {
+                        "type": "env",
+                        "name": "water_ph",
+                        "data_name": "water_ph",
+                        "value": 11.95,
+                        "unit": "℃",
+                        "time": "2021-12-18T09:13:53.276Z"
+                    },
+                    {
+                        "type": "env",
+                        "name": "air_temp",
+                        "data_name": "air_temp",
+                        "value": 8.6,
+                        "unit": "%",
+                        "time": "2021-12-18T09:13:53.276Z"
+                    },
+                    {
+                        "name": "air_hum",
+                        "data_name": "air_hum",
+                        "value": 95,
+                        "time": "2021-12-18T09:13:53.276Z"
+                    },
+                    {
+                        "name": "illuminance",
+                        "data_name": "illuminance",
+                        "value": 0,
+                        "time": "2021-12-18T09:13:53.276Z"
+                    },
+                    {
+                        "name": "water_conductivity",
+                        "data_name": "water_conductivity",
+                        "value": 0.006,
+                        "time": "2021-12-18T09:13:53.276Z"
+                    }
                 ]
         '400':
           description: Bad Request. Incorect request.
