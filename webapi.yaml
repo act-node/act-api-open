@@ -368,10 +368,6 @@ paths:
               required:
                 - payload
               properties:
-                type:
-                  type: string
-                version:
-                  type: string
                 payload:
                   type: object
                   required:
@@ -394,14 +390,15 @@ paths:
                             # A1, A2, A1-1, 
                           name:
                             type: string
-                            # air_temperature: 気温, air_humidity: 空気湿度,
-                            # soil_temperature: 土壌温度, soil_humidity: 土壌水分, soil_ec: 土壌EC,
-                            # leaf_temperature: 葉面温度, leaf_humidity: 葉面湿度,
-                            # co2_concentrations: 二酸化炭素濃度
-                            # illumination: 照度, par: 光合成有効放射,
-                            # ph: pH値, water_ec: 水EC値, water_do: 水溶存酸素, water_temperature: 水温
+                            # air_temp: 気温, air_hum: 空気湿度,
+                            # illuminance: 照度
+                            # water_oxygen: 水溶存酸素, water_temp: 水温
                           value:
                             type: string
+                type:
+                  type: string
+                version:
+                  type: string
               example:
                 type: "metric"
                 version: "v1"
