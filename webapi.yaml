@@ -31,17 +31,9 @@ paths:
           application/json:
             schema:
               type: object 
+              required:
+                - data
               properties:
-                type:
-                  type: string
-                name:
-                  type: string
-                data-name:
-                  type: string
-                value:
-                  type: number
-                unit:
-                  type: string
                 time:
                   type: string
                   format: date-time
@@ -112,7 +104,6 @@ paths:
                     unit: "%"
                   }
                 ]
-
       responses:
         '200':
           description: Successfully post sensor data
