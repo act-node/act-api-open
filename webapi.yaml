@@ -95,10 +95,9 @@ paths:
                     data_name: "relative_humidity"
                     unit: "%"
                 time: "2021-05-10T09:12:34.56789Z"
-                location: {
-                  lat: 35.391133800000006,
+                location:
+                  lat: 35.391133800000006
                   lng: 139.55841339999998
-                }
       responses:
         '200':
           description: Successfully post sensor data
@@ -161,24 +160,20 @@ paths:
                               type: string
                             name:
                               type: string
-              example: {
-                statusCode: 200,
-                headers: {
+              example:
+                statusCode: 200
+                headers:
                   Content-Type: "application/json"
-                },
-                body: {
-                  type: "env",
-                  value: 23.4,
-                  name: "温度",
-                  data_name: "temperature",
-                  unit: "°C",
-                  time: "2021-05-26T11:35:23.045Z",
-                  location: {
-                    lng: 139.56031134283484,
+                body:
+                  type: "env"
+                  value: 23.4
+                  name: "温度"
+                  data_name: "temperature"
+                  unit: "°C"
+                  time: "2021-05-26T11:35:23.045Z"
+                  location:
+                    lng: 139.56031134283484
                     lat: 35.39041839643905
-                  }
-                }
-              }
         '400':
           description: Bad Request. Incorect request.
         '403':
@@ -308,38 +303,29 @@ paths:
                               type: string
                             name:
                               type: string
-              example: {
-                statusCode: 200,
-                headers: {
+              example:
+                statusCode: 200
+                headers:
                   Content-Type: "application/json"
-                },
-                body: {
-                  type: "env",
-                  time: "2021-05-26T11:35:23.045Z",
-                  location: {
-                    lng: 139.56031134283484,
+                body:
+                  type: "env"
+                  time: "2021-05-26T11:35:23.045Z"
+                  location:
+                    lng: 139.56031134283484
                     lat: 35.39041839643905
-                  },
-                  data: [
-                    {
-                      index: "0",
-                      type: "env",
-                      value: 23.4,
-                      name: "温度",
-                      data_name: "temperature",
-                      unit: "°C",
-                    },
-                    {
-                      index: "1",
-                      type: "env",
-                      value: 50,
-                      name: "湿度",
-                      data_name: "temperature",
-                      unit: "%",
-                    }
-                  ]
-                }
-              }
+                  data:
+                    - index: "0"
+                      type: "env"
+                      value: 23.4
+                      name: "温度"
+                      data_name: "temperature"
+                      unit: "°C"
+                    - index: "1"
+                      type: "env"
+                      value: 50
+                      name: "湿度"
+                      data_name: "temperature"
+                      unit: "%"
         '400':
           description: Bad Request. Incorect request.
         '403':
