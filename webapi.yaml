@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: ACT.cloud webhook API
+  title: アクト・アップ オープンセンサー接続APIリファレンス
   description: ACT cloud sensor data post API.
   version: 1.0.0
 servers:
