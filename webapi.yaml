@@ -392,54 +392,77 @@ paths:
             schema:
               type: object 
               required:
-                - type
-                - info
-                - data
+                - payload
               properties:
                 type:
                   type: string
-                info:
+                version:
+                  type: string
+                payload:
                   type: object
                   required:
                     - device
-                    - time
+                    - data
                   properties:
                     device:
                       type: string
-                    time:
+                    timestamp:
                       type: integer
                       description: UNIX Time
-                data:
-                  type: array
-                  items:
-                    type: object
-                    required:
-                      - masterPort
-                      - name
-                      - value
-                    properties:
-                      masterPote:
-                        type: string
-                      expandPort:
-                        type: string
-                        # A1, A2
-                        # 接続口A1開拓口1, 接続口A1開拓口2, 接続口A1開拓口3, 接続口A1開拓口4, 接続口A1開拓口5
-                        # 接続口A2開拓口1, 接続口A2開拓口2, 接続口A2開拓口3, 接続口A2開拓口4, 接続口A2開拓口5
-                      name:
-                        type: string
-                        # air_temperature: 気温, air_humidity: 空気湿度,
-                        # soil_temperature: 土壌温度, soil_humidity: 土壌水分, soil_ec: 土壌EC,
-                        # leaf_temperature: 葉面温度, leaf_humidity: 葉面湿度,
-                        # co2_concentrations: 二酸化炭素濃度
-                        # illumination: 照度, par: 光合成有効放射,
-                        # ph: pH値, water_ec: 水EC値, water_do: 水溶存酸素, water_temperature: 水温
-                      value:
-                        type: string
-                        # ℃, %, ℃, %, dS/m, ℃, %, ppm, Lux, μmol/m2·s, ,mS/cm, mg/L, ℃
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        required:
+                          - value
+                        properties:
+                          port:
+                            type: string
+                            # A1, A2, A1-1, 
+                          name:
+                            type: string
+                            # air_temperature: 気温, air_humidity: 空気湿度,
+                            # soil_temperature: 土壌温度, soil_humidity: 土壌水分, soil_ec: 土壌EC,
+                            # leaf_temperature: 葉面温度, leaf_humidity: 葉面湿度,
+                            # co2_concentrations: 二酸化炭素濃度
+                            # illumination: 照度, par: 光合成有効放射,
+                            # ph: pH値, water_ec: 水EC値, water_do: 水溶存酸素, water_temperature: 水温
+                          value:
+                            type: string
               example:
-                type: sensor_data
-                info: { device: 11130231756A0021, time: 1550647733}
-                data: [ { masterPort: 1, expandPort: 5, name: ph, value: 9.71}, { masterPort: 1, expandPort: 4, name: water_do, value: 13.89}]
+                type: "metric"
+                version: "v1"
+                payload: 
+                  device: "111513318ABA0006"
+                  timestamp: 1639817016
+                  data:
+                    - port: ""
+                      name: "battery"
+                      value: 98
+                    - port: ""
+                      name: "battery_status"
+                      value: 2
+                    - port: "A1-1"
+                      name: "water_oxygen"
+                      value: 15.6
+                    - port: "A1-1"
+                      name: "water_temp"
+                      value: 20.90
+                    - port: "A1-3"
+                      name: "water_ph"
+                      value: 7.22
+                    - port: "A1-4"
+                      name: "air_temp"
+                      value: 7.6
+                    - port: "A1-4"
+                      name: "air_hum"
+                      value: 95
+                    - port: "A1-4"
+                      name: "illuminance"
+                      value: 1
+                    - port: "A1-5"
+                      name: "water_conductivity"
+                      value: 0.007
       responses:
         '200':
           description: Successfully post sensor data
