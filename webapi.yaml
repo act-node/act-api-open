@@ -244,8 +244,6 @@ paths:
                   type: string
                 device:
                   type: string
-                snr:
-                  type: string
                 rssi:
                   type: string
                 station:
@@ -258,7 +256,6 @@ paths:
               - time: 1626534351,
                 deviceTypeId: "60bf61444175811d757ab461"
                 device: "EFB9A3"
-                snr: "11.00"
                 rssi: "-133.00"
                 station: "ADAC"
                 data: "7d44533d7e003d00"
