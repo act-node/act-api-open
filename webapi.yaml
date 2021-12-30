@@ -141,24 +141,20 @@ paths:
                             name:
                               type: string
               example:
-                statusCode: 200
-                headers:
-                  Content-Type: "application/json"
-                body:
-                  registration: "Success"
-                  data:
-                  - type: "env"
-                    name: "温度"
-                    data_name: "temperature"
-                    value: 30.4
-                    unit: "℃"
-                    time: "2021-12-27T09:12:34.567Z"
-                  - type: "env"
-                    name: "湿度"
-                    data_name: "unknown"
-                    value: 80
-                    unit: "%"
-                    time: "2021-12-28T09:12:34.567Z"
+                registration: "Success"
+                data:
+                - type: "env"
+                  name: "温度"
+                  data_name: "temperature"
+                  value: 30.4
+                  unit: "℃"
+                  time: "2021-12-27T09:12:34.567Z"
+                - type: "env"
+                  name: "湿度"
+                  data_name: "unknown"
+                  value: 80
+                  unit: "%"
+                  time: "2021-12-28T09:12:34.567Z"
 
         '400':
           description: Bad Request. Incorect request.
