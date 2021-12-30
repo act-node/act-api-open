@@ -218,7 +218,7 @@ paths:
                 seqNumber:
                   type: string
               example:
-              - time: 1640788260
+                time: 1640788260
                 deviceTypeId: "60bf61444175811d757ab461"
                 device: "EFB9A3"
                 rssi: "-133.00"
