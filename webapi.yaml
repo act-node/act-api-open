@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: アクト・アップ オープンセンサー接続APIリファレンス
   description: ACT cloud sensor data post API.
-  version: 1.0.0
+  version: 1.0.1
 servers:
   - url: https://hooks.act-app.io/v1
     description: ACT cloud webhook APIs
@@ -106,28 +106,8 @@ paths:
               schema:
                 type: object
                 properties:   
-                  type:
+                  registration:
                     type: string
-                  name:
-                    type: string
-                  data-name:
-                    type: string
-                  value:
-                    type: number
-                  unit:
-                    type: string
-                  time: 
-                    type: string
-                    format: date-time
-                  location:
-                    type: object
-                    properties:
-                      lat:
-                        type: string
-                      lng:
-                        type: string
-                      name:
-                        type: string
                   data:
                     type: array
                     items:
@@ -165,15 +145,21 @@ paths:
                 headers:
                   Content-Type: "application/json"
                 body:
-                  type: "env"
-                  value: 23.4
-                  name: "温度"
-                  data_name: "temperature"
-                  unit: "°C"
-                  time: "2021-05-26T11:35:23.045Z"
-                  location:
-                    lng: 139.56031134283484
-                    lat: 35.39041839643905
+                  registration: "Success"
+                  data:
+                  - type: "env"
+                    name: "温度"
+                    data_name: "temperature"
+                    value: 30.4
+                    unit: "℃"
+                    time: "2021-12-27T09:12:34.567Z"
+                  - type: "env"
+                    name: "湿度"
+                    data_name: "unknown"
+                    value: 80
+                    unit: "%"
+                    time: "2021-12-28T09:12:34.567Z"
+
         '400':
           description: Bad Request. Incorect request.
         '403':
@@ -236,7 +222,7 @@ paths:
                 seqNumber:
                   type: string
               example:
-              - time: 1626534351,
+              - time: 1640788260
                 deviceTypeId: "60bf61444175811d757ab461"
                 device: "EFB9A3"
                 rssi: "-133.00"
@@ -251,37 +237,13 @@ paths:
               schema:
                 type: object
                 properties:   
-                  type:
+                  registration:
                     type: string
-                  name:
-                    type: string
-                  data-name:
-                    type: string
-                  value:
-                    type: number
-                  unit:
-                    type: string
-                  time: 
-                    type: string
-                    format: date-time
-                  location:
-                    type: object
-                    properties:
-                      lat:
-                        type: string
-                      lng:
-                        type: string
-                      name:
-                        type: string
                   data:
                     type: array
                     items:
                       type: object
                       properties:
-                        index:
-                          type: string
-                        type:
-                          type: string
                         name:
                           type: string
                         data-name:
@@ -293,6 +255,10 @@ paths:
                         time:
                           type: string
                           format: date-time
+                        index:
+                          type: string
+                        type:
+                          type: string
                         location:
                           type: object
                           required:
@@ -310,24 +276,28 @@ paths:
                 headers:
                   Content-Type: "application/json"
                 body:
-                  type: "env"
-                  time: "2021-05-26T11:35:23.045Z"
-                  location:
-                    lng: 139.56031134283484
-                    lat: 35.39041839643905
+                  registration: "Success"
                   data:
-                    - index: "0"
-                      type: "env"
-                      value: 23.4
-                      name: "温度"
-                      data_name: "temperature"
-                      unit: "°C"
-                    - index: "1"
-                      type: "env"
-                      value: 50
-                      name: "湿度"
-                      data_name: "temperature"
-                      unit: "%"
+                  - name: "温度"
+                    data_name: "temperature"
+                    value: 25.68
+                    unit: "°C"
+                    time: "2021-12-29T14:31:00.000Z"
+                  - name: "湿度(相対)"
+                    data_name: "relative_humidity"
+                    value: 83
+                    unit: "%"
+                    time: "2021-12-29T14:31:00.000Z"
+                  - name: "電池量"
+                    data_name: "battery_level"
+                    value: 61
+                    unit: "%"
+                    time: "2021-12-29T14:31:00.000Z"
+                  - name: "電池温度"
+                    data_name: "battery_temperature"
+                    value: 26,
+                    unit: "°C"
+                    time: "2021-12-29T14:31:00.000Z"
         '400':
           description: Bad Request. Incorect request.
         '403':
