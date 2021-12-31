@@ -157,17 +157,109 @@ paths:
                   time: "2021-12-28T09:12:34.567Z"
 
         '400':
-          description: Bad Request. Incorect request.
+          description: リクエストのパラメーターが正しくない。正しく修正して下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: "string"
+                    example: "Bad Request. Incorect request."
         '403':
-          description: Forbidden. webhook URL NOT exist or expired.
+          description: WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: "string"
+                    example: "Forbidden. webhook URL NOT exist or expired."
         '406':
-          description: Not Acceptable. Request source IP address changed from before.
+          description: 初期の接続時とIPアドレスが変わっているため受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 406
+                  message:
+                    type: "string"
+                    example: "Not Acceptable. Request source IP address changed from before."
         '412':
-          description: Number of Sensor data exceed connection limit.
+          description: センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 412
+                  message:
+                    type: "string"
+                    example: "Number of Sensor data exceed connection limit."
+        '432':
+          description: timeパラメーターが未来の日時になっています。未来日時は受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 432
+                  message:
+                    type: "string"
+                    example: "Future date time is not acceptable."
+        '433':
+          description: timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 433
+                  message:
+                    type: "string"
+                    example: "Too old date time is not acceptable.(less than 100days)"
         '500':
-          description: Internal Server Error.
+          description: 処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 500
+                  message:
+                    type: "string"
+                    example: "Internal Server Error."
         '503':
-          description: Service Unavailable. The connection is suspended or disabled.
+          description: センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 503
+                  message:
+                    type: "string"
+                    example: "Service Unavailable. The connection is suspended or disabled."
 
   # Sigfox #####################################################################################
   /sigfox/{deviceType}/{groupCode}/{Key}:
@@ -291,17 +383,109 @@ paths:
                   unit: "°C"
                   time: "2021-12-29T14:31:00.000Z"
         '400':
-          description: Bad Request. Incorect request.
+          description: リクエストのパラメーターが正しくない。正しく修正して下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: "string"
+                    example: "Bad Request. Incorect request."
         '403':
-          description: Forbidden. webhook URL NOT exist or expired.
+          description: WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: "string"
+                    example: "Forbidden. webhook URL NOT exist or expired."
         '406':
-          description: Not Acceptable. Request source IP address changed from before.
+          description: 初期の接続時とIPアドレスが変わっているため受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 406
+                  message:
+                    type: "string"
+                    example: "Not Acceptable. Request source IP address changed from before."
         '412':
-          description: Number of Sensor data exceed connection limit.
+          description: センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 412
+                  message:
+                    type: "string"
+                    example: "Number of Sensor data exceed connection limit."
+        '432':
+          description: timeパラメーターが未来の日時になっています。未来日時は受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 432
+                  message:
+                    type: "string"
+                    example: "Future date time is not acceptable."
+        '433':
+          description: timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 433
+                  message:
+                    type: "string"
+                    example: "Too old date time is not acceptable.(less than 100days)"
         '500':
-          description: Internal Server Error.
+          description: 処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 500
+                  message:
+                    type: "string"
+                    example: "Internal Server Error."
         '503':
-          description: Service Unavailable. The connection is suspended or disabled.
+          description: センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 503
+                  message:
+                    type: "string"
+                    example: "Service Unavailable. The connection is suspended or disabled."
 
   # ZETA Techsor Sensor API ################################################################
   /zeta_techsor/{groupCode}/{key}:
@@ -473,17 +657,109 @@ paths:
                   time: "2021-12-18T09:13:53.276Z"
 
         '400':
-          description: Bad Request. Incorect request.
+          description: リクエストのパラメーターが正しくない。正しく修正して下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: "string"
+                    example: "Bad Request. Incorect request."
         '403':
-          description: Forbidden. webhook URL NOT exist or expired.
+          description: WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: "string"
+                    example: "Forbidden. webhook URL NOT exist or expired."
         '406':
-          description: Not Acceptable. Request source IP address changed from before.
+          description: 初期の接続時とIPアドレスが変わっているため受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 406
+                  message:
+                    type: "string"
+                    example: "Not Acceptable. Request source IP address changed from before."
         '412':
-          description: Number of Sensor data exceed connection limit.
+          description: センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 412
+                  message:
+                    type: "string"
+                    example: "Number of Sensor data exceed connection limit."
+        '432':
+          description: timeパラメーターが未来の日時になっています。未来日時は受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 432
+                  message:
+                    type: "string"
+                    example: "Future date time is not acceptable."
+        '433':
+          description: timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 433
+                  message:
+                    type: "string"
+                    example: "Too old date time is not acceptable.(less than 100days)"
         '500':
-          description: Internal Server Error.
+          description: 処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 500
+                  message:
+                    type: "string"
+                    example: "Internal Server Error."
         '503':
-          description: Service Unavailable. The connection is suspended or disabled.
+          description: センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 503
+                  message:
+                    type: "string"
+                    example: "Service Unavailable. The connection is suspended or disabled."
 
   # TEST Sensor Data Get ########################################################################
   # /data_check/{groupCode}/{Key}:
