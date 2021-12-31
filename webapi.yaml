@@ -657,7 +657,7 @@ paths:
                   time: "2021-12-18T09:13:53.276Z"
 
         '400':
-          description: リクエストのパラメーターが正しくない。正しく修正して下さい。
+          description: Bad Request. Incorect request.
           content:
             application/json:
               schema:
@@ -669,6 +669,9 @@ paths:
                   message:
                     type: "string"
                     example: "Bad Request. Incorect request."
+                  explain:
+                    type: "string"
+                    example: "リクエストのパラメーターが正しくない。正しく修正して下さい。"
         '403':
           description: WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。
           content:
