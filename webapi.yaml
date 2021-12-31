@@ -155,9 +155,8 @@ paths:
                   value: 80
                   unit: "%"
                   time: "2021-12-28T09:12:34.567Z"
-
         '400':
-          description: リクエストのパラメーターが正しくない。正しく修正して下さい。
+          description: Bad Request. Incorect request.
           content:
             application/json:
               schema:
@@ -169,8 +168,11 @@ paths:
                   message:
                     type: "string"
                     example: "Bad Request. Incorect request."
+                  explain:
+                    type: "string"
+                    example: "リクエストのパラメーターが正しくない。正しく修正して下さい。"
         '403':
-          description: WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。
+          description: Forbidden. webhook URL NOT exist or expired.
           content:
             application/json:
               schema:
@@ -182,8 +184,11 @@ paths:
                   message:
                     type: "string"
                     example: "Forbidden. webhook URL NOT exist or expired."
+                  explain:
+                    type: "string"
+                    example: "WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。"
         '406':
-          description: 初期の接続時とIPアドレスが変わっているため受け付けられません。
+          description: Not Acceptable. Request source IP address changed from before.
           content:
             application/json:
               schema:
@@ -195,8 +200,11 @@ paths:
                   message:
                     type: "string"
                     example: "Not Acceptable. Request source IP address changed from before."
+                  explain:
+                    type: "string"
+                    example: "初期の接続時とIPアドレスが変わっているため受け付けられません。"
         '412':
-          description: センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。
+          description: Number of Sensor data exceed connection limit.
           content:
             application/json:
               schema:
@@ -208,8 +216,11 @@ paths:
                   message:
                     type: "string"
                     example: "Number of Sensor data exceed connection limit."
+                  explain:
+                    type: "string"
+                    example: "センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。"
         '432':
-          description: timeパラメーターが未来の日時になっています。未来日時は受け付けられません。
+          description: Future date time is not acceptable.
           content:
             application/json:
               schema:
@@ -221,8 +232,11 @@ paths:
                   message:
                     type: "string"
                     example: "Future date time is not acceptable."
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが未来の日時になっています。未来日時は受け付けられません。"
         '433':
-          description: timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。
+          description: Too old date time is not acceptable.(less than 100days)
           content:
             application/json:
               schema:
@@ -234,8 +248,11 @@ paths:
                   message:
                     type: "string"
                     example: "Too old date time is not acceptable.(less than 100days)"
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。"
         '500':
-          description: 処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。
+          description: Internal Server Error.
           content:
             application/json:
               schema:
@@ -247,8 +264,11 @@ paths:
                   message:
                     type: "string"
                     example: "Internal Server Error."
+                  explain:
+                    type: "string"
+                    example: "処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。"
         '503':
-          description: センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。
+          description: Service Unavailable. The connection is suspended or disabled.
           content:
             application/json:
               schema:
@@ -260,7 +280,9 @@ paths:
                   message:
                     type: "string"
                     example: "Service Unavailable. The connection is suspended or disabled."
-
+                  explain:
+                    type: "string"
+                    example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
   # Sigfox #####################################################################################
   /sigfox/{deviceType}/{groupCode}/{Key}:
     post:
@@ -383,7 +405,7 @@ paths:
                   unit: "°C"
                   time: "2021-12-29T14:31:00.000Z"
         '400':
-          description: リクエストのパラメーターが正しくない。正しく修正して下さい。
+          description: Bad Request. Incorect request.
           content:
             application/json:
               schema:
@@ -395,8 +417,11 @@ paths:
                   message:
                     type: "string"
                     example: "Bad Request. Incorect request."
+                  explain:
+                    type: "string"
+                    example: "リクエストのパラメーターが正しくない。正しく修正して下さい。"
         '403':
-          description: WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。
+          description: Forbidden. webhook URL NOT exist or expired.
           content:
             application/json:
               schema:
@@ -408,8 +433,11 @@ paths:
                   message:
                     type: "string"
                     example: "Forbidden. webhook URL NOT exist or expired."
+                  explain:
+                    type: "string"
+                    example: "WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。"
         '406':
-          description: 初期の接続時とIPアドレスが変わっているため受け付けられません。
+          description: Not Acceptable. Request source IP address changed from before.
           content:
             application/json:
               schema:
@@ -421,8 +449,11 @@ paths:
                   message:
                     type: "string"
                     example: "Not Acceptable. Request source IP address changed from before."
+                  explain:
+                    type: "string"
+                    example: "初期の接続時とIPアドレスが変わっているため受け付けられません。"
         '412':
-          description: センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。
+          description: Number of Sensor data exceed connection limit.
           content:
             application/json:
               schema:
@@ -434,8 +465,11 @@ paths:
                   message:
                     type: "string"
                     example: "Number of Sensor data exceed connection limit."
+                  explain:
+                    type: "string"
+                    example: "センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。"
         '432':
-          description: timeパラメーターが未来の日時になっています。未来日時は受け付けられません。
+          description: Future date time is not acceptable.
           content:
             application/json:
               schema:
@@ -447,8 +481,11 @@ paths:
                   message:
                     type: "string"
                     example: "Future date time is not acceptable."
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが未来の日時になっています。未来日時は受け付けられません。"
         '433':
-          description: timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。
+          description: Too old date time is not acceptable.(less than 100days)
           content:
             application/json:
               schema:
@@ -460,8 +497,11 @@ paths:
                   message:
                     type: "string"
                     example: "Too old date time is not acceptable.(less than 100days)"
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。"
         '500':
-          description: 処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。
+          description: Internal Server Error.
           content:
             application/json:
               schema:
@@ -473,8 +513,11 @@ paths:
                   message:
                     type: "string"
                     example: "Internal Server Error."
+                  explain:
+                    type: "string"
+                    example: "処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。"
         '503':
-          description: センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。
+          description: Service Unavailable. The connection is suspended or disabled.
           content:
             application/json:
               schema:
@@ -486,6 +529,9 @@ paths:
                   message:
                     type: "string"
                     example: "Service Unavailable. The connection is suspended or disabled."
+                  explain:
+                    type: "string"
+                    example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
 
   # ZETA Techsor Sensor API ################################################################
   /zeta_techsor/{groupCode}/{key}:
@@ -673,7 +719,7 @@ paths:
                     type: "string"
                     example: "リクエストのパラメーターが正しくない。正しく修正して下さい。"
         '403':
-          description: WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。
+          description: Forbidden. webhook URL NOT exist or expired.
           content:
             application/json:
               schema:
@@ -685,8 +731,11 @@ paths:
                   message:
                     type: "string"
                     example: "Forbidden. webhook URL NOT exist or expired."
+                  explain:
+                    type: "string"
+                    example: "WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。"
         '406':
-          description: 初期の接続時とIPアドレスが変わっているため受け付けられません。
+          description: Not Acceptable. Request source IP address changed from before.
           content:
             application/json:
               schema:
@@ -698,8 +747,11 @@ paths:
                   message:
                     type: "string"
                     example: "Not Acceptable. Request source IP address changed from before."
+                  explain:
+                    type: "string"
+                    example: "初期の接続時とIPアドレスが変わっているため受け付けられません。"
         '412':
-          description: センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。
+          description: Number of Sensor data exceed connection limit.
           content:
             application/json:
               schema:
@@ -711,8 +763,11 @@ paths:
                   message:
                     type: "string"
                     example: "Number of Sensor data exceed connection limit."
+                  explain:
+                    type: "string"
+                    example: "センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。"
         '432':
-          description: timeパラメーターが未来の日時になっています。未来日時は受け付けられません。
+          description: Future date time is not acceptable.
           content:
             application/json:
               schema:
@@ -724,8 +779,11 @@ paths:
                   message:
                     type: "string"
                     example: "Future date time is not acceptable."
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが未来の日時になっています。未来日時は受け付けられません。"
         '433':
-          description: timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。
+          description: Too old date time is not acceptable.(less than 100days)
           content:
             application/json:
               schema:
@@ -737,8 +795,11 @@ paths:
                   message:
                     type: "string"
                     example: "Too old date time is not acceptable.(less than 100days)"
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。"
         '500':
-          description: 処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。
+          description: Internal Server Error.
           content:
             application/json:
               schema:
@@ -750,8 +811,11 @@ paths:
                   message:
                     type: "string"
                     example: "Internal Server Error."
+                  explain:
+                    type: "string"
+                    example: "処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。"
         '503':
-          description: センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。
+          description: Service Unavailable. The connection is suspended or disabled.
           content:
             application/json:
               schema:
@@ -763,6 +827,9 @@ paths:
                   message:
                     type: "string"
                     example: "Service Unavailable. The connection is suspended or disabled."
+                  explain:
+                    type: "string"
+                    example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
 
   # TEST Sensor Data Get ########################################################################
   # /data_check/{groupCode}/{Key}:
