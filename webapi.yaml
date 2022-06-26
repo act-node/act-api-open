@@ -82,8 +82,10 @@ paths:
                       type: string
                 external_id:
                   type: string
+                  description: requied the infor when not fixed IP address connection.
                 external_key:
                   type: string
+                  description: requied the infor when not fixed IP address connection.
               example:
                 data:
                   - index: "0"
