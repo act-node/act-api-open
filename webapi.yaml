@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: アクト・アップ オープンセンサー接続APIリファレンス
   description: ACT cloud sensor data post API.
-  version: 1.0.1
+  version: 1.0.2
 servers:
   - url: https://hooks.act-app.io/v1
     description: ACT cloud webhook APIs
@@ -80,6 +80,10 @@ paths:
                       type: string
                     name:
                       type: string
+                external_id:
+                  type: string
+                external_key:
+                  type: string
               example:
                 data:
                   - index: "0"
