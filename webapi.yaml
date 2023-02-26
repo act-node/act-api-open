@@ -73,6 +73,7 @@ paths:
                   format: date-time
                 device_id:
                   type: string
+                  description: unique id of device node.
                 location:
                   type: object
                   properties:
