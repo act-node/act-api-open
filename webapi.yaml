@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: アクト・アップ オープンセンサー接続APIリファレンス
   description: ACT cloud sensor data post API.
-  version: 1.0.2
+  version: 1.0.3
 servers:
   - url: https://hooks.act-app.io/v1
     description: ACT cloud webhook APIs
@@ -71,6 +71,8 @@ paths:
                 time:
                   type: string
                   format: date-time
+                device_id:
+                  type: string
                 location:
                   type: object
                   properties:
@@ -101,6 +103,7 @@ paths:
                     data_name: "relative_humidity"
                     unit: "%"
                 time: "2021-05-10T09:12:34.56789Z"
+                device_id: "ABC0123"
                 location:
                   lat: 35.391133800000006
                   lng: 139.55841339999998
