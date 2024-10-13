@@ -870,7 +870,7 @@ paths:
               properties:
                 image:
                   type: string
-                  description: unique id of device node.
+                  description: ubase64 encoded data.
                 file_type:
                   type: string
                   description: image file type (jpg, png, ...)
@@ -892,7 +892,7 @@ paths:
                   type: string
                   description: requied the infor when not fixed IP address connection.
               example:
-                image: "/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
+                image: "base64,/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
                 file_type: "jpg"
                 time: "2021-05-10T09:12:34.56789Z"
                 location:
