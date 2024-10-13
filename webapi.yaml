@@ -841,6 +841,194 @@ paths:
                     type: "string"
                     example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
 
+  # Web Cammera Image API #####################################################################
+  /cam_image/{groupCode}/{key}:
+    post:
+      summary: Post web cam image data.
+      description: Post web cam image data send to ACT.cloud.
+      parameters:
+      - in: path
+        name: "groupCode"
+        required: true
+        schema:
+          type: string
+          description: Group Code
+      - in: path
+        name: Key
+        required: true
+        schema:
+          type: string
+          description: Whebhook Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object 
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  description: unique id of device node.
+                file_type:
+                  type: string
+                  description: image file type (jpg, png, ...)
+                time:
+                  type: string
+                  format: date-time
+                  description: UTC time ex. 2021-05-10T09:12:34.56789Z
+                location:
+                  type: object
+                  properties:
+                    lat:
+                      type: string
+                    lng:
+                      type: string
+                external_id:
+                  type: string
+                  description: requied the infor when not fixed IP address connection.
+                external_key:
+                  type: string
+                  description: requied the infor when not fixed IP address connection.
+              example:
+                image: "/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
+                file_type: "jpg"
+                time: "2021-05-10T09:12:34.56789Z"
+                location:
+                  lat: 35.391133800000006
+                  lng: 139.55841339999998
+      responses:
+        '200':
+          description: Successfully post image data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  registration:
+                    type: string
+                  name:
+                    type: string
+                  time:
+                    type: string
+                    format: date-time
+              example:
+                registration: "Success"
+                name: "2021-12-28T09:12:34.jpg"
+                time: "2021-12-28T09:12:34.567Z"
+        '400':
+          description: Bad Request. Incorect request.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: "string"
+                    example: "Bad Request. Incorect request."
+                  explain:
+                    type: "string"
+                    example: "リクエストのパラメーターが正しくない。正しく修正して下さい。"
+        '403':
+          description: Forbidden. webhook URL NOT exist or expired.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: "string"
+                    example: "Forbidden. webhook URL NOT exist or expired."
+                  explain:
+                    type: "string"
+                    example: "WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。"
+        '406':
+          description: Not Acceptable. Request source IP address changed from before.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 406
+                  message:
+                    type: "string"
+                    example: "Not Acceptable. Request source IP address changed from before."
+                  explain:
+                    type: "string"
+        '432':
+          description: Future date time is not acceptable.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 432
+                  message:
+                    type: "string"
+                    example: "Future date time is not acceptable."
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが未来の日時になっています。未来日時は受け付けられません。"
+        '433':
+          description: Too old date time is not acceptable.(less than 100days)
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 433
+                  message:
+                    type: "string"
+                    example: "Too old date time is not acceptable.(less than 100days)"
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。"
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 500
+                  message:
+                    type: "string"
+                    example: "Internal Server Error."
+                  explain:
+                    type: "string"
+                    example: "処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。"
+        '503':
+          description: Service Unavailable. The connection is suspended or disabled.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 503
+                  message:
+                    type: "string"
+                    example: "Service Unavailable. The connection is suspended or disabled."
+                  explain:
+                    type: "string"
+                    example: "接続が保留または無効化されています。設定が変更されるまで接続できません。"
+
   # TEST Sensor Data Get ########################################################################
   # /data_check/{groupCode}/{Key}:
   #   get:
