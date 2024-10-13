@@ -842,7 +842,7 @@ paths:
                     example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
 
   # Web Cammera Image API #####################################################################
-  /cam_image/{groupCode}/{key}:
+  /webcam_image/{groupCode}/{key}:
     post:
       summary: Post web cam image data.
       description: Post web cam image data send to ACT.cloud.
