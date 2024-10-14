@@ -929,8 +929,8 @@ paths:
                     format: date-time
               example:
                 registration: "Success"
-                name: "2021-12-28T09:12:34.jpg"
-                time: "2021-12-28T09:12:34.567Z"
+                name: "2024-06-05T13:33:08.jpg"
+                time: "2024-06-05T13:33:08.010+09:00"
         '400':
           description: Bad Request. Incorect request.
           content:
