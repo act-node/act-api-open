@@ -898,11 +898,11 @@ paths:
                   type: string
                   description: required info when not using fixed IP address connection.
             examples:
-              example1:
+              example 1:
                 value:
                   image: "/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
                   time: "2021-05-10T09:12:34.567Z"
-              example2:
+              example 2:
                 value:
                   image: "/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
                   file_type: "jpg"
