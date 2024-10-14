@@ -847,18 +847,18 @@ paths:
       summary: Post web cam image data.
       description: Post web cam image data send to ACT.cloud.
       parameters:
-      - in: path
-        name: "groupCode"
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: groupCode
+          required: true
+          schema:
+            type: string
           description: Group Code
-      - in: path
-        name: Key
-        required: true
-        schema:
-          type: string
-          description: Whebhook Key
+        - in: path
+          name: key
+          required: true
+          schema:
+            type: string
+          description: Webhook Key
       requestBody:
         required: true
         content:
@@ -877,30 +877,40 @@ paths:
                 time:
                   type: string
                   format: date-time
-                  description: UTC time ex. 2021-05-10T09:12:34.56789Z
+                  description: UTC time ex. 2024-06-05T04:33:08.010Z | 2024-06-05T13:33:08.010+09:00
+                timezone:
+                  type: string
+                  description: set timezone. ex. +9 | -9.5 | Asia/Tokyo
                 location:
                   type: object
                   properties:
                     lat:
-                      type: string
+                      type: number
                     lng:
-                      type: string
+                      type: number
                 cam_model:
                   type: string
-                  description: set cammera device model to be referred by auto setting.
+                  description: set camera device model to be referred by auto setting.
                 external_id:
                   type: string
-                  description: requied the infor when not fixed IP address connection.
+                  description: required info when not using fixed IP address connection.
                 external_key:
                   type: string
-                  description: requied the infor when not fixed IP address connection.
-              example:
-                image: "/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
-                file_type: "jpg"
-                time: "2021-05-10T09:12:34.56789Z"
-                location:
-                  lat: 35.391133800000006
-                  lng: 139.55841339999998
+                  description: required info when not using fixed IP address connection.
+            examples:
+              example1:
+                value:
+                  image: "/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
+                  time: "2021-05-10T09:12:34.567Z"
+              example2:
+                value:
+                  image: "/9j//gAQTGF2YzU4LjU0LjEwMAD/2..."
+                  file_type: "jpg"
+                  time: "2021-05-10T09:12:34.567Z"
+                  timezone: "+9"
+                  location:
+                    lat: 35.391133800000006
+                    lng: 139.55841339999998
       responses:
         '200':
           description: Successfully post image data
