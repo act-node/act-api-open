@@ -885,6 +885,9 @@ paths:
                       type: string
                     lng:
                       type: string
+                cam_model:
+                  type: string
+                  description: set cammera device model to be referred by auto setting.
                 external_id:
                   type: string
                   description: requied the infor when not fixed IP address connection.
