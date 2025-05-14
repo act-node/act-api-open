@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>環境センサーデータ一覧</title>
+  <title>環境センサーデータ一覧 | Environment Sensor Data Name List</title>
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
@@ -12,6 +12,7 @@
 
     h1 {
       text-align: center;
+      font-size: 1.6rem;
     }
 
     .table-wrapper {
@@ -20,18 +21,19 @@
     }
 
     table {
-      width: 100%;
+      width: auto;
       border-collapse: collapse;
-      min-width: 800px;
+      min-width: 1200px; /* 表全体の最小幅を広げる */
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      table-layout: auto;
     }
 
     th, td {
       border: 1px solid #ccc;
-      padding: 8px 12px;
+      padding: 8px 16px;
       text-align: left;
-      word-break: break-word;
+      white-space: nowrap; /* 改行させず1行で表示 */
     }
 
     th {
@@ -52,12 +54,12 @@
   </style>
 </head>
 <body>
-  <h1>環境センサーデータ名覧 | Environment Sensor Data Name List</h1>
+  <h1>環境センサーデータ名一覧 | Environment Sensor Data Name List</h1>
   <div class="table-wrapper">
     <table id="data-table"></table>
   </div>
 
-  <!-- PapaParse 読み込み -->
+  <!-- PapaParse CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script>
     fetch('environment_sensor_data_list.csv')
@@ -74,7 +76,7 @@
         const headers = parsed.meta.fields;
         const rawData = parsed.data;
 
-        // 空行やすべての値が空の行を除外
+        // 空行や全カラム空の行を除外
         const data = rawData.filter(row =>
           headers.some(header => (row[header] || '').trim() !== '')
         );
