@@ -10,15 +10,16 @@
       background-color: #f9f9f9;
     }
 
-    h1 {
-      text-align: center;
-      font-size: 1.6rem;
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2em;
     }
 
-    .download-button {
-      display: flex;
-      justify-content: center;
-      margin: 1em 0;
+    h1 {
+      font-size: 1.6rem;
+      margin: 0;
     }
 
     .download-button a {
@@ -51,19 +52,24 @@
       border: 1px solid #ccc;
       padding: 6px 12px;
       text-align: left;
-      background-color: #007acc;
+      background-color: #888888; /* グレーに変更 */
       color: white;
       position: sticky;
       top: 0;
       z-index: 1;
-      white-space: nowrap; /* ✅ ヘッダーは改行させない */
+      white-space: nowrap; /* ヘッダーは改行させない */
+    }
+
+    /* Data Name の列ヘッダーのみ青色にする */
+    th.data-name-header {
+      background-color: #007acc;
     }
 
     td {
       border: 1px solid #ccc;
       padding: 6px 12px;
       text-align: left;
-      white-space: normal;       /* ✅ データ部は改行OK */
+      white-space: normal;       /* データ部は改行OK */
       word-break: break-word;
     }
 
@@ -91,10 +97,11 @@
   </style>
 </head>
 <body>
-  <h1>環境センサーデータ名一覧 | Environment Sensor Data Name List</h1>
-
-  <div class="download-button">
-    <a href="environment_sensor_data_list.csv" download>CSVファイルをダウンロード</a>
+  <div class="header-container">
+    <h1>環境センサーデータ名一覧 | Environment Sensor Data Name List</h1>
+    <div class="download-button">
+      <a href="environment_sensor_data_list.csv" download>CSVファイルをダウンロード</a>
+    </div>
   </div>
 
   <div class="table-wrapper">
@@ -135,6 +142,12 @@
         headers.forEach(header => {
           const th = document.createElement('th');
           th.textContent = header;
+          
+          // 「Data Name」の列ヘッダーのみクラスを追加して青色にする
+          if (header === 'Data Name (clickでcopy)') {
+            th.className = 'data-name-header';
+          }
+          
           headerRow.appendChild(th);
         });
 
@@ -145,8 +158,8 @@
             const td = tr.insertCell();
             td.textContent = row[header] || '';
 
-            // ✅ 1列目（Data Name）だけクリックコピー機能を持たせる
-            if (index === 0) {
+            // Data Name の列にのみクリックコピー機能を追加
+            if (header === 'Data Name (clickでcopy)') {
               td.style.cursor = "pointer";
               td.title = "クリックしてコピー";
               td.addEventListener('click', () => {
