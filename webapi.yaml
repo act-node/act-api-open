@@ -617,27 +617,18 @@ paths:
                     decoded_payload:
                       type: object
                       properties:
-                        Bat:
+                        soil_temperature:
+                          type: string
+                          description: "Soil temperature"
+                        soil_volumetric_water_content:
+                          type: string
+                          description: "Soil volumetric water content"
+                        soil_electrical_conductivi:
+                          type: string
+                          description: "Soil EC"
+                        battery_voltage:
                           type: string
                           description: "Battery voltage"
-                        Hardware_flag:
-                          type: string
-                        Interrupt_flag:
-                          type: string
-                        Sensor_flag:
-                          type: string
-                        TempC_DS18B20:
-                          type: string
-                          description: "Temperature in Celsius from DS18B20 sensor"
-                        conduct_SOIL:
-                          type: string
-                          description: "Soil conductivity"
-                        temp_SOIL:
-                          type: string
-                          description: "Soil temperature in Celsius"
-                        water_SOIL:
-                          type: string
-                          description: "Soil moisture percentage"
                     rx_metadata:
                       type: array
                       items:
@@ -750,10 +741,10 @@ paths:
                   f_cnt: "66008"
                   frm_payload: "DPQABBBaBBsMAOBA="
                   decoded_payload: 
-                    soil_electrical_conductivity: "56"
                     soil_temperature: "17.31"
                     soil_volumetric_water_content: "16.65"
-                    battery_level: "3.316"
+                    soil_electrical_conductivity: "56"
+                    battery_voltage: "3.316"
                   rx_metadata: 
                   -
                     gateway_ids: 
