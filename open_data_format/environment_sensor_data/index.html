@@ -31,6 +31,7 @@
       border: 1px solid #ccc;
       padding: 8px 12px;
       text-align: left;
+      word-break: break-word;
     }
 
     th {
@@ -40,3 +41,64 @@
       top: 0;
       z-index: 1;
     }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #e6f7ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>環境センサーデータ一覧</h1>
+  <div class="table-wrapper">
+    <table id="data-table"></table>
+  </div>
+
+  <!-- PapaParse CSVライブラリの読み込み -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script>
+    // CSVファイルを読み込み、表として描画
+    fetch('environment_sensor_data_list.csv')
+      .then(response => {
+        if (!response.ok) throw new Error('CSVファイルが読み込めません');
+        return response.text();
+      })
+      .then(csvText => {
+        const parsed = Papa.parse(csvText, { header: true });
+        const data = parsed.data;
+
+        const table = document.getElementById('data-table');
+        if (data.length === 0) {
+          table.innerHTML = '<tr><td>データがありません</td></tr>';
+          return;
+        }
+
+        // ヘッダー行作成
+        const thead = table.createTHead();
+        const headerRow = thead.insertRow();
+        Object.keys(data[0]).forEach(key => {
+          const th = document.createElement('th');
+          th.textContent = key;
+          headerRow.appendChild(th);
+        });
+
+        // 本文行作成
+        const tbody = table.createTBody();
+        data.forEach(row => {
+          const tr = tbody.insertRow();
+          Object.values(row).forEach(value => {
+            const td = tr.insertCell();
+            td.textContent = value;
+          });
+        });
+      })
+      .catch(error => {
+        document.getElementById('data-table').innerHTML = '<tr><td>読み込みエラー: ' + error.message + '</td></tr>';
+        console.error('読み込みエラー:', error);
+      });
+  </script>
+</body>
+</html>
