@@ -1,5 +1,3 @@
-Environment Sensing Data Name List | 環境センサーデータ名一覧,,,,,,,
-,,,,,,,
 data_name,type,c_code,category(jp),en,cid,name(jp),en
 weather,env,10000,天気,Weather,10000,天気,Weather
 fine_weather,env,10000,天気,Weather,10011,天気: 快晴,Fine weather
