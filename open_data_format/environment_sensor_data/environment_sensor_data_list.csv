@@ -49,7 +49,7 @@ env,11000,Temperature,11030,Outside Air Temperature,outside_air_temperature,温�
 env,11000,Temperature,11040,Canopy Temperature,canopy_temperature,温度,群落温度
 env,11000,Temperature,11050,Leaf Temperature,leaf_temperature,温度,葉面温度
 env,11000,Temperature,11060,Land Surface Temperature,land_surface_temperature,温度,地表面温度
-env,11000,Temperature,11070,Growing Point Air Temperature,growing-point_air_temperature,温度,生長点温度
+env,11000,Temperature,11070,Growing Point Air Temperature,growing_point_air_temperature,温度,生長点温度
 env,11000,Temperature,11080,Daytime Greenhouse Air Temperature,daytime_greenhouse_air_temperature,温度,日中温室内気温
 env,11000,Temperature,11090,Nighttime Greenhouse Air Temperature,nighttime_greenhouse_air_temperature,温度,夜間温室内気温
 env,11000,Temperature,11100,Heating Temperature,heating_temperature,温度,暖房温度
@@ -64,13 +64,13 @@ env,12000,Humidity,12000,Absolute Humidity,absolute_humidity,湿度,湿度 [絶�
 env,12000,Humidity,12010,Relative Humidity,relative_humidity,湿度,湿度 [相対]
 env,12000,Humidity,12020,Outside Relative Humidity,outside_relative_humidity,湿度,屋外相対湿度
 env,12000,Humidity,12030,Greenhouse Relative Humidity,greenhouse_relative_humidity,湿度,温室内相対湿度
-env,12000,Humidity,12040,Growing Point Relative Humidity,growing-point_relative_humidity,湿度,生長点相対湿度
+env,12000,Humidity,12040,Growing Point Relative Humidity,growing_point_relative_humidity,湿度,生長点相対湿度
 env,12000,Humidity,12050,Dewpoint Temperature,dewpoint_temperature,湿度,露点温度
 env,12000,Humidity,12060,Greenhouse Dewpoint Temperature,greenhouse_dewpoint_temperature,湿度,温室内露点温度
-env,12000,Humidity,12070,Growing Point Dewpoint Temperature,growing-point_dewpoint_temperature,湿度,生長点露点温度
+env,12000,Humidity,12070,Growing Point Dewpoint Temperature,growing_point_dewpoint_temperature,湿度,生長点露点温度
 env,12000,Humidity,12080,Frostpoint Temperature,frostpoint_temperature,湿度,霜点温度
 env,12000,Humidity,12090,Vapor Pressure,vapor_pressure,湿度,蒸気圧
-env,12000,Humidity,12100,Growing Point Vapor Pressure,growing-point_vapor_pressure,湿度,生長点蒸気圧
+env,12000,Humidity,12100,Growing Point Vapor Pressure,growing_point_vapor_pressure,湿度,生長点蒸気圧
 env,12000,Humidity,12110,Vapor Pressure Deficit,vapor_pressure_deficit,湿度,飽差(VPD)
 env,12000,Humidity,12120,Humidity Deficit,humidity_deficit,湿度,飽差(HD)
 ,,,,,,,
@@ -85,7 +85,7 @@ env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_O2,空気中成分,O
 env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_nitrogen_dioxide_vol_conc,空気中成分,NO2 空気中二酸化窒素体積濃度
 env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_NO2,空気中成分,NO2 空気中二酸化窒素体積濃度
 env,14000,Atmospheric Composition,14040,Air Ethylene Vol Conc,air_etylene_vol_conc,空気中成分,空気中エチレン
-env,14000,Atmospheric Composition,14050,Air Ammonia Vol Conc,air_etylene-ammonia_vol_conc,空気中成分,空気中アンモニア体積濃度
+env,14000,Atmospheric Composition,14050,Air Ammonia Vol Conc,air_etylene_ammonia_vol_conc,空気中成分,空気中アンモニア体積濃度
 env,14000,Atmospheric Composition,14060,Dose Equivalent,dose_equivalent,空気中成分,線量当量
 env,14000,Atmospheric Composition,14070,Energy Dose,energy_dose,空気中成分,吸収線量
 env,14000,Atmospheric Composition,14080,Ion Dose,ion_dose,空気中成分,照射線量
@@ -101,7 +101,7 @@ env,16000,Surface Wind,16020,Maximum Instantaneous Wind Speed,maximum_instananeo
 env,16000,Surface Wind,16030,Wind Direction,wind_direction,風,風向
 env,16000,Surface Wind,16040,Wind Direction In Maximum Wind Speed,wind_direction_in_maximum_wind_speed,風,風向（最大風速時）
 env,16000,Surface Wind,16050,Wind Direction In Maximum Instantaneous Wind Speed,wind_direction_in_maximum_instananeous_wind_speed,風,風向（最大瞬間風速時）
-env,16000,Surface Wind,16060,Growing Point Wind Direction In Maximum Instantaneous Wind Speed,growing-point_wind_direction_in_maximum_instananeous_wind_speed,風,生長点風向（最大瞬間風速時）
+env,16000,Surface Wind,16060,Growing Point Wind Direction In Maximum Instantaneous Wind Speed,growing_point_wind_direction_in_maximum_instananeous_wind_speed,風,生長点風向（最大瞬間風速時）
 ,,,,,,,
 env,17000,Radiation,17010,Illuminance,illuminance,放射,照度
 env,17000,Radiation,17020,Irradiance,irradiance,放射,放射照度
@@ -218,11 +218,11 @@ env,35000,Soil Physical Properties,35040,Soil Bulk Density,soil_bulk_density,土
 env,35000,Soil Physical Properties,35050,Soil Porosity,soil_porocity,土壌 物理性,土壌孔隙率
 env,35000,Soil Physical Properties,35060,Gravitational Water Porosity,gravitational_water_porosity,土壌 物理性,重力水孔隙率
 env,35000,Soil Physical Properties,35070,Effective Water Porosity,effective_water_porosity,土壌 物理性,易有効水分孔隙率
-env,35000,Soil Physical Properties,35080,Soil Clay Mass Fraction,soil_clay_mass-fraction,土壌 物理性,土壌中粘土含量
-env,35000,Soil Physical Properties,35090,Soil Silt Mass Fraction,soil_silt_mass-fraction,土壌 物理性,土壌中シルト含量
-env,35000,Soil Physical Properties,35100,Soil Sand Mass Fraction,soil_sand_mass-fraction,土壌 物理性,土壌中砂含量
-env,35000,Soil Physical Properties,35110,Soil Fine Sand Mass Fraction,soil_fine_sand_mass-fraction,土壌 物理性,土壌中細砂含量
-env,35000,Soil Physical Properties,35120,Soil Coarse Sand Mass Fraction,soil_coarse_sand_mass-fraction,土壌 物理性,土壌中粗砂含量
+env,35000,Soil Physical Properties,35080,Soil Clay Mass Fraction,soil_clay_mass_fraction,土壌 物理性,土壌中粘土含量
+env,35000,Soil Physical Properties,35090,Soil Silt Mass Fraction,soil_silt_mass_fraction,土壌 物理性,土壌中シルト含量
+env,35000,Soil Physical Properties,35100,Soil Sand Mass Fraction,soil_sand_mass_fraction,土壌 物理性,土壌中砂含量
+env,35000,Soil Physical Properties,35110,Soil Fine Sand Mass Fraction,soil_fine_sand_mass_fraction,土壌 物理性,土壌中細砂含量
+env,35000,Soil Physical Properties,35120,Soil Coarse Sand Mass Fraction,soil_coarse_sand_mass_fraction,土壌 物理性,土壌中粗砂含量
 env,35000,Soil Physical Properties,35130,Soil Water Holding Capacity,soil_water_holding_capacity,土壌 物理性,土壌水分保持力
 env,35000,Soil Physical Properties,35140,Field Capacity,field_capacity,土壌 物理性,圃場容水量
 env,35000,Soil Physical Properties,35150,Soil Saturated Hydraulic Conductivity,soil_saturated_hydraulic_conductivity,土壌 物理性,飽和透水係数
@@ -232,10 +232,10 @@ env,35000,Soil Physical Properties,35180,Soil Intrinsic Permeability,soil_intrin
 env,35000,Soil Physical Properties,35190,Soil Gas Diffusivity,soil_gas_diffusivity,土壌 物理性,ガス拡散係数
 env,35000,Soil Physical Properties,35200,Soil Thermal Conductivity,soil_thermal_conductivity,土壌 物理性,熱伝導率
 ,,,,,,,
-env,36000,Soil Biological Properties,36000,Soil Humus Mass Fraction,soil_humus_mass-fraction,土壌 生物性,土壌中腐植
-env,36000,Soil Biological Properties,36010,Soil Organic Matter Mass Fraction,soil_organic_matter_mass-fraction,土壌 生物性,土壌有機物
-env,36000,Soil Biological Properties,36020,Alfa Glucosidase Activity,alfa-glucosidase_activity,土壌 生物性,αグルコシダーゼ活性
-env,36000,Soil Biological Properties,36030,Beta Glucosidase Activity,beta-glucosidase_activity,土壌 生物性,βグルコシダーゼ活性
+env,36000,Soil Biological Properties,36000,Soil Humus Mass Fraction,soil_humus_mass_fraction,土壌 生物性,土壌中腐植
+env,36000,Soil Biological Properties,36010,Soil Organic Matter Mass Fraction,soil_organic_matter_mass_fraction,土壌 生物性,土壌有機物
+env,36000,Soil Biological Properties,36020,Alfa Glucosidase Activity,alfa_glucosidase_activity,土壌 生物性,αグルコシダーゼ活性
+env,36000,Soil Biological Properties,36030,Beta Glucosidase Activity,beta_glucosidase_activity,土壌 生物性,βグルコシダーゼ活性
 env,36000,Soil Biological Properties,36040,Meloidogyne Hapla Num,Meloidogyne_hapla_num,土壌 生物性,キタネコブセンチュウ
 env,36000,Soil Biological Properties,36050,Pratylenchus Penetrans Num,Pratylenchus_penetrans_num,土壌 生物性,キタネグサレセンチュウ
 env,36000,Soil Biological Properties,36060,Pratylenchus Coffeae Num,Pratylenchus_coffeae_num,土壌 生物性,ミナミネグサレセンチュウ
@@ -310,38 +310,38 @@ env,40000,Soil Chemical Properties,42000,Soil Ph,soil_pH,土壌 化学性,土壌
 env,40000,Soil Chemical Properties,42100,Soil Ph Potassium Chloride,soil_pH_potassium_chloride,土壌 化学性,土壌pH(KCl)
 env,40000,Soil Chemical Properties,42200,Rhizosphere Ph,rhizosphere_pH,土壌 化学性,根圏pH
 env,40000,Soil Chemical Properties,45010,Soil Fertility Value,soil_fertility_value,土壌 化学性,土壌肥沃度
-env,40000,Soil Chemical Properties,45020,Soil Oxidation Reduction Potential,soil_oxidation-reduction_potential,土壌 化学性,土壌酸化還元電位
+env,40000,Soil Chemical Properties,45020,Soil Oxidation Reduction Potential,soil_oxidation_reduction_potential,土壌 化学性,土壌酸化還元電位
 env,40000,Soil Chemical Properties,45030,Soil Carbon Content,soil_carbon_content,土壌 化学性,土壌炭素量
 env,40000,Soil Chemical Properties,45040,Soil Cn Ratio,soil_cn_ratio,土壌 化学性,CN比
-env,40000,Soil Chemical Properties,45050,Soil Total Carbon Mass Fraction,soil_total_carbon_mass-fraction,土壌 化学性,土壌中全炭素
-env,40000,Soil Chemical Properties,45060,Soil Total Nitrogen Mass Fraction,soil_total_nitrogen_mass-fraction,土壌 化学性,土壌中全窒素
-env,40000,Soil Chemical Properties,45070,Soil Ammonium Nitrogen Mass Fraction,soil_ammonium_nitrogen_mass-fraction,土壌 化学性,土壌中アンモニア態窒素
-env,40000,Soil Chemical Properties,45080,Soil Nitrate Nitrogen Mass Fraction,soil_nitrate_nitrogen_mass-fraction,土壌 化学性,土壌中硝酸態窒素
-env,40000,Soil Chemical Properties,45090,Soil Hot Water Extractable Nitrogen Mass Fraction,soil_hot-water_extractable_nitrogen_mass-fraction,土壌 化学性,土壌中熱水抽出性窒素
+env,40000,Soil Chemical Properties,45050,Soil Total Carbon Mass Fraction,soil_total_carbon_mass_fraction,土壌 化学性,土壌中全炭素
+env,40000,Soil Chemical Properties,45060,Soil Total Nitrogen Mass Fraction,soil_total_nitrogen_mass_fraction,土壌 化学性,土壌中全窒素
+env,40000,Soil Chemical Properties,45070,Soil Ammonium Nitrogen Mass Fraction,soil_ammonium_nitrogen_mass_fraction,土壌 化学性,土壌中アンモニア態窒素
+env,40000,Soil Chemical Properties,45080,Soil Nitrate Nitrogen Mass Fraction,soil_nitrate_nitrogen_mass_fraction,土壌 化学性,土壌中硝酸態窒素
+env,40000,Soil Chemical Properties,45090,Soil Hot Water Extractable Nitrogen Mass Fraction,soil_hot_water_extractable_nitrogen_mass_fraction,土壌 化学性,土壌中熱水抽出性窒素
 env,40000,Soil Chemical Properties,45100,Soil Phosphorus Absorptive Coefficient,soil_phosphorus_absorptive_coefficient,土壌 化学性,土壌リン酸吸収係数
-env,40000,Soil Chemical Properties,45110,Soil Available Phosphorus Mass Fraction,soil_available_phosphorus_mass-fraction,土壌 化学性,土壌中有効態リン酸
-env,40000,Soil Chemical Properties,45120,Soil Exchangeable Potassium Mass Fraction,soil_exchangable_potassium_mass-fraction,土壌 化学性,土壌中交換性カリウム
-env,40000,Soil Chemical Properties,45130,Soil Exchangeable Calcium Mass Fraction,soil_exchangable_calcium_mass-fraction,土壌 化学性,土壌中交換性カルシウム
-env,40000,Soil Chemical Properties,45140,Soil Carbonate Mass Fraction,soil_carbonate_mass-fraction,土壌 化学性,土壌中炭酸カルシウム
-env,40000,Soil Chemical Properties,45150,Soil Gypsum Mass Fraction,soil_gypsum_mass-fraction,土壌 化学性,土壌中石膏
-env,40000,Soil Chemical Properties,45160,Soil Exchangeable Magnesium Mass Fraction,soil_exchangable_magnesium_mass-fraction,土壌 化学性,土壌中交換性マグネシウム
+env,40000,Soil Chemical Properties,45110,Soil Available Phosphorus Mass Fraction,soil_available_phosphorus_mass_fraction,土壌 化学性,土壌中有効態リン酸
+env,40000,Soil Chemical Properties,45120,Soil Exchangeable Potassium Mass Fraction,soil_exchangable_potassium_mass_fraction,土壌 化学性,土壌中交換性カリウム
+env,40000,Soil Chemical Properties,45130,Soil Exchangeable Calcium Mass Fraction,soil_exchangable_calcium_mass_fraction,土壌 化学性,土壌中交換性カルシウム
+env,40000,Soil Chemical Properties,45140,Soil Carbonate Mass Fraction,soil_carbonate_mass_fraction,土壌 化学性,土壌中炭酸カルシウム
+env,40000,Soil Chemical Properties,45150,Soil Gypsum Mass Fraction,soil_gypsum_mass_fraction,土壌 化学性,土壌中石膏
+env,40000,Soil Chemical Properties,45160,Soil Exchangeable Magnesium Mass Fraction,soil_exchangable_magnesium_mass_fraction,土壌 化学性,土壌中交換性マグネシウム
 env,40000,Soil Chemical Properties,45170,Soil Magnesium Potassium Ratio,soil_magnesium_potassium_ratio,土壌 化学性,土壌中苦土カリ比
 env,40000,Soil Chemical Properties,45180,Soil Calcium Magnesium Ratio,soil_calcium_magnesium_ratio,土壌 化学性,土壌石灰苦土比
 env,40000,Soil Chemical Properties,45190,Soil Calcium Saturation Ratio,soil_calcium_saturation_ratio,土壌 化学性,土壌石灰飽和度
-env,40000,Soil Chemical Properties,45200,Soil Base Cation Saturation Ratio,soil_base-cation_saturation_ratio,土壌 化学性,土壌塩基飽和度
-env,40000,Soil Chemical Properties,45210,Soil Soluble Copper Mass Fraction,soil_soluble_copper_mass-fraction,土壌 化学性,土壌中可溶性銅
-env,40000,Soil Chemical Properties,45220,Soil Soluble Zinc Mass Fraction,soil_soluble_zinc_mass-fraction,土壌 化学性,土壌中可溶性亜鉛
-env,40000,Soil Chemical Properties,45230,Soil Easily Reducible Manganese Mass Fraction,soil_easily_reducible_manganese_mass-fraction,土壌 化学性,土壌中易還元性マンガン
-env,40000,Soil Chemical Properties,45240,Soil Exchangeable Manganese Mass Fraction,soil_exchangable_manganese_mass-fraction,土壌 化学性,土壌中交換性マンガン
-env,40000,Soil Chemical Properties,45250,Soil Hot Water Soluble Boron Mass Fraction,soil_hot-water_soluble_boron_mass-fraction,土壌 化学性,土壌中熱水可溶性ホウ素
-env,40000,Soil Chemical Properties,45260,Soil Ferric Oxide Mass Fraction,soil_ferric_oxide_mass-fraction,土壌 化学性,土壌中遊離酸化鉄
-env,40000,Soil Chemical Properties,45270,Soil Available Silicic Acid Mass Fraction,soil_available_silic_acid_mass-fraction,土壌 化学性,土壌中有効態ケイ酸
-env,40000,Soil Chemical Properties,45280,Soil Available Molybdenum Mass Fraction,soil_available_molybdenum_mass-fraction,土壌 化学性,土壌中有効態モリブデン
-env,40000,Soil Chemical Properties,45290,Soil Chlorine Mass Fraction,soil_chlorine_mass-fraction,土壌 化学性,土壌中塩素
-env,40000,Soil Chemical Properties,45300,Soil Sulfate Sulfate Mass Fraction,soil_sulfate_sulfate_mass-fraction,土壌 化学性,土壌中硫黄
-env,40000,Soil Chemical Properties,45310,Soil Exchangeable Aluminium Mass Fraction,soil_exchangable_aluminium_mass-fraction,土壌 化学性,土壌中交換性アルミニウム
-env,40000,Soil Chemical Properties,45320,Soil Cadmium Mass Fraction,soil_cadmium_mass-fraction,土壌 化学性,土壌中カドミウム
-env,40000,Soil Chemical Properties,45330,Soil Arsenic Mass Fraction,soil_arsenic_mass-fraction,土壌 化学性,土壌中ヒ素
+env,40000,Soil Chemical Properties,45200,Soil Base Cation Saturation Ratio,soil_base_cation_saturation_ratio,土壌 化学性,土壌塩基飽和度
+env,40000,Soil Chemical Properties,45210,Soil Soluble Copper Mass Fraction,soil_soluble_copper_mass_fraction,土壌 化学性,土壌中可溶性銅
+env,40000,Soil Chemical Properties,45220,Soil Soluble Zinc Mass Fraction,soil_soluble_zinc_mass_fraction,土壌 化学性,土壌中可溶性亜鉛
+env,40000,Soil Chemical Properties,45230,Soil Easily Reducible Manganese Mass Fraction,soil_easily_reducible_manganese_mass_fraction,土壌 化学性,土壌中易還元性マンガン
+env,40000,Soil Chemical Properties,45240,Soil Exchangeable Manganese Mass Fraction,soil_exchangable_manganese_mass_fraction,土壌 化学性,土壌中交換性マンガン
+env,40000,Soil Chemical Properties,45250,Soil Hot Water Soluble Boron Mass Fraction,soil_hot_water_soluble_boron_mass_fraction,土壌 化学性,土壌中熱水可溶性ホウ素
+env,40000,Soil Chemical Properties,45260,Soil Ferric Oxide Mass Fraction,soil_ferric_oxide_mass_fraction,土壌 化学性,土壌中遊離酸化鉄
+env,40000,Soil Chemical Properties,45270,Soil Available Silicic Acid Mass Fraction,soil_available_silic_acid_mass_fraction,土壌 化学性,土壌中有効態ケイ酸
+env,40000,Soil Chemical Properties,45280,Soil Available Molybdenum Mass Fraction,soil_available_molybdenum_mass_fraction,土壌 化学性,土壌中有効態モリブデン
+env,40000,Soil Chemical Properties,45290,Soil Chlorine Mass Fraction,soil_chlorine_mass_fraction,土壌 化学性,土壌中塩素
+env,40000,Soil Chemical Properties,45300,Soil Sulfate Sulfate Mass Fraction,soil_sulfate_sulfate_mass_fraction,土壌 化学性,土壌中硫黄
+env,40000,Soil Chemical Properties,45310,Soil Exchangeable Aluminium Mass Fraction,soil_exchangable_aluminium_mass_fraction,土壌 化学性,土壌中交換性アルミニウム
+env,40000,Soil Chemical Properties,45320,Soil Cadmium Mass Fraction,soil_cadmium_mass_fraction,土壌 化学性,土壌中カドミウム
+env,40000,Soil Chemical Properties,45330,Soil Arsenic Mass Fraction,soil_arsenic_mass_fraction,土壌 化学性,土壌中ヒ素
 ,,,,,,,
 env,50000,Water,50100,Water Depth,water_depth,水,水深
 env,50000,Water,50110,Water Level From Land Surface,water_level_from_land_surface,水,水底からの水位
@@ -388,11 +388,11 @@ env,61000,Visual,61020,緑色,water_color_green,目視,緑色
 env,61000,Visual,61030,茶色,water_color_brown,目視,茶色
 env,61000,Visual,61040,赤色,water_color_red,目視,赤色
 env,61000,Visual,61100,泡,water_froth,目視,泡
-env,61000,Visual,61200,残餌量,water_remain-feed,目視,残餌量
+env,61000,Visual,61200,残餌量,water_remain_feed,目視,残餌量
 ,,,,,,,
-env,64000,Smell,64010,発酵臭,water_smell_fermented-odor,臭い,発酵臭
+env,64000,Smell,64010,発酵臭,water_smell_fermented_odor,臭い,発酵臭
 env,64000,Smell,64040,アンモニア臭,water_smell_ammonia,臭い,アンモニア臭
-env,64000,Smell,64060,亜硝酸臭,water_smell_nitrous-acid,臭い,亜硝酸臭
+env,64000,Smell,64060,亜硝酸臭,water_smell_nitrous_acid,臭い,亜硝酸臭
 env,64000,Smell,64210,硫酸臭,water_smell_sulfate,臭い,硫酸臭
 ,,,,,,,
 env,80000,Meter,80000,Meter,total_meter_value,メーター,メーター
