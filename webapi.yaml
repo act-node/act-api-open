@@ -316,7 +316,7 @@ paths:
         required: true
         schema:
           type: string
-          description: Whebhook Key
+          description: Device Connection Key
       requestBody:
         required: true
         content:
@@ -349,6 +349,313 @@ paths:
                 station: "ADAC"
                 data: "7d44533d7e003d00"
                 seqNumber: "1029"
+      responses:
+        '200':
+          description: Successfully post sensor data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  registration:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        data-name:
+                          type: string
+                        value:
+                          type: number
+                        unit:
+                          type: string
+                        time:
+                          type: string
+                          format: date-time
+                        index:
+                          type: string
+                        type:
+                          type: string
+                        location:
+                          type: object
+                          required:
+                            - lat
+                            - lng
+                          properties:
+                            lat:
+                              type: string
+                            lng:
+                              type: string
+                            name:
+                              type: string
+              example:
+                registration: "Success"
+                data:
+                - name: "温度"
+                  data_name: "temperature"
+                  value: 25.68
+                  unit: "°C"
+                  time: "2021-12-29T14:31:00.000Z"
+                - name: "湿度(相対)"
+                  data_name: "relative_humidity"
+                  value: 83
+                  unit: "%"
+                  time: "2021-12-29T14:31:00.000Z"
+                - name: "電池量"
+                  data_name: "battery_level"
+                  value: 61
+                  unit: "%"
+                  time: "2021-12-29T14:31:00.000Z"
+                - name: "電池温度"
+                  data_name: "battery_temperature"
+                  value: 26,
+                  unit: "°C"
+                  time: "2021-12-29T14:31:00.000Z"
+        '400':
+          description: Bad Request. Incorect request.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: "string"
+                    example: "Bad Request. Incorect request."
+                  explain:
+                    type: "string"
+                    example: "リクエストのパラメーターが正しくない。正しく修正して下さい。"
+        '403':
+          description: Forbidden. webhook URL NOT exist or expired.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: "string"
+                    example: "Forbidden. webhook URL NOT exist or expired."
+                  explain:
+                    type: "string"
+                    example: "WebhookURLが存在しないか、期限切れになっています。Webhook URLを確認して下さい。"
+        '406':
+          description: Not Acceptable. Request source IP address changed from before.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 406
+                  message:
+                    type: "string"
+                    example: "Not Acceptable. Request source IP address changed from before."
+                  explain:
+                    type: "string"
+                    example: "初期の接続時とIPアドレスが変わっているため受け付けられません。"
+        '412':
+          description: Number of Sensor data exceed connection limit.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 412
+                  message:
+                    type: "string"
+                    example: "Number of Sensor data exceed connection limit."
+                  explain:
+                    type: "string"
+                    example: "センサーデータの数が上限を超えています。センサー数に合わせて接続上限を増やして下さい。"
+        '432':
+          description: Future date time is not acceptable.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 432
+                  message:
+                    type: "string"
+                    example: "Future date time is not acceptable."
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが未来の日時になっています。未来日時は受け付けられません。"
+        '433':
+          description: Too old date time is not acceptable.(less than 100days)
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 433
+                  message:
+                    type: "string"
+                    example: "Too old date time is not acceptable.(less than 100days)"
+                  explain:
+                    type: "string"
+                    example: "timeパラメーターが100日以上前になっています。100日以内のデータしか受け付けられません。"
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 500
+                  message:
+                    type: "string"
+                    example: "Internal Server Error."
+                  explain:
+                    type: "string"
+                    example: "処理がエラーになりました。原因の調査が必要です。問い合わせを行って下さい。"
+        '503':
+          description: Service Unavailable. The connection is suspended or disabled.
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: number
+                    example: 503
+                  message:
+                    type: "string"
+                    example: "Service Unavailable. The connection is suspended or disabled."
+                  explain:
+                    type: "string"
+                    example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
+
+  # Sigfox #####################################################################################
+  /lora/{deviceType}/{groupCode}/{Key}:
+    post:
+      summary: Post LoRaWAN sensor data via TTN.
+      description: LoRaWAN sensor data send to ACT.cloud.
+      parameters:
+      - in: path
+        name: "deviceType"
+        required: true
+        schema:
+          type: string
+          description: Device Type {ex. LSE01 }
+      - in: path
+        name: "groupCode"
+        required: true
+        schema:
+          type: string
+          description: Group Code
+      - in: path
+        name: Key
+        required: true
+        schema:
+          type: string
+          description: Device Connection Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object 
+              required:
+                - data
+              properties:
+                time:
+                  type: integer
+                  description: UNIX Time
+                deviceTypeId:
+                  type: string
+                device:
+                  type: string
+                rssi:
+                  type: string
+                station:
+                  type: string
+                data:
+                  type: string
+                seqNumber:
+                  type: string
+              example:
+                end_device_ids: 
+                  device_id: "veinz-actup-lse01-850a"
+                  application_ids: 
+                    application_id: "veinz-actup-001"
+                  dev_eui: "A840417251800000"
+                  join_eui: "A840410000000000"
+                  dev_addr: "260BE000"
+                correlation_ids: 
+                - "gs:uplink:01JV6ACGQ4PHW98Z0HMDDC000B"
+                received_at: "2025-05-14T02:36:10.552254957Z"
+                uplink_message: 
+                  session_key_id: "AYRbZcM/N3peYHgX2HB+Pg=="
+                  f_port: "2"
+                  f_cnt: "66008"
+                  frm_payload: "DPQAAAaBBsMAOBA="
+                  decoded_payload: 
+                    Bat: "3.316"
+                    Hardware_flag: "0"
+                    Interrupt_flag: "0"
+                    Sensor_flag: "1"
+                    TempC_DS18B20: "0.00"
+                    conduct_SOIL: "56"
+                    temp_SOIL: "17.31"
+                    water_SOIL: "16.65"
+                  rx_metadata: 
+                  -
+                    gateway_ids: 
+                      gateway_id: "veinz-tryangleehime-dlos8-0db0"
+                      eui: "A84041FFFF210DB0"
+                    time: "2025-05-14T02:36:10.193819Z"
+                    timestamp: "577710339"
+                    rssi: "-73"
+                    channel_rssi: "-73"
+                    snr: "7.2"
+                    uplink_token: "CiwKKgoedmVpbnotdHJ5YW5nbGVlaGltZS1kbG9zOC0wZGIwEgioQEH//yENsBCD0ryTAhoMCJqDkMEGEJ/59KEBILjn4JHoxZUB"
+                    channel_index: "4"
+                    received_at: "2025-05-14T02:36:10.339557535Z"
+                  settings: 
+                    data_rate: 
+                      lora: 
+                        bandwidth: "125000"
+                        spreading_factor: "7"
+                        coding_rate: "4/5"
+                    frequency: "922600000"
+                    timestamp: "577710339"
+                    time: "2025-05-14T02:36:10.193819Z"
+                  received_at: "2025-05-14T02:36:10.341586918Z"
+                  consumed_airtime: "0.061696s"
+                  version_ids: 
+                    brand_id: "dragino"
+                    model_id: "lse01"
+                    hardware_version: "unknown_hw_version"
+                    firmware_version: "1.1.4"
+                    band_id: "AS_923"
+                  network_ids: 
+                    net_id: "000013"
+                    ns_id: "EC656E0000000181"
+                    tenant_id: "ttn"
+                    cluster_id: "eu1"
+                    cluster_address: "eu1.cloud.thethings.network"
+                  last_battery_percentage: 
+                    f_cnt: "65962"
+                    value: "100"
+                    received_at: "2025-05-13T11:16:10.511056609Z"
       responses:
         '200':
           description: Successfully post sensor data

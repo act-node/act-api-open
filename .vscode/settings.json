@@ -1,0 +1,5 @@
+{
+    "yaml.schemas": {
+        "swaggerviewer:openapi": "file:///home/momozu/git/act-api-open/webapi.yaml"
+    }
+}
