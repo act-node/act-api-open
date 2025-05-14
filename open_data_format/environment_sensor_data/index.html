@@ -1,47 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <title>環境センサーデータ</title>
-</head>
-<body>
-  <h1>環境センサーデータ一覧</h1>
-  <div id="table-container"></div>
+  <meta charset="UTF-8">
+  <title>環境センサーデータ一覧</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      padding: 2em;
+      background-color: #f9f9f9;
+    }
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script>
-    fetch('environment_sensor_data_list.csv')
-      .then(response => response.text())
-      .then(csv => {
-        const data = Papa.parse(csv, { header: true }).data;
-        const container = document.getElementById('table-container');
+    h1 {
+      text-align: center;
+    }
 
-        // テーブル作成
-        const table = document.createElement('table');
-        table.border = 1;
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 1em;
+    }
 
-        // ヘッダー行
-        const headerRow = document.createElement('tr');
-        Object.keys(data[0]).forEach(key => {
-          const th = document.createElement('th');
-          th.textContent = key;
-          headerRow.appendChild(th);
-        });
-        table.appendChild(headerRow);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
 
-        // データ行
-        data.forEach(row => {
-          const tr = document.createElement('tr');
-          Object.values(row).forEach(value => {
-            const td = document.createElement('td');
-            td.textContent = value;
-            tr.appendChild(td);
-          });
-          table.appendChild(tr);
-        });
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: left;
+    }
 
-        container.appendChild(table);
-      });
-  </script>
-</body>
-</html>
+    th {
+      background-color: #007acc;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
