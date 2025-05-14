@@ -1,4 +1,4 @@
-Data Name,Type,c_code,Category (jp),Category (en),cid,Name (jp),Name (en)
+Data Name (クリックでコピー),Type,c_code,Category (jp),Category (en),cid(data id),Name (jp),Name (en)
 weather,env,10000,天気,Weather,10000,天気,Weather
 fine_weather,env,10000,天気,Weather,10011,天気: 快晴,Fine weather
 sunny,env,10000,天気,Weather,10012,天気: 晴れ,Sunny
