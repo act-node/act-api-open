@@ -48,11 +48,12 @@
       table-layout: auto;
     }
 
+    /* すべての列ヘッダーをグレーに */
     th {
       border: 1px solid #ccc;
       padding: 6px 12px;
       text-align: left;
-      background-color: #888888; /* グレーに変更 */
+      background-color: #888888;
       color: white;
       position: sticky;
       top: 0;
@@ -62,7 +63,7 @@
 
     /* Data Name の列ヘッダーのみ青色にする */
     th.data-name-header {
-      background-color: #007acc;
+      background-color: #007acc !important;
     }
 
     td {
@@ -81,16 +82,14 @@
       background-color: #e6f7ff;
     }
 
-    /* Data Name のセルを目立たせる - 青色の背景 */
+    /* データセルのコピー機能用スタイル */
     td.data-name-cell {
       cursor: pointer;
-      color: #ffffff;
-      background-color: #007acc;
       transition: background-color 0.2s;
     }
 
     td.data-name-cell:hover {
-      background-color: #0095ff;
+      background-color: #e6f7ff;
       text-decoration: underline;
     }
 
@@ -99,7 +98,7 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: #333;
+      background: #007acc;
       color: #fff;
       padding: 8px 16px;
       border-radius: 4px;
@@ -244,11 +243,12 @@
         });
 
         const tbody = table.createTBody();
+        
+        // Data Name の列インデックスを特定
+        const dataNameIndex = headers.findIndex(header => header === 'Data Name (clickでcopy)');
+        
         data.forEach(row => {
           const tr = tbody.insertRow();
-          
-          // Data Name の列インデックスを特定
-          const dataNameIndex = headers.findIndex(header => header === 'Data Name (clickでcopy)');
           
           headers.forEach((header, index) => {
             const td = tr.insertCell();
