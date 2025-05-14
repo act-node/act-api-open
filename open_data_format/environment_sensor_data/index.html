@@ -81,6 +81,19 @@
       background-color: #e6f7ff;
     }
 
+    /* Data Name のセルを目立たせる */
+    td.data-name-cell {
+      cursor: pointer;
+      color: #0066cc;
+      background-color: #f0f7ff;
+      transition: background-color 0.2s;
+    }
+
+    td.data-name-cell:hover {
+      background-color: #d0e5ff;
+      text-decoration: underline;
+    }
+
     .copied-message {
       position: fixed;
       bottom: 20px;
@@ -94,34 +107,25 @@
       z-index: 1000;
       font-size: 0.9rem;
       box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-      animation: fadeInOut 1.5s ease-in-out;
-    }
-    
-    @keyframes fadeInOut {
-      0% { opacity: 0; }
-      20% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-    
-    /* Data Name のセルを目立たせる */
-    td.data-name-cell {
-      cursor: pointer;
-      color: #0066cc;
-      background-color: #f0f7ff;
-      transition: background-color 0.2s;
     }
 
-    td.data-name-cell:hover {
-      background-color: #d0e5ff;
-      text-decoration: underline;
+    /* コピーメッセージのフェードイン・アウト */
+    .fade-in {
+      animation: fadeIn 0.3s ease-in forwards;
     }
-    
-    @keyframes fadeInOut {
-      0% { opacity: 0; }
-      20% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; }
+
+    .fade-out {
+      animation: fadeOut 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
   </style>
 </head>
@@ -142,6 +146,65 @@
   <!-- PapaParse CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script>
+    // コピー関数 - 複数の方法を試みる
+    function copyTextToClipboard(text) {
+      // 方法1: clipboard API (モダンブラウザ)
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text)
+          .then(() => true)
+          .catch(err => {
+            console.error('Clipboard APIでのコピーに失敗:', err);
+            return fallbackCopyToClipboard(text);
+          });
+      } else {
+        // 方法2: document.execCommand (フォールバック)
+        return fallbackCopyToClipboard(text);
+      }
+    }
+
+    // フォールバックコピー方法
+    function fallbackCopyToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      
+      // オフスクリーンに配置
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      
+      // テキストを選択してコピー
+      textArea.focus();
+      textArea.select();
+      
+      let success = false;
+      try {
+        success = document.execCommand('copy');
+      } catch (err) {
+        console.error('execCommandでのコピーに失敗:', err);
+      }
+      
+      document.body.removeChild(textArea);
+      return Promise.resolve(success);
+    }
+
+    // コピー成功時のフィードバック表示
+    function showCopyFeedback(text) {
+      const msg = document.getElementById('copied-message');
+      msg.textContent = `「${text}」をコピーしました`;
+      msg.style.display = 'block';
+      msg.classList.remove('fade-out');
+      msg.classList.add('fade-in');
+      
+      setTimeout(() => {
+        msg.classList.remove('fade-in');
+        msg.classList.add('fade-out');
+        setTimeout(() => {
+          msg.style.display = 'none';
+        }, 300);
+      }, 1500);
+    }
+
     fetch('environment_sensor_data_list.csv')
       .then(response => {
         if (!response.ok) throw new Error('CSVファイルの読み込みに失敗しました');
@@ -195,22 +258,22 @@
             if (index === dataNameIndex) {
               td.className = "data-name-cell";
               td.title = "クリックしてコピー";
-              td.addEventListener('click', function() {
-                // クリップボードにコピー
-                const textToCopy = this.textContent || '';
-                navigator.clipboard.writeText(textToCopy)
-                  .then(() => {
-                    // コピー成功時の処理
-                    const msg = document.getElementById('copied-message');
-                    msg.textContent = `「${textToCopy}」をコピーしました`;
-                    msg.style.display = 'block';
-                    setTimeout(() => msg.style.display = 'none', 1500);
-                  })
-                  .catch(err => {
-                    console.error('コピーに失敗しました:', err);
-                    alert('コピーに失敗しました');
+              
+              // クリックイベントを直接設定
+              td.onclick = function() {
+                const textToCopy = this.textContent.trim();
+                
+                // コピー処理
+                copyTextToClipboard(textToCopy)
+                  .then(success => {
+                    if (success) {
+                      showCopyFeedback(textToCopy);
+                    } else {
+                      console.warn('コピーに失敗しました');
+                      alert('コピーに失敗しました。別の方法で選択してコピーしてください。');
+                    }
                   });
-              });
+              };
             }
           });
         });
