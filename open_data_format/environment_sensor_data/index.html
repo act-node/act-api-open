@@ -57,46 +57,51 @@
     <table id="data-table"></table>
   </div>
 
-  <!-- PapaParse CSVライブラリの読み込み -->
+  <!-- PapaParse 読み込み -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script>
-    // CSVファイルを読み込み、表として描画
     fetch('environment_sensor_data_list.csv')
       .then(response => {
-        if (!response.ok) throw new Error('CSVファイルが読み込めません');
+        if (!response.ok) throw new Error('CSVファイルの読み込みに失敗しました');
         return response.text();
       })
       .then(csvText => {
-        const parsed = Papa.parse(csvText, { header: true });
+        const parsed = Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+        });
+
         const data = parsed.data;
+        const headers = parsed.meta.fields; // すべての列名を取得
 
         const table = document.getElementById('data-table');
-        if (data.length === 0) {
+        if (data.length === 0 || !headers) {
           table.innerHTML = '<tr><td>データがありません</td></tr>';
           return;
         }
 
-        // ヘッダー行作成
+        // ヘッダー作成
         const thead = table.createTHead();
         const headerRow = thead.insertRow();
-        Object.keys(data[0]).forEach(key => {
+        headers.forEach(header => {
           const th = document.createElement('th');
-          th.textContent = key;
+          th.textContent = header;
           headerRow.appendChild(th);
         });
 
-        // 本文行作成
+        // 本文作成
         const tbody = table.createTBody();
         data.forEach(row => {
           const tr = tbody.insertRow();
-          Object.values(row).forEach(value => {
+          headers.forEach(header => {
             const td = tr.insertCell();
-            td.textContent = value;
+            td.textContent = row[header] || '';
           });
         });
       })
       .catch(error => {
-        document.getElementById('data-table').innerHTML = '<tr><td>読み込みエラー: ' + error.message + '</td></tr>';
+        document.getElementById('data-table').innerHTML =
+          '<tr><td>読み込みエラー: ' + error.message + '</td></tr>';
         console.error('読み込みエラー:', error);
       });
   </script>
