@@ -47,20 +47,24 @@
       table-layout: auto;
     }
 
-    th, td {
+    th {
       border: 1px solid #ccc;
       padding: 6px 12px;
       text-align: left;
-      white-space: normal;         /* ✅ 改行許可 */
-      word-break: break-word;      /* ✅ 単語の途中でも折り返し */
-    }
-
-    th {
       background-color: #007acc;
       color: white;
       position: sticky;
       top: 0;
       z-index: 1;
+      white-space: nowrap; /* ✅ ヘッダーは改行させない */
+    }
+
+    td {
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      text-align: left;
+      white-space: normal;       /* ✅ データ部は改行OK */
+      word-break: break-word;
     }
 
     tr:nth-child(even) {
@@ -141,7 +145,7 @@
             const td = tr.insertCell();
             td.textContent = row[header] || '';
 
-            // ✅ Data Name列（1列目）のコピー機能は維持
+            // ✅ 1列目（Data Name）だけクリックコピー機能を持たせる
             if (index === 0) {
               td.style.cursor = "pointer";
               td.title = "クリックしてコピー";
