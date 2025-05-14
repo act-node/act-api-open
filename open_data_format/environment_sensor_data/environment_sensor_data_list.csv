@@ -79,7 +79,7 @@ env,13000,Evaporation,13020,Potential Evapotranspiration,potential_evapotranspir
 env,13000,Evaporation,13030,Evapotranspiration Fao,evapotranspiration_FAO,蒸発,FAO基準蒸発散量
 ,,,,,,,
 env,14000,Atmospheric Composition,14010,Air CO2 Vol Conc,air_carbon_dioxide_vol_conc,空気中成分,CO2 空気中二酸化炭素体積濃度
-env,,Atmospheric Composition,14010,Air CO2 Vol Conc,air_CO2,空気中成分,CO2 空気中二酸化炭素体積濃度
+env,14000,Atmospheric Composition,14010,Air CO2 Vol Conc,air_CO2,空気中成分,CO2 空気中二酸化炭素体積濃度
 env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_oxygen_vol_conc,空気中成分,O2 空気中酸素体積濃度
 env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_O2,空気中成分,O2 空気中酸素体積濃度
 env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_nitrogen_dioxide_vol_conc,空気中成分,NO2 空気中二酸化窒素体積濃度
