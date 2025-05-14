@@ -248,7 +248,7 @@ env,36000,Soil Biological Properties,36120,Streptomyces Num,Streptomyces_num,土
 ,,,,,,,
 env,40000,Soil Chemical Properties,40000,Cation Exchange Capacity,cation_exchange_capacity,土壌 化学性,CEC
 env,40000,Soil Chemical Properties,40100,Soil EC,soil_electrical_conductivity,土壌 化学性,土壌EC
-env,,,40100,Soil EC,soil_EC,,土壌EC
+env,40000,Soil Chemical Properties,40100,Soil EC,soil_EC,土壌 化学性,土壌EC
 env,40000,Soil Chemical Properties,40105,Soil EC (5cm),soil_electrical_conductivity_depth5cm,土壌 化学性,土壌EC (深度5cm)
 env,40000,Soil Chemical Properties,40110,Soil EC (10cm),soil_electrical_conductivity_depth10cm,土壌 化学性,土壌EC (深度10cm)
 env,40000,Soil Chemical Properties,40115,Soil EC (15cm),soil_electrical_conductivity_depth1cm,土壌 化学性,土壌EC (深度15cm)
@@ -262,7 +262,7 @@ env,40000,Soil Chemical Properties,40150,Soil EC (50cm),soil_electrical_conducti
 env,40000,Soil Chemical Properties,40155,Soil EC (55cm),soil_electrical_conductivity_depth55cm,土壌 化学性,土壌EC (深度55cm)
 env,40000,Soil Chemical Properties,40160,Soil EC (60cm),soil_electrical_conductivity_depth60cm,土壌 化学性,土壌EC (深度60cm)
 env,40000,Soil Chemical Properties,40200,Soil pore EC,soil_pore_electrical_conductivity,土壌 化学性,間隙水EC
-env,,,40200,Soil pore EC,soil_pore_EC,,間隙水EC
+env,40000,Soil Chemical Properties,40200,Soil pore EC,soil_pore_EC,土壌 化学性,間隙水EC
 env,40000,Soil Chemical Properties,40205,Soil pore EC (5cm),soil_pore_electrical_conductivity_depth5cm,土壌 化学性,間隙水EC (深度5cm)
 env,40000,Soil Chemical Properties,40210,Soil pore EC (10cm),soil_pore_electrical_conductivity_depth10cm,土壌 化学性,間隙水EC (深度10cm)
 env,40000,Soil Chemical Properties,40215,Soil pore EC (15cm),soil_pore_electrical_conductivity_depth15cm,土壌 化学性,間隙水EC (深度15cm)
@@ -276,7 +276,7 @@ env,40000,Soil Chemical Properties,40250,Soil pore EC (50cm),soil_pore_electrica
 env,40000,Soil Chemical Properties,40255,Soil pore EC (55cm),soil_pore_electrical_conductivity_depth55cm,土壌 化学性,間隙水EC (深度55cm)
 env,40000,Soil Chemical Properties,40260,Soil pore EC (60cm),soil_pore_electrical_conductivity_depth60cm,土壌 化学性,間隙水EC (深度60cm)
 env,40000,Soil Chemical Properties,40300,Soil bulk EC,soil_bulk_electrical_conductivity,土壌 化学性,バルクEC
-env,,,40300,Soil bulk EC,soil_bulk_EC,,バルクEC
+env,40000,Soil Chemical Properties,40300,Soil bulk EC,soil_bulk_EC,土壌 化学性,バルクEC
 env,40000,Soil Chemical Properties,40305,Soil bulk EC (5cm),soil_bulk_electrical_conductivity_depth5cm,土壌 化学性,バルクEC (深度5cm)
 env,40000,Soil Chemical Properties,40310,Soil bulk EC (10cm),soil_bulk_electrical_conductivity_depth10cm,土壌 化学性,バルクEC (深度10cm)
 env,40000,Soil Chemical Properties,40315,Soil bulk EC (15cm),soil_bulk_electrical_conductivity_depth15cm,土壌 化学性,バルクEC (深度15cm)
