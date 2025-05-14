@@ -293,6 +293,7 @@ paths:
                   explain:
                     type: "string"
                     example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
+ 
   # Sigfox #####################################################################################
   /sigfox/{deviceType}/{groupCode}/{Key}:
     post:
@@ -543,7 +544,7 @@ paths:
                     type: "string"
                     example: "センサーの接続が保留または無効化されています。設定が変更されるまで接続できません。"
 
-  # Sigfox #####################################################################################
+  # LoRaWAN TTN #####################################################################################
   /lora/{deviceType}/{groupCode}/{Key}:
     post:
       summary: Post LoRaWAN sensor data via TTN.
@@ -554,7 +555,7 @@ paths:
         required: true
         schema:
           type: string
-          description: Device Type {ex. LSE01 }
+          description: Device Type (ex. LSE01)
       - in: path
         name: "groupCode"
         required: true
@@ -572,25 +573,220 @@ paths:
         content:
           application/json:
             schema:
-              type: object 
-              required:
-                - data
+              type: object
               properties:
-                time:
-                  type: integer
-                  description: UNIX Time
-                deviceTypeId:
+                end_device_ids:
+                  type: object
+                  required:
+                    - device_id
+                    - application_ids
+                    - dev_eui
+                    - join_eui
+                    - dev_addr
+                  properties:
+                    device_id:
+                      type: string
+                    application_ids:
+                      type: object
+                      required:
+                        - application_id
+                      properties:
+                        application_id:
+                          type: string
+                          example: "veinz-actup-001"
+                    dev_eui:
+                      type: string
+                      example: "A840417251800000"
+                    join_eui:
+                      type: string
+                      example: "A840410000000000"
+                    dev_addr:
+                      type: string
+                      example: "260BE000"
+                correlation_ids:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - "gs:uplink:01JV6ACGQ4PHW98Z0HMDDC000B"
+                received_at:
                   type: string
-                device:
-                  type: string
-                rssi:
-                  type: string
-                station:
-                  type: string
-                data:
-                  type: string
-                seqNumber:
-                  type: string
+                  format: date-time
+                  example: "2025-05-14T02:36:10.552254957Z"
+                uplink_message:
+                  type: object
+                  properties:
+                    session_key_id:
+                      type: string
+                      example: "AYRbZcM/N3peYHgX2HB+Pg=="
+                    f_port:
+                      type: string
+                      example: "2"
+                    f_cnt:
+                      type: string
+                      example: "66008"
+                    frm_payload:
+                      type: string
+                      example: "DPQAAAaBBsMAOBA="
+                    decoded_payload:
+                      type: object
+                      properties:
+                        Bat:
+                          type: string
+                          description: "Battery voltage"
+                          example: "3.316"
+                        Hardware_flag:
+                          type: string
+                          example: "0"
+                        Interrupt_flag:
+                          type: string
+                          example: "0"
+                        Sensor_flag:
+                          type: string
+                          example: "1"
+                        TempC_DS18B20:
+                          type: string
+                          description: "Temperature in Celsius from DS18B20 sensor"
+                          example: "0.00"
+                        conduct_SOIL:
+                          type: string
+                          description: "Soil conductivity"
+                          example: "56"
+                        temp_SOIL:
+                          type: string
+                          description: "Soil temperature in Celsius"
+                          example: "17.31"
+                        water_SOIL:
+                          type: string
+                          description: "Soil moisture percentage"
+                          example: "16.65"
+                    rx_metadata:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          gateway_ids:
+                            type: object
+                            properties:
+                              gateway_id:
+                                type: string
+                                example: "veinz-tryangleehime-dlos8-0db0"
+                              eui:
+                                type: string
+                                example: "A84041FFFF210DB0"
+                          time:
+                            type: string
+                            format: date-time
+                            example: "2025-05-14T02:36:10.193819Z"
+                          timestamp:
+                            type: string
+                            example: "577710339"
+                          rssi:
+                            type: string
+                            description: "Received Signal Strength Indicator"
+                            example: "-73"
+                          channel_rssi:
+                            type: string
+                            example: "-73"
+                          snr:
+                            type: string
+                            description: "Signal-to-Noise Ratio"
+                            example: "7.2"
+                          uplink_token:
+                            type: string
+                            example: "CiwKKgoedmVpbnotdHJ5YW5nbGVlaGltZS1kbG9zOC0wZGIwEgioQEH//yENsBCD0ryTAhoMCJqDkMEGEJ/59KEBILjn4JHoxZUB"
+                          channel_index:
+                            type: string
+                            example: "4"
+                          received_at:
+                            type: string
+                            format: date-time
+                            example: "2025-05-14T02:36:10.339557535Z"
+                    settings:
+                      type: object
+                      properties:
+                        data_rate:
+                          type: object
+                          properties:
+                            lora:
+                              type: object
+                              properties:
+                                bandwidth:
+                                  type: string
+                                  example: "125000"
+                                spreading_factor:
+                                  type: string
+                                  example: "7"
+                                coding_rate:
+                                  type: string
+                                  example: "4/5"
+                        frequency:
+                          type: string
+                          example: "922600000"
+                        timestamp:
+                          type: string
+                          example: "577710339"
+                        time:
+                          type: string
+                          format: date-time
+                          example: "2025-05-14T02:36:10.193819Z"
+                    received_at:
+                      type: string
+                      format: date-time
+                      example: "2025-05-14T02:36:10.341586918Z"
+                    consumed_airtime:
+                      type: string
+                      example: "0.061696s"
+                    version_ids:
+                      type: object
+                      properties:
+                        brand_id:
+                          type: string
+                          example: "dragino"
+                        model_id:
+                          type: string
+                          example: "lse01"
+                        hardware_version:
+                          type: string
+                          example: "unknown_hw_version"
+                        firmware_version:
+                          type: string
+                          example: "1.1.4"
+                        band_id:
+                          type: string
+                          example: "AS_923"
+                    network_ids:
+                      type: object
+                      properties:
+                        net_id:
+                          type: string
+                          example: "000013"
+                        ns_id:
+                          type: string
+                          example: "EC656E0000000181"
+                        tenant_id:
+                          type: string
+                          example: "ttn"
+                        cluster_id:
+                          type: string
+                          example: "eu1"
+                        cluster_address:
+                          type: string
+                          example: "eu1.cloud.thethings.network"
+                    last_battery_percentage:
+                      type: object
+                      properties:
+                        f_cnt:
+                          type: string
+                          example: "65962"
+                        value:
+                          type: string
+                          example: "100"
+                        received_at:
+                          type: string
+                          format: date-time
+                          example: "2025-05-13T11:16:10.511056609Z"
+
               example:
                 end_device_ids: 
                   device_id: "veinz-actup-lse01-850a"
