@@ -233,12 +233,12 @@
         headers.forEach(header => {
           const th = document.createElement('th');
           th.textContent = header;
-          
-          // 「Data Name」の列ヘッダーのみクラスを追加して青色にする
-          if (header === 'Data Name (clickでcopy)') {
+
+          // 部分一致で "Data Name" を含むヘッダーを青に
+          if (header.includes('Data Name')) {
             th.className = 'data-name-header';
           }
-          
+
           headerRow.appendChild(th);
         });
 
