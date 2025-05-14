@@ -79,11 +79,11 @@ env,13000,Evaporation,13020,Potential Evapotranspiration,potential_evapotranspir
 env,13000,Evaporation,13030,Evapotranspiration Fao,evapotranspiration_FAO,蒸発,FAO基準蒸発散量
 ,,,,,,,
 env,14000,Atmospheric Composition,14010,Air CO2 Vol Conc,air_carbon_dioxide_vol-conc,空気中成分,CO2 空気中二酸化炭素体積濃度
-env,,,14010,Air CO2 Vol Conc,air_CO2,,CO2 空気中二酸化炭素体積濃度
+env,,Atmospheric Composition,14010,Air CO2 Vol Conc,air_CO2,空気中成分,CO2 空気中二酸化炭素体積濃度
 env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_oxygen_vol-conc,空気中成分,O2 空気中酸素体積濃度
-env,14000,,14020,Air O2 Vol Conc,air_O2,,O2 空気中酸素体積濃度
+env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_O2,空気中成分,O2 空気中酸素体積濃度
 env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_nitrogen_dioxide_vol-conc,空気中成分,NO2 空気中二酸化窒素体積濃度
-env,,,14030,Air NO2 Vol Conc,air_NO2,,NO2 空気中二酸化窒素体積濃度
+env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_NO2,空気中成分,NO2 空気中二酸化窒素体積濃度
 env,14000,Atmospheric Composition,14040,Air Ethylene Vol Conc,air_etylene_vol-conc,空気中成分,空気中エチレン
 env,14000,Atmospheric Composition,14050,Air Ammonia Vol Conc,air_etylene-ammonia_vol-conc,空気中成分,空気中アンモニア体積濃度
 env,14000,Atmospheric Composition,14060,Dose Equivalent,dose_equivalent,空気中成分,線量当量
@@ -355,9 +355,9 @@ env,51000,Water Temperature,51002,Water Temperature Max,maximum_water_temperatur
 env,51000,Water Temperature,51003,Water Temperature Min,minimum_water_temperature,水温,水温 [最低]
 ,,,,,,,
 env,54000,Water content,54010,Water EC,water_EC,水中成分,水中EC
-env,,,54010,Water EC,water_electrical_conductivity,,水中EC
+env,54000,Water content,54010,Water EC,water_electrical_conductivity,水中成分,水中EC
 env,54000,Water content,54020,Dissolved oxygen (DO),water_oxygen_sub-conc,水中成分,溶存 酸素 (DO)
-env,,,54020,Dissolved oxygen (DO),water_do,,溶存 酸素 (DO)
+env,54000,Water content,54020,Dissolved oxygen (DO),water_do,水中成分,溶存 酸素 (DO)
 env,54000,Water content,54030,Water pH,water_pH,水中成分,水中 pH
 env,54000,Water content,54040,Water Ammonia [NH3],water_ammonia,水中成分,水中アンモニア [NH3]
 env,54000,Water content,54045,Water Ammonium Nitrogen Sub Conc,water_ammonium_nitrogen_sub-conc,水中成分,水中アンモニア態窒素
