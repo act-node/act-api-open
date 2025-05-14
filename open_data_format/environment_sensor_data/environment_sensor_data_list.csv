@@ -383,17 +383,17 @@ env,54000,Water content,54230,TDS,water_TDS,水中成分,TDS
 env,56000,Water Biological,56010,chlorophyll,water_chlorophyll_sub_conc,水中生物性,クロロフィル
 env,56000,Water Biological,56410,Biofloc,water_BF,水中生物性,BF(バイオフロック)量
 ,,,,,,,
-env,61000,Visual,61010,白濁,water_color_white,目視,白濁
-env,61000,Visual,61020,緑色,water_color_green,目視,緑色
-env,61000,Visual,61030,茶色,water_color_brown,目視,茶色
-env,61000,Visual,61040,赤色,water_color_red,目視,赤色
-env,61000,Visual,61100,泡,water_froth,目視,泡
-env,61000,Visual,61200,残餌量,water_remain_feed,目視,残餌量
+env,61000,Visual,61010,Cloudy Water,water_color_white,目視,白濁
+env,61000,Visual,61020,Green Water,water_color_green,目視,緑色
+env,61000,Visual,61030,Brown Water,water_color_brown,目視,茶色
+env,61000,Visual,61040,Red Water,water_color_red,目視,赤色
+env,61000,Visual,61100,Water Froth,water_froth,目視,泡
+env,61000,Visual,61200,Remain Feed,water_remain_feed,目視,残餌量
 ,,,,,,,
-env,64000,Smell,64010,発酵臭,water_smell_fermented_odor,臭い,発酵臭
-env,64000,Smell,64040,アンモニア臭,water_smell_ammonia,臭い,アンモニア臭
-env,64000,Smell,64060,亜硝酸臭,water_smell_nitrous_acid,臭い,亜硝酸臭
-env,64000,Smell,64210,硫酸臭,water_smell_sulfate,臭い,硫酸臭
+env,64000,Smell,64010,Fermented Smell,water_smell_fermented_odor,臭い,発酵臭
+env,64000,Smell,64040,Ammonia Smell,water_smell_ammonia,臭い,アンモニア臭
+env,64000,Smell,64060,Nitrite Smell,water_smell_nitrous_acid,臭い,亜硝酸臭
+env,64000,Smell,64210,Sulfuric Acid Smell,water_smell_sulfate,臭い,硫酸臭
 ,,,,,,,
 env,80000,Meter,80000,Meter,total_meter_value,メーター,メーター
 env,80000,Meter,80100,Water flow meter,total_water_flow_value,メーター,水道メーター
