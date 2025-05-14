@@ -45,10 +45,8 @@
       border-collapse: collapse;
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      table-layout: auto;
     }
 
-    /* すべての列ヘッダーをグレーに */
     th {
       border: 1px solid #ccc;
       padding: 6px 12px;
@@ -58,10 +56,9 @@
       position: sticky;
       top: 0;
       z-index: 1;
-      white-space: nowrap; /* ヘッダーは改行させない */
+      white-space: nowrap;
     }
 
-    /* Data Name の列ヘッダーのみ青色にする */
     th.data-name-header {
       background-color: #007acc !important;
     }
@@ -70,7 +67,7 @@
       border: 1px solid #ccc;
       padding: 6px 12px;
       text-align: left;
-      white-space: normal;       /* データ部は改行OK */
+      white-space: normal;
       word-break: break-word;
     }
 
@@ -82,7 +79,6 @@
       background-color: #e6f7ff;
     }
 
-    /* データセルのコピー機能用スタイル */
     td.data-name-cell {
       cursor: pointer;
       transition: background-color 0.2s;
@@ -108,7 +104,6 @@
       box-shadow: 0 3px 8px rgba(0,0,0,0.3);
     }
 
-    /* コピーメッセージのフェードイン・アウト */
     .fade-in {
       animation: fadeIn 0.3s ease-in forwards;
     }
@@ -142,146 +137,80 @@
 
   <div id="copied-message" class="copied-message">コピーしました</div>
 
-  <!-- PapaParse CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script>
-    // コピー関数 - 複数の方法を試みる
     function copyTextToClipboard(text) {
-      // 方法1: clipboard API (モダンブラウザ)
       if (navigator.clipboard && window.isSecureContext) {
-        return navigator.clipboard.writeText(text)
-          .then(() => true)
-          .catch(err => {
-            console.error('Clipboard APIでのコピーに失敗:', err);
-            return fallbackCopyToClipboard(text);
-          });
+        return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
       } else {
-        // 方法2: document.execCommand (フォールバック)
-        return fallbackCopyToClipboard(text);
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+          const success = document.execCommand("copy");
+          document.body.removeChild(textarea);
+          return Promise.resolve(success);
+        } catch {
+          document.body.removeChild(textarea);
+          return Promise.resolve(false);
+        }
       }
     }
 
-    // フォールバックコピー方法
-    function fallbackCopyToClipboard(text) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      
-      // オフスクリーンに配置
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
-      document.body.appendChild(textArea);
-      
-      // テキストを選択してコピー
-      textArea.focus();
-      textArea.select();
-      
-      let success = false;
-      try {
-        success = document.execCommand('copy');
-      } catch (err) {
-        console.error('execCommandでのコピーに失敗:', err);
-      }
-      
-      document.body.removeChild(textArea);
-      return Promise.resolve(success);
-    }
-
-    // コピー成功時のフィードバック表示
     function showCopyFeedback(text) {
       const msg = document.getElementById('copied-message');
       msg.textContent = `「${text}」をコピーしました`;
       msg.style.display = 'block';
       msg.classList.remove('fade-out');
       msg.classList.add('fade-in');
-      
       setTimeout(() => {
         msg.classList.remove('fade-in');
         msg.classList.add('fade-out');
-        setTimeout(() => {
-          msg.style.display = 'none';
-        }, 300);
+        setTimeout(() => { msg.style.display = 'none'; }, 300);
       }, 1500);
     }
 
     fetch('environment_sensor_data_list.csv')
-      .then(response => {
-        if (!response.ok) throw new Error('CSVファイルの読み込みに失敗しました');
-        return response.text();
-      })
-      .then(csvText => {
-        const parsed = Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true
-        });
-
+      .then(res => res.text())
+      .then(csv => {
+        const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
         const headers = parsed.meta.fields;
-        const rawData = parsed.data;
-
-        const data = rawData.filter(row =>
-          headers.some(header => (row[header] || '').trim() !== '')
-        );
-
-        const table = document.getElementById('data-table');
-        if (data.length === 0 || !headers) {
-          table.innerHTML = '<tr><td>有効なデータがありません</td></tr>';
-          return;
-        }
-
+        const data = parsed.data;
+        const table = document.getElementById("data-table");
         const thead = table.createTHead();
         const headerRow = thead.insertRow();
-        headers.forEach(header => {
-          const th = document.createElement('th');
+
+        const dataNameIndex = headers.findIndex(h => h.includes('Data Name'));
+
+        headers.forEach((header, idx) => {
+          const th = document.createElement("th");
           th.textContent = header;
-
-          // 部分一致で "Data Name" を含むヘッダーを青に
-          if (header.includes('Data Name')) {
-            th.className = 'data-name-header';
-          }
-
+          if (idx === dataNameIndex) th.className = "data-name-header";
           headerRow.appendChild(th);
         });
 
         const tbody = table.createTBody();
-        
-        // Data Name の列インデックスを特定
-        const dataNameIndex = headers.findIndex(header => header === 'Data Name (clickでcopy)');
-        
         data.forEach(row => {
           const tr = tbody.insertRow();
-          
-          headers.forEach((header, index) => {
+          headers.forEach((header, idx) => {
             const td = tr.insertCell();
             td.textContent = row[header] || '';
-
-            // Data Name の列にのみクリックコピー機能を追加
-            if (index === dataNameIndex) {
-              td.className = "data-name-cell";
-              td.title = "クリックしてコピー";
-              
-              // クリックイベントを直接設定
-              td.onclick = function() {
-                const textToCopy = this.textContent.trim();
-                
-                // コピー処理
-                copyTextToClipboard(textToCopy)
-                  .then(success => {
-                    if (success) {
-                      showCopyFeedback(textToCopy);
-                    } else {
-                      console.warn('コピーに失敗しました');
-                      alert('コピーに失敗しました。別の方法で選択してコピーしてください。');
-                    }
-                  });
+            if (idx === dataNameIndex) {
+              td.className = 'data-name-cell';
+              td.onclick = () => {
+                const text = td.textContent.trim();
+                copyTextToClipboard(text).then(success => {
+                  if (success) showCopyFeedback(text);
+                  else alert('コピーに失敗しました');
+                });
               };
             }
           });
         });
-      })
-      .catch(error => {
-        document.getElementById('data-table').innerHTML =
-          '<tr><td>読み込みエラー: ' + error.message + '</td></tr>';
-        console.error('読み込みエラー:', error);
       });
   </script>
 </body>
