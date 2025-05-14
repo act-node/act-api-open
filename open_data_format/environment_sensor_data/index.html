@@ -1,9 +1,47 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-<script>
-  fetch('environment_sensor_data_list.csv')
-    .then(response => response.text())
-    .then(csv => {
-      const data = Papa.parse(csv, {header: true}).data;
-      // 表形式に変換して表示
-    });
-</script>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>環境センサーデータ</title>
+</head>
+<body>
+  <h1>環境センサーデータ一覧</h1>
+  <div id="table-container"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script>
+    fetch('environment_sensor_data_list.csv')
+      .then(response => response.text())
+      .then(csv => {
+        const data = Papa.parse(csv, { header: true }).data;
+        const container = document.getElementById('table-container');
+
+        // テーブル作成
+        const table = document.createElement('table');
+        table.border = 1;
+
+        // ヘッダー行
+        const headerRow = document.createElement('tr');
+        Object.keys(data[0]).forEach(key => {
+          const th = document.createElement('th');
+          th.textContent = key;
+          headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        // データ行
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          Object.values(row).forEach(value => {
+            const td = document.createElement('td');
+            td.textContent = value;
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+
+        container.appendChild(table);
+      });
+  </script>
+</body>
+</html>
