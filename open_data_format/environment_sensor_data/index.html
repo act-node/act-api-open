@@ -68,19 +68,24 @@
       .then(csvText => {
         const parsed = Papa.parse(csvText, {
           header: true,
-          skipEmptyLines: true,
+          skipEmptyLines: true
         });
 
-        const data = parsed.data;
-        const headers = parsed.meta.fields; // すべての列名を取得
+        const headers = parsed.meta.fields;
+        const rawData = parsed.data;
+
+        // 空行やすべての値が空の行を除外
+        const data = rawData.filter(row =>
+          headers.some(header => (row[header] || '').trim() !== '')
+        );
 
         const table = document.getElementById('data-table');
         if (data.length === 0 || !headers) {
-          table.innerHTML = '<tr><td>データがありません</td></tr>';
+          table.innerHTML = '<tr><td>有効なデータがありません</td></tr>';
           return;
         }
 
-        // ヘッダー作成
+        // ヘッダー描画
         const thead = table.createTHead();
         const headerRow = thead.insertRow();
         headers.forEach(header => {
@@ -89,7 +94,7 @@
           headerRow.appendChild(th);
         });
 
-        // 本文作成
+        // 本文描画
         const tbody = table.createTBody();
         data.forEach(row => {
           const tr = tbody.insertRow();
