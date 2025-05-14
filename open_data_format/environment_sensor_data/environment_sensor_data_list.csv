@@ -78,14 +78,14 @@ env,13000,Evaporation,13010,Potential Evaporation,potential_evaporation,蒸発,�
 env,13000,Evaporation,13020,Potential Evapotranspiration,potential_evapotranspiration,蒸発,ポテンシャル蒸発散量
 env,13000,Evaporation,13030,Evapotranspiration Fao,evapotranspiration_FAO,蒸発,FAO基準蒸発散量
 ,,,,,,,
-env,14000,Atmospheric Composition,14010,Air CO2 Vol Conc,air_carbon_dioxide_vol-conc,空気中成分,CO2 空気中二酸化炭素体積濃度
+env,14000,Atmospheric Composition,14010,Air CO2 Vol Conc,air_carbon_dioxide_vol_conc,空気中成分,CO2 空気中二酸化炭素体積濃度
 env,,Atmospheric Composition,14010,Air CO2 Vol Conc,air_CO2,空気中成分,CO2 空気中二酸化炭素体積濃度
-env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_oxygen_vol-conc,空気中成分,O2 空気中酸素体積濃度
+env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_oxygen_vol_conc,空気中成分,O2 空気中酸素体積濃度
 env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_O2,空気中成分,O2 空気中酸素体積濃度
-env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_nitrogen_dioxide_vol-conc,空気中成分,NO2 空気中二酸化窒素体積濃度
+env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_nitrogen_dioxide_vol_conc,空気中成分,NO2 空気中二酸化窒素体積濃度
 env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_NO2,空気中成分,NO2 空気中二酸化窒素体積濃度
-env,14000,Atmospheric Composition,14040,Air Ethylene Vol Conc,air_etylene_vol-conc,空気中成分,空気中エチレン
-env,14000,Atmospheric Composition,14050,Air Ammonia Vol Conc,air_etylene-ammonia_vol-conc,空気中成分,空気中アンモニア体積濃度
+env,14000,Atmospheric Composition,14040,Air Ethylene Vol Conc,air_etylene_vol_conc,空気中成分,空気中エチレン
+env,14000,Atmospheric Composition,14050,Air Ammonia Vol Conc,air_etylene-ammonia_vol_conc,空気中成分,空気中アンモニア体積濃度
 env,14000,Atmospheric Composition,14060,Dose Equivalent,dose_equivalent,空気中成分,線量当量
 env,14000,Atmospheric Composition,14070,Energy Dose,energy_dose,空気中成分,吸収線量
 env,14000,Atmospheric Composition,14080,Ion Dose,ion_dose,空気中成分,照射線量
@@ -189,20 +189,20 @@ env,33000,Irrigation,33400,Irrigation EC,irrigation_EC,灌水,灌水EC
 env,33000,Irrigation,33410,Irrigation Ph,irrigation_pH,灌水,潅水pH
 env,33000,Irrigation,33500,Solution Electrical Conductivity,solution_electrical_conductivity,灌水,養液EC
 env,33000,Irrigation,33510,Solution pH,solution_pH,灌水,養液pH
-env,33000,Irrigation,33520,Solution Ammonium Nitrogen Sub Conc,solution_ammonium_nitrogen_sub-conc,灌水,養液中アンモニア態窒素
-env,33000,Irrigation,33530,Solution Nitrate Nitrogen Sub Conc,solution_nitrate_nitrogen_sub-conc,灌水,養液中硝酸態窒素
-env,33000,Irrigation,33540,Solution Phosphorus Sub Conc,solution_phosphorus_sub-conc,灌水,養液中リン酸
-env,33000,Irrigation,33550,Solution Potassium Sub Conc,solution_potassium_sub-conc,灌水,養液中カリウム
-env,33000,Irrigation,33560,Solution Calcium Sub Conc,solution_calcium_sub-conc,灌水,養液中カルシウム
-env,33000,Irrigation,33570,Solution Magnesium Sub Conc,solution_magnesium_sub-conc,灌水,養液中マグネシウム
-env,33000,Irrigation,33580,Solution Copper Sub Conc,solution_copper_sub-conc,灌水,養液中銅
-env,33000,Irrigation,33590,Solution Zinc Sub Conc,solution_zinc_sub-conc,灌水,養液中亜鉛
-env,33000,Irrigation,33600,Solution Manganese Sub Conc,solution_manganese_sub-conc,灌水,養液中マンガン
-env,33000,Irrigation,33610,Solution Boron Sub Conc,solution_boron_sub-conc,灌水,養液中ホウ素
-env,33000,Irrigation,33620,Solution Ferric Oxide Sub Conc,solution_ferric_oxide_sub-conc,灌水,養液中鉄
-env,33000,Irrigation,33630,Solution Molybdenum Sub Conc,solution_molybdenum_sub-conc,灌水,養液中モリブデン
-env,33000,Irrigation,33640,Solution Chlorine Sub Conc,solution_chlorine_sub-conc,灌水,養液中塩素
-env,33000,Irrigation,33650,Solution Sulfate Sub Conc,solution_sulfate_sub-conc,灌水,養液中硫酸
+env,33000,Irrigation,33520,Solution Ammonium Nitrogen Sub Conc,solution_ammonium_nitrogen_sub_conc,灌水,養液中アンモニア態窒素
+env,33000,Irrigation,33530,Solution Nitrate Nitrogen Sub Conc,solution_nitrate_nitrogen_sub_conc,灌水,養液中硝酸態窒素
+env,33000,Irrigation,33540,Solution Phosphorus Sub Conc,solution_phosphorus_sub_conc,灌水,養液中リン酸
+env,33000,Irrigation,33550,Solution Potassium Sub Conc,solution_potassium_sub_conc,灌水,養液中カリウム
+env,33000,Irrigation,33560,Solution Calcium Sub Conc,solution_calcium_sub_conc,灌水,養液中カルシウム
+env,33000,Irrigation,33570,Solution Magnesium Sub Conc,solution_magnesium_sub_conc,灌水,養液中マグネシウム
+env,33000,Irrigation,33580,Solution Copper Sub Conc,solution_copper_sub_conc,灌水,養液中銅
+env,33000,Irrigation,33590,Solution Zinc Sub Conc,solution_zinc_sub_conc,灌水,養液中亜鉛
+env,33000,Irrigation,33600,Solution Manganese Sub Conc,solution_manganese_sub_conc,灌水,養液中マンガン
+env,33000,Irrigation,33610,Solution Boron Sub Conc,solution_boron_sub_conc,灌水,養液中ホウ素
+env,33000,Irrigation,33620,Solution Ferric Oxide Sub Conc,solution_ferric_oxide_sub_conc,灌水,養液中鉄
+env,33000,Irrigation,33630,Solution Molybdenum Sub Conc,solution_molybdenum_sub_conc,灌水,養液中モリブデン
+env,33000,Irrigation,33640,Solution Chlorine Sub Conc,solution_chlorine_sub_conc,灌水,養液中塩素
+env,33000,Irrigation,33650,Solution Sulfate Sub Conc,solution_sulfate_sub_conc,灌水,養液中硫酸
 env,33000,Irrigation,33800,Drainage Water,drainage_water,灌水,排液量
 env,33000,Irrigation,33810,Drainage Ratio,drainage_ratio,灌水,排液率
 env,33000,Irrigation,33900,Drainage Electrical Conductivity,drainage_electrical_conductivity,灌水,排液EC
@@ -356,31 +356,31 @@ env,51000,Water Temperature,51003,Water Temperature Min,minimum_water_temperatur
 ,,,,,,,
 env,54000,Water content,54010,Water EC,water_EC,水中成分,水中EC
 env,54000,Water content,54010,Water EC,water_electrical_conductivity,水中成分,水中EC
-env,54000,Water content,54020,Dissolved oxygen (DO),water_oxygen_sub-conc,水中成分,溶存 酸素 (DO)
+env,54000,Water content,54020,Dissolved oxygen (DO),water_oxygen_sub_conc,水中成分,溶存 酸素 (DO)
 env,54000,Water content,54020,Dissolved oxygen (DO),water_do,水中成分,溶存 酸素 (DO)
 env,54000,Water content,54030,Water pH,water_pH,水中成分,水中 pH
 env,54000,Water content,54040,Water Ammonia [NH3],water_ammonia,水中成分,水中アンモニア [NH3]
-env,54000,Water content,54045,Water Ammonium Nitrogen Sub Conc,water_ammonium_nitrogen_sub-conc,水中成分,水中アンモニア態窒素
-env,54000,Water content,54050,Water Nitrate [NO3-],water_nitrate_sub-conc,水中成分,水中 硝酸塩 [NO3-]
-env,54000,Water content,54055,Water Nitrate Nitrogen [NO3-N],water_nitrate_nitrogen_sub-conc,水中成分,水中 硝酸態窒素 [NO3-N]
-env,54000,Water content,54060,Water Nitrite [NO2-],water_nitrite_sub-conc,水中成分,水中 亜硝酸塩 [NO2-]
-env,54000,Water content,54070,Water Phosphorus Sub Conc,water_phosphorus_sub-conc,水中成分,水中 リン酸
-env,54000,Water content,54080,Water Potassium Sub Conc,water_potassium_sub-conc,水中成分,水中 カリウム [K+]
-env,54000,Water content,54090,Water Calcium Sub Conc,water_calcium_sub-conc,水中成分,水中 カルシウム [Ca2+]
-env,54000,Water content,54100,Water Magnesium Sub Conc,water_magnesium_sub-conc,水中成分,水中 マグネシウム [Mg2+]
-env,54000,Water content,54110,Water Copper Sub Conc,water_copper_sub-conc,水中成分,水中銅
-env,54000,Water content,54120,Water Zinc Sub Conc,water_zinc_sub-conc,水中成分,水中亜鉛
-env,54000,Water content,54130,Water Manganese Sub Conc,water_manganese_sub-conc,水中成分,水中マンガン
-env,54000,Water content,54140,Water Boron Sub Conc,water_boron_sub-conc,水中成分,水中ホウ素
-env,54000,Water content,54150,Water Ferric Oxide Sub Conc,water_ferric_oxide_sub-conc,水中成分,水中鉄
-env,54000,Water content,54160,Water Molybdenum Sub Conc,water_molybdenum_sub-conc,水中成分,水中モリブデン
-env,54000,Water content,54170,Water Chlorine Sub Conc,water_chlorine_sub-conc,水中成分,水中塩素
-env,54000,Water content,54180,Water Sulfate Sub Conc,water_sulfate_sub-conc,水中成分,水中硫酸
-env,54000,Water content,54200,Water Salinity Sub Conc,water_salinity_sub-conc,水中成分,塩分濃度
+env,54000,Water content,54045,Water Ammonium Nitrogen Sub Conc,water_ammonium_nitrogen_sub_conc,水中成分,水中アンモニア態窒素
+env,54000,Water content,54050,Water Nitrate [NO3-],water_nitrate_sub_conc,水中成分,水中 硝酸塩 [NO3-]
+env,54000,Water content,54055,Water Nitrate Nitrogen [NO3-N],water_nitrate_nitrogen_sub_conc,水中成分,水中 硝酸態窒素 [NO3-N]
+env,54000,Water content,54060,Water Nitrite [NO2-],water_nitrite_sub_conc,水中成分,水中 亜硝酸塩 [NO2-]
+env,54000,Water content,54070,Water Phosphorus Sub Conc,water_phosphorus_sub_conc,水中成分,水中 リン酸
+env,54000,Water content,54080,Water Potassium Sub Conc,water_potassium_sub_conc,水中成分,水中 カリウム [K+]
+env,54000,Water content,54090,Water Calcium Sub Conc,water_calcium_sub_conc,水中成分,水中 カルシウム [Ca2+]
+env,54000,Water content,54100,Water Magnesium Sub Conc,water_magnesium_sub_conc,水中成分,水中 マグネシウム [Mg2+]
+env,54000,Water content,54110,Water Copper Sub Conc,water_copper_sub_conc,水中成分,水中銅
+env,54000,Water content,54120,Water Zinc Sub Conc,water_zinc_sub_conc,水中成分,水中亜鉛
+env,54000,Water content,54130,Water Manganese Sub Conc,water_manganese_sub_conc,水中成分,水中マンガン
+env,54000,Water content,54140,Water Boron Sub Conc,water_boron_sub_conc,水中成分,水中ホウ素
+env,54000,Water content,54150,Water Ferric Oxide Sub Conc,water_ferric_oxide_sub_conc,水中成分,水中鉄
+env,54000,Water content,54160,Water Molybdenum Sub Conc,water_molybdenum_sub_conc,水中成分,水中モリブデン
+env,54000,Water content,54170,Water Chlorine Sub Conc,water_chlorine_sub_conc,水中成分,水中塩素
+env,54000,Water content,54180,Water Sulfate Sub Conc,water_sulfate_sub_conc,水中成分,水中硫酸
+env,54000,Water content,54200,Water Salinity Sub Conc,water_salinity_sub_conc,水中成分,塩分濃度
 env,54000,Water content,54220,KH,water_KH,水中成分,KH
 env,54000,Water content,54230,TDS,water_TDS,水中成分,TDS
 ,,,,,,,
-env,56000,Water Biological,56010,chlorophyll,water_chlorophyll_sub-conc,水中生物性,クロロフィル
+env,56000,Water Biological,56010,chlorophyll,water_chlorophyll_sub_conc,水中生物性,クロロフィル
 env,56000,Water Biological,56410,Biofloc,water_BF,水中生物性,BF(バイオフロック)量
 ,,,,,,,
 env,61000,Visual,61010,白濁,water_color_white,目視,白濁
