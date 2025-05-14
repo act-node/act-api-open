@@ -54,6 +54,13 @@
       white-space: nowrap;
     }
 
+    /* ✅ Data Name列の幅を制限 */
+    td.data-name-cell {
+      min-width: 100px;
+      max-width: 160px;
+      width: 140px;
+    }
+
     th {
       background-color: #007acc;
       color: white;
@@ -116,6 +123,7 @@
         const headers = parsed.meta.fields;
         const rawData = parsed.data;
 
+        // 空行や全カラム空の行を除外
         const data = rawData.filter(row =>
           headers.some(header => (row[header] || '').trim() !== '')
         );
@@ -126,6 +134,7 @@
           return;
         }
 
+        // ヘッダー描画
         const thead = table.createTHead();
         const headerRow = thead.insertRow();
         headers.forEach(header => {
@@ -134,6 +143,7 @@
           headerRow.appendChild(th);
         });
 
+        // 本文描画
         const tbody = table.createTBody();
         data.forEach(row => {
           const tr = tbody.insertRow();
@@ -141,8 +151,9 @@
             const td = tr.insertCell();
             td.textContent = row[header] || '';
 
-            // ✅ 1列目（data_name）にクリックコピー機能を付加
+            // ✅ 1列目（Data Name）だけスタイル＆コピー機能追加
             if (index === 0) {
+              td.classList.add('data-name-cell');
               td.style.cursor = "pointer";
               td.title = "クリックしてコピー";
               td.addEventListener('click', () => {
