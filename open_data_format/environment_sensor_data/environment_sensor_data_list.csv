@@ -290,7 +290,7 @@ env,40000,Soil Chemical Properties,40350,Soil bulk EC (50cm),soil_bulk_electrica
 env,40000,Soil Chemical Properties,40355,Soil bulk EC (55cm),soil_bulk_electrical_conductivity_depth55cm,土壌 化学性,バルクEC (深度55cm)
 env,40000,Soil Chemical Properties,40360,Soil bulk EC (60cm),soil_bulk_electrical_conductivity_depth60cm,土壌 化学性,バルクEC (深度60cm)
 env,40000,Soil Chemical Properties,40400,Soil electric permittivity,soil_bulk_electrical_conductivity_depth60cm,土壌 化学性,土壌 誘電率
-env,40000,Soil Chemical Properties,40500,Soil relative permittivity,,土壌 化学性,土壌 比誘電率
+env,40000,Soil Chemical Properties,40500,Soil relative permittivity,soil_relative_permittivity,土壌 化学性,土壌 比誘電率
 ,,,,,,,
 env,40000,Soil Chemical Properties,41100,Soil volumetric ion content,soil_volumetric_Ion_content,土壌 化学性,体積イオン含有量
 env,40000,Soil Chemical Properties,41105,Soil volumetric ion content (5cm),soil_volumetric_Ion_content_depth5cm,土壌 化学性,体積イオン含有量 (深度5cm)
@@ -405,6 +405,6 @@ env,90000,Device,90110,Battery Level,battery_level,計測器,バッテリーレ�
 env,90000,Device,90200,Battery Temperature,battery_temppalture,計測器,バッテリー温度
 ,,,,,,,
 env,90000,Device,91200,Sigfox Link Quality Indicator (OK>1),link_quality_indicator,計測器,Sigfox電波強度 LQI (OK>1)
-env,90000,Device,91300,LoRa RSSI (OK>-130),,計測器,LoRa電波強度 RSSI (OK>-130)
+env,90000,Device,91300,LoRa RSSI (OK>-130),lora_rssi,計測器,LoRa電波強度 RSSI (OK>-130)
 ,,,,,,,
-,,,92200,,,ロガー,ロガー温度
+env,90000,Logger,92200,Logger Temperature,logger_temperature,ロガー,ロガー温度
