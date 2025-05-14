@@ -1,20 +1,20 @@
 Type,c_code,Category, cid(data id), Name, Data Name (clickでcopy),Category [和名],Name [和名]
 env,10000,Weather,10000,Weather,weather,天気,天気
-env,10000,Weather,10011,Fine weather,fine_weather,天気,天気: 快晴
-env,10000,Weather,10012,Sunny,sunny,天気,天気: 晴れ
-env,10000,Weather,10013,Cloudy (Thin),cloudy_thin,天気,天気: 薄曇
-env,10000,Weather,10014,Cloudy,cloudy,天気,天気: 曇り
-env,10000,Weather,10015,Smoke fog,smoke_fog,天気,天気: 煙霧
-env,10000,Weather,10016,Sand storm,sand_storm,天気,天気: 砂塵嵐
-env,10000,Weather,10017,Ground Blizzard,ground_blizzard,天気,天気: 地吹雪
-env,10000,Weather,10018,Fog,fog,天気,天気: 霧
-env,10000,Weather,10019,Drizzle,drizzle,天気,天気: 霧雨
-env,10000,Weather,10020,Rain,rain,天気,天気: 雨
-env,10000,Weather,10021,Sleet,sleet,天気,天気: みぞれ
-env,10000,Weather,10022,Snow,snow,天気,天気: 雪
-env,10000,Weather,10023,Hhail (Small),hail_small,天気,天気: あられ
-env,10000,Weather,10024,Hail,hail,天気,天気: 雹
-env,10000,Weather,10025,Thunder,thunder,天気,天気: 雷
+env,10000,Weather,10011,Weather: Fine,weather_fine,天気,天気: 快晴
+env,10000,Weather,10012,Weather: Sunny,weather_sunny,天気,天気: 晴れ
+env,10000,Weather,10013,Weather: Cloudy (Thin),weather_cloudy_thin,天気,天気: 薄曇
+env,10000,Weather,10014,Weather: Cloudy,weather_cloudy,天気,天気: 曇り
+env,10000,Weather,10015,Weather: Smoke fog,weather_smoke_fog,天気,天気: 煙霧
+env,10000,Weather,10016,Weather: Sand storm,weather_sand_storm,天気,天気: 砂塵嵐
+env,10000,Weather,10017,Weather: Ground Blizzard,weather_ground_blizzard,天気,天気: 地吹雪
+env,10000,Weather,10018,Weather: Fog,weather_fog,天気,天気: 霧
+env,10000,Weather,10019,Weather: Drizzle,weather_drizzle,天気,天気: 霧雨
+env,10000,Weather,10020,Weather: Rain,weather_rain,天気,天気: 雨
+env,10000,Weather,10021,Weather: Sleet,weather_sleet,天気,天気: みぞれ
+env,10000,Weather,10022,Weather: Snow,weather_snow,天気,天気: 雪
+env,10000,Weather,10023,Weather: Hhail (Small),weather_hail_small,天気,天気: あられ
+env,10000,Weather,10024,Weather: Hail,weather_hail,天気,天気: 雹
+env,10000,Weather,10025,Weather: Thunder,weather_thunder,天気,天気: 雷
 ,,,,,,,
 env,10500,Precipitation,10510,Rain,rain,降水,感雨
 env,10500,Precipitation,10520,Precipitation,precipitation,降水,降水量
