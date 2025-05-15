@@ -1,410 +1,107 @@
 Type,c_code,Category, cid(data id), Name, Data Name (clickでcopy),Category [和名],Name [和名]
-env,10000,Weather,10000,Weather,weather,天気,天気
-env,10000,Weather,10011,Weather: Fine,weather_fine,天気,天気: 快晴
-env,10000,Weather,10012,Weather: Sunny,weather_sunny,天気,天気: 晴れ
-env,10000,Weather,10013,Weather: Cloudy (Thin),weather_cloudy_thin,天気,天気: 薄曇
-env,10000,Weather,10014,Weather: Cloudy,weather_cloudy,天気,天気: 曇り
-env,10000,Weather,10015,Weather: Smoke fog,weather_smoke_fog,天気,天気: 煙霧
-env,10000,Weather,10016,Weather: Sand storm,weather_sand_storm,天気,天気: 砂塵嵐
-env,10000,Weather,10017,Weather: Ground Blizzard,weather_ground_blizzard,天気,天気: 地吹雪
-env,10000,Weather,10018,Weather: Fog,weather_fog,天気,天気: 霧
-env,10000,Weather,10019,Weather: Drizzle,weather_drizzle,天気,天気: 霧雨
-env,10000,Weather,10020,Weather: Rain,weather_rain,天気,天気: 雨
-env,10000,Weather,10021,Weather: Sleet,weather_sleet,天気,天気: みぞれ
-env,10000,Weather,10022,Weather: Snow,weather_snow,天気,天気: 雪
-env,10000,Weather,10023,Weather: Hhail (Small),weather_hail_small,天気,天気: あられ
-env,10000,Weather,10024,Weather: Hail,weather_hail,天気,天気: 雹
-env,10000,Weather,10025,Weather: Thunder,weather_thunder,天気,天気: 雷
+activity,100,Seedling,101,Seeding,seeding,育苗,育苗播種
+activity,100,Seedling,102,Planting (Parent stock),planting_(parent_stock),育苗,定植(親株)
+activity,100,Seedling,110,Puddling culti-plate,puddling_culti-plate,育苗,培地浸水
+activity,100,Seedling,170,Transplant,transplant,育苗,移植
+activity,100,Seedling,171,Nursery replanting,nursery_replanting,育苗,苗床植替え
+activity,200,Brooding,201,Brooding,brooding,育雛,育雛
+activity,1000,Preparation,1000,Preparation,preparation,準備,準備
+activity,1000,Preparation,1001,Clean up,clean_up,準備,準備清掃
+activity,1000,Preparation,1002,Remove Mulch,remove_mulch,準備,マルチ剥ぎ
+activity,1000,Preparation,1050,Remove feces,remove_feces,準備,除フン
+activity,1100,Land_preparation,1101,Plow,plow,耕起・整地,耕起
+activity,1100,Land_preparation,1102,Ridging,ridging,耕起・整地,畝立
+activity,1100,Land_preparation,1103,Mulching,mulching,耕起・整地,マルチ張り
+activity,1700,Feed_preparation,1771,,,飼料準備,アルテミア培養
+activity,1800,Feed_preparation,1871,,,資材準備,バイオミックス作成
+activity,1800,Feed_preparation,1872,,,資材準備,バイオアグリゲーション作成
+activity,1800,Feed_preparation,1873,,,資材準備,ジオライト投入
+activity,2100,Planting,2101,Seeding,seeding,播種・定植,播種
+activity,2100,Planting,2102,Planting,planting,播種・定植,定植
+activity,2100,Planting,2103,Planting,planting,播種・定植,田植
+activity,2200,Introduction,2200,Introduction,introduction,導入,導入
+activity,2200,Introduction,2201,Chick Introduction,chick_introduction,導入,ひな導入
+activity,2200,Introduction,2251,Fry Introduction,fry_introduction,導入,池入れ
+activity,3100,Fertilization,3100,Fertilization,fertilization,施肥,施肥
+activity,3100,Fertilization,3101,Fertilization,fertilization,施肥,施肥
+activity,3100,Fertilization,3102,Add Fertilizer,add_fertilizer,施肥,追肥
+activity,3100,Fertilization,3103,Add Soil Conditioner,add_soil_conditioner,施肥,土壌改良剤散布
+activity,3200,Feeding,3200,Feed,feed,給餌,給餌
+activity,3200,Feeding,3210,Add Feed,add_feed,給餌,飼料追加
+activity,3200,Feeding,3220,Feed Check,feed_check,給餌,餌量チェック
+activity,3200,Feeding,3230,Water Meter,water_meter,給餌,飲水量チェック
+activity,4000,Control,4000,Control,control,管理,管理
+activity,4000,Control,4001,Feild Check,feild_check,管理,見回り
+activity,4000,Control,4002,Observe,observe,管理,観察記録
+activity,4000,Control,4003,Inspection,inspection,管理,点検
+activity,4000,Control,4004,Photo,photo,管理,写真撮影
+activity,4100,Org Check,4100,Org Check,org_check,生体チェック,生体観察
+activity,4100,Org Check,4101,Weight,weight,生体チェック,体重計測
+activity,4200,Env Check,4200,Env Check,env_check,環境チェック,環境チェック
+activity,4200,Env Check,4201,Env. Data,env._data,環境チェック,環境計測
+activity,4300,Facility Check,4300,Facility Check,facility_check,設備チェック,設備チェック
+activity,4400,Utility Cost Check,4410,electric bill,electric_bill,光熱費チェック,電気代
+activity,4600,Pruning,4602,Pruning,pruning,剪定,剪定
+activity,4900,Loss Check,4900,Loss Check,loss_check,ロスチェック,ロスチェック
+activity,4900,Loss Check,4901,Dead Check,dead_check,ロスチェック,死鳥チェック
+activity,4900,Loss Check,4902,Dead Check,dead_check,ロスチェック,死魚チェック
+activity,4900,Loss Check,4990,Num Correction,num_correction,ロスチェック,数値補正
+activity,5000,Prevention,5000,Privent,privent,防除,防除
+activity,5000,Prevention,5001,Weeding,weeding,防除,除草
+activity,5000,Prevention,5002,Apply Herbicide,apply_herbicide,防除,除草剤散布
+activity,5000,Prevention,5003,Apply Herbicide,apply_herbicide,防除,薬剤散布
+activity,5000,Prevention,5004,Apply Chemical,apply_chemical,防除,農薬散布
+activity,5000,Prevention,5005,Soil Disinfection,soil_disinfection,防除,土壌消毒
+activity,5100,Snitize,5100,Snitize,snitize,消毒,消毒
+activity,5100,Snitize,5101,Snitize Equipment,snitize_equipment,消毒,備品消毒
+activity,5200,Irrigation,5200,Irrigation,irrigation,潅水,潅水
+activity,5200,Irrigation,5201,Watering,watering,潅水,水やり
+activity,5300,Medication,5301,Medication,medication,投薬,薬品投与
+activity,5300,Medication,5302,Vaccines,vaccines,投薬,ワクチン
+activity,5300,Medication,5303,Addition to Water,addition_to_water,投薬,飲水添加
+activity,5500,Env Control,5501,Drain Water,drain_water,環境調整,排水
+activity,5500,Env Control,5502,Add Water,add_water,環境調整,給水
+activity,5500,Env Control,5520,Water Activation,water_activation,環境調整,水質活性
+activity,5600,Env Control,5640,Mulching,mulching,環境調整,マルチング
+activity,5600,Env Control,5645,Uncover Mulchi,uncover_mulchi,環境調整,マルチ外し
+activity,5600,Env Control,5560,Bee introduction,bee_introduction,環境調整,ミツバチ搬入
+activity,5600,Setting,5600,Facility Setting,facility_setting,設定,設備設定
+activity,5600,Setting,5601,Guard Resize,guard_resize,設定,ガード変更
+activity,5700,Control,5701,Fruit Thinning,fruit_thinning,管理,摘果
+activity,5700,Control,5702,Pruning,pruning,管理,剪定
+activity,5700,Control,5703,Defoliation,defoliation,管理,摘葉
+activity,5700,Control,5704,Bind branches,bind_branches,管理,誘引
+activity,5700,Control,5705,Expose fruit,expose_fruit,管理,玉だし
+activity,5700,Control,5706,Pinch,pinch,管理,摘心
+activity,5700,Control,5707,Flower picking,flower_picking,管理,摘花
+activity,5700,Control,5708,Pull down,pull_down,管理,おろし
+activity,5700,Control,5709,Runner trimming,runner_trimming,管理,ランナー摘み
+activity,5700,Control,5710,Side bud trimming,side_bud_trimming,管理,わき芽かき
+activity,5700,Control,5711,Buds picking,buds_picking,管理,摘らい
 ,,,,,,,
-env,10500,Precipitation,10510,Rain,rain,降水,感雨
-env,10500,Precipitation,10520,Precipitation,precipitation,降水,降水量
-env,10500,Precipitation,10530,Rainfall,rainfall,降水,降雨量
-env,10500,Precipitation,10531,Rainfall (hourly),rainfall_hourly,降水,降雨量(/時間)
-env,10500,Precipitation,10532,Rainfall (dayly),rainfall_daily,降水,降雨量(/日)
-env,10500,Precipitation,10540,Rainfall Duration,rainfall_duration,降水,降雨時間
-env,10500,Precipitation,10550,Rainfall Intensity,rainfall_intensity,降水,降雨強度
-env,10500,Precipitation,10560,Snowfall,snowfall,降水,降雪量
-env,10500,Precipitation,10570,Snow Cover Depth,snow_cover_depth,降水,積雪深
-env,10500,Precipitation,10580,Hailfall,hailfall,降水,降雹量
-env,10500,Precipitation,10590,Hailfall Duration,hailfall_duration,降水,降雹時間
-env,10500,Precipitation,10600,Hailfall Intensity,hailfall_intensity,降水,降雹強度
-env,10500,Precipitation,10610,Leaf Wetness,leaf_wetness,降水,葉面濡れ
-env,10500,Precipitation,10620,Leaf Wetness Duration,leaf_wetness_duration,降水,葉面濡れ時間
-,,,,,,,
-env,10700,Sunshine Duration,10710,Sunshine Duration,sunshine_duration,日照時間,日照時間
-env,10700,Sunshine Duration,10720,Greenhouse Sunshine Duration,greenhouse_sunshine_duration,日照時間,温室内日照時間
-env,10700,Sunshine Duration,10730,Possible Sunshine Duration,possible_sunshine_duration,日照時間,可照時間
-env,10700,Sunshine Duration,10740,Relative Sunshine Duration,relative_sunshine_duration,日照時間,日照率
-env,10700,Sunshine Duration,10750,Day Length,day_length,日照時間,日長
-env,10700,Sunshine Duration,10760,Sunrise Time,sunrise_time,日照時間,日出時間
-env,10700,Sunshine Duration,10770,Sunset Time,sunset_time,日照時間,日没時間
-,,,,,,,
-env,11000,Temperature,11000,Temperature,temperature,温度,温度
-env,11000,Temperature,11001,Temperature Ave,average_temperature,温度,温度 [平均]
-env,11000,Temperature,11002,Temperature Max,maximum_temperature,温度,温度 [最高]
-env,11000,Temperature,11003,Temperature Min,minimum_temperature,温度,温度 [最低]
-env,11000,Temperature,11010,Air Temperature,air_temperature,温度,気温
-env,11000,Temperature,11020,Greenhouse Air Temperature,greenhouse_air_temperature,温度,温室内気温
-env,11000,Temperature,11030,Outside Air Temperature,outside_air_temperature,温度,屋外温度
-env,11000,Temperature,11040,Canopy Temperature,canopy_temperature,温度,群落温度
-env,11000,Temperature,11050,Leaf Temperature,leaf_temperature,温度,葉面温度
-env,11000,Temperature,11060,Land Surface Temperature,land_surface_temperature,温度,地表面温度
-env,11000,Temperature,11070,Growing Point Air Temperature,growing_point_air_temperature,温度,生長点温度
-env,11000,Temperature,11080,Daytime Greenhouse Air Temperature,daytime_greenhouse_air_temperature,温度,日中温室内気温
-env,11000,Temperature,11090,Nighttime Greenhouse Air Temperature,nighttime_greenhouse_air_temperature,温度,夜間温室内気温
-env,11000,Temperature,11100,Heating Temperature,heating_temperature,温度,暖房温度
-env,11000,Temperature,11110,Cooling Temperature,cooling_temperature,温度,冷房温度
-env,11000,Temperature,11120,Greenhouse Measurement Box Temperature,greenhouse_measurement_box_temperature,温度,温室内センサ内温度
-env,11000,Temperature,11130,Outside Measurement Box Temperature,outside_measurement_box_temperature,温度,屋外センサ内温度
-env,11000,Temperature,11140,Growing Degree Days,growing_degree_days,温度,成長度日
-env,11000,Temperature,11150,Accumulated Temperature,accumulated_temperature,温度,積算温度
-env,11000,Temperature,11160,Effective Accumulated Temperature,effective_accumulated_temperature,温度,有効積算温度
-,,,,,,,
-env,12000,Humidity,12000,Absolute Humidity,absolute_humidity,湿度,湿度 [絶対]
-env,12000,Humidity,12010,Relative Humidity,relative_humidity,湿度,湿度 [相対]
-env,12000,Humidity,12020,Outside Relative Humidity,outside_relative_humidity,湿度,屋外相対湿度
-env,12000,Humidity,12030,Greenhouse Relative Humidity,greenhouse_relative_humidity,湿度,温室内相対湿度
-env,12000,Humidity,12040,Growing Point Relative Humidity,growing_point_relative_humidity,湿度,生長点相対湿度
-env,12000,Humidity,12050,Dewpoint Temperature,dewpoint_temperature,湿度,露点温度
-env,12000,Humidity,12060,Greenhouse Dewpoint Temperature,greenhouse_dewpoint_temperature,湿度,温室内露点温度
-env,12000,Humidity,12070,Growing Point Dewpoint Temperature,growing_point_dewpoint_temperature,湿度,生長点露点温度
-env,12000,Humidity,12080,Frostpoint Temperature,frostpoint_temperature,湿度,霜点温度
-env,12000,Humidity,12090,Vapor Pressure,vapor_pressure,湿度,蒸気圧
-env,12000,Humidity,12100,Growing Point Vapor Pressure,growing_point_vapor_pressure,湿度,生長点蒸気圧
-env,12000,Humidity,12110,Vapor Pressure Deficit,vapor_pressure_deficit,湿度,飽差(VPD)
-env,12000,Humidity,12120,Humidity Deficit,humidity_deficit,湿度,飽差(HD)
-,,,,,,,
-env,13000,Evaporation,13010,Potential Evaporation,potential_evaporation,蒸発,ポテンシャル蒸発量
-env,13000,Evaporation,13020,Potential Evapotranspiration,potential_evapotranspiration,蒸発,ポテンシャル蒸発散量
-env,13000,Evaporation,13030,Evapotranspiration Fao,evapotranspiration_FAO,蒸発,FAO基準蒸発散量
-,,,,,,,
-env,14000,Atmospheric Composition,14010,Air CO2 Vol Conc,air_carbon_dioxide_vol_conc,空気中成分,CO2 空気中二酸化炭素体積濃度
-env,14000,Atmospheric Composition,14010,Air CO2 Vol Conc,air_CO2,空気中成分,CO2 空気中二酸化炭素体積濃度
-env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_oxygen_vol_conc,空気中成分,O2 空気中酸素体積濃度
-env,14000,Atmospheric Composition,14020,Air O2 Vol Conc,air_O2,空気中成分,O2 空気中酸素体積濃度
-env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_nitrogen_dioxide_vol_conc,空気中成分,NO2 空気中二酸化窒素体積濃度
-env,14000,Atmospheric Composition,14030,Air NO2 Vol Conc,air_NO2,空気中成分,NO2 空気中二酸化窒素体積濃度
-env,14000,Atmospheric Composition,14040,Air Ethylene Vol Conc,air_etylene_vol_conc,空気中成分,空気中エチレン
-env,14000,Atmospheric Composition,14050,Air Ammonia Vol Conc,air_etylene_ammonia_vol_conc,空気中成分,空気中アンモニア体積濃度
-env,14000,Atmospheric Composition,14060,Dose Equivalent,dose_equivalent,空気中成分,線量当量
-env,14000,Atmospheric Composition,14070,Energy Dose,energy_dose,空気中成分,吸収線量
-env,14000,Atmospheric Composition,14080,Ion Dose,ion_dose,空気中成分,照射線量
-env,14000,Atmospheric Composition,14090,Radioactivity,radioactivity,空気中成分,放射能
-,,,,,,,
-env,15000,Atmospheric Pressure,15000,Air Pressure,air_pressure,気圧,空気圧
-env,15000,Atmospheric Pressure,15010,Atmospheric Pressure,atmospheric_pressure,気圧,気圧
-env,15000,Atmospheric Pressure,15020,Atmospheric Pressure At Sea Level,atmospheric_pressure_at_sea_level,気圧,海面気圧
-env,15000,Atmospheric Pressure,15030,Atmospheric Pressure At Station Level,atmospheric_pressure_at_station_level,気圧,現地気圧
-,,,,,,,
-env,16000,Surface Wind,16010,Wind Speed,wind_speed,風,風速
-env,16000,Surface Wind,16020,Maximum Instantaneous Wind Speed,maximum_instananeous_wind_speed,風,最大瞬間風速
-env,16000,Surface Wind,16030,Wind Direction,wind_direction,風,風向
-env,16000,Surface Wind,16040,Wind Direction In Maximum Wind Speed,wind_direction_in_maximum_wind_speed,風,風向（最大風速時）
-env,16000,Surface Wind,16050,Wind Direction In Maximum Instantaneous Wind Speed,wind_direction_in_maximum_instananeous_wind_speed,風,風向（最大瞬間風速時）
-env,16000,Surface Wind,16060,Growing Point Wind Direction In Maximum Instantaneous Wind Speed,growing_point_wind_direction_in_maximum_instananeous_wind_speed,風,生長点風向（最大瞬間風速時）
-,,,,,,,
-env,17000,Radiation,17010,Illuminance,illuminance,放射,照度
-env,17000,Radiation,17020,Irradiance,irradiance,放射,放射照度
-env,17000,Radiation,17030,Solar Irradiance,solar_irradiance,放射,日射照度
-env,17000,Radiation,17040,Diffuse Solar Irradiance,diffuse_solar_irradiance,放射,散乱日射照度
-env,17000,Radiation,17050,Direct Solar Irradiance,direct_solar_irradiance,放射,直達日射照度
-env,17000,Radiation,17060,Global Solar Irradiance,global_solar_irradiance,放射,全天日射照度
-env,17000,Radiation,17070,Global Solar Radiant Exposure,global_solar_radiant_exposure,放射,全天日射量
-env,17000,Radiation,17080,Daily Global Solar Radiant Exposure,daily_global_solar_radiant_exposure,放射,日全天日射量
-env,17000,Radiation,17090,Greenhouse Solar Irradiance,greenhouse_solar_irradiance,放射,温室内日射照度
-env,17000,Radiation,17100,Greenhouse Diffuse Solar Irradiance,greenhouse_diffuse_solar_irradiance,放射,温室内散乱日射照度
-env,17000,Radiation,17110,Greenhouse Direct Solar Irradiance,greenhouse_direct_solar_irradiance,放射,温室内直達日射照度
-env,17000,Radiation,17120,Downward Longwave Irradiance,downward_longwave_irradiance,放射,長波放射
-env,17000,Radiation,17130,Greenhouse Global Solar Irradiance,greenhouse_global_solar_irradiance,放射,温室内全天日射照度
-env,17000,Radiation,17140,Greenhouse Solar Radiant Exposure,greenhouse_solar_radiant_exposure,放射,温室内日射量
-env,17000,Radiation,17150,Greenhouse Global Solar Radiant Exposure,greenhouse_global_solar_radiant_exposure,放射,温室内全天日射量
-env,17000,Radiation,17160,PAR Radiant Exposure,PAR_radiant_exposure,放射,光合成有効放射量
-env,17000,Radiation,17170,Photosynthetic Photon Flux,photosynthetic_photon_flux,放射,光合成光量子フラックス
-env,17000,Radiation,17180,Photosynthetic Photon Flux Density,photosynthetic_photon_flux_density,放射,光合成光量子束密度
-env,17000,Radiation,17190,Outside Photosynthetic Photon Flux Density,outside_photosynthetic_photon_flux_density,放射,屋外光合成光量子束密度
-env,17000,Radiation,17200,Plant Photosynthetic Photon Flux Density,plant_photosynthetic_photon_flux_density,放射,植物体光合成光量子束密度
-env,17000,Radiation,17210,Ultraviolet Rays Dose,ultraviolet_rays_dose,放射,紫外線線量
-env,17000,Radiation,17220,Uv Index,UV_index,放射,紫外線量
-env,17000,Radiation,17230,Ultraviolet Rays Irradiance,ultraviolet_rays_irradiance,放射,紫外線強度
-,,,,,,,
-env,30000,Field Information,30000,Soil Type,soil_type,土壌情報,土壌型
-env,30000,Field Information,30010,Soil Texture,soil_texture,土壌情報,土性
-env,30000,Field Information,30020,Top Soil Depth,top_soil_depth,土壌情報,作土深
-env,30000,Field Information,30030,Effective Soil Depth,effective_soil_depth,土壌情報,有効土層深
-,,,,,,,
-env,31000,Soil Temperature,31000,Soil Temperature,soil_temperature,土壌温度,土壌温度
-env,31000,Soil Temperature,31005,Soil Temperature (5cm),soil_temperature_depth5cm,土壌温度,土壌温度 (深度5cm)
-env,31000,Soil Temperature,31010,Soil Temperature (10cm),soil_temperature_depth10cm,土壌温度,土壌温度 (深度10cm)
-env,31000,Soil Temperature,31015,Soil Temperature (15cm),soil_temperature_depth15cm,土壌温度,土壌温度 (深度15cm)
-env,31000,Soil Temperature,31020,Soil Temperature (20cm),soil_temperature_depth20cm,土壌温度,土壌温度 (深度20cm)
-env,31000,Soil Temperature,31025,Soil Temperature (25cm),soil_temperature_depth25cm,土壌温度,土壌温度 (深度25cm)
-env,31000,Soil Temperature,31030,Soil Temperature (30cm),soil_temperature_depth30cm,土壌温度,土壌温度 (深度30cm)
-env,31000,Soil Temperature,31035,Soil Temperature (35cm),soil_temperature_depth35cm,土壌温度,土壌温度 (深度35cm)
-env,31000,Soil Temperature,31040,Soil Temperature (40cm),soil_temperature_depth40cm,土壌温度,土壌温度 (深度40cm)
-env,31000,Soil Temperature,31045,Soil Temperature (45cm),soil_temperature_depth45cm,土壌温度,土壌温度 (深度45cm)
-env,31000,Soil Temperature,31050,Soil Temperature (50cm),soil_temperature_depth50cm,土壌温度,土壌温度 (深度50cm)
-env,31000,Soil Temperature,31055,Soil Temperature (55cm),soil_temperature_depth55cm,土壌温度,土壌温度 (深度55cm)
-env,31000,Soil Temperature,31060,Soil Temperature (60cm),soil_temperature_depth60cm,土壌温度,土壌温度 (深度60cm)
-env,31000,Soil Temperature,31100,Root Temperature,root_temperature,土壌温度,根圏土壌温度
-env,31000,Soil Temperature,31200,Rhizosphere Temperature,rhizosphere_temperature,土壌温度,根圏温度
-env,31000,Soil Temperature,31300,Substrate Temperature,substrate_temperature,土壌温度,培地温度
-,,,,,,,
-env,32000,Soil Moisture,32100,Soil Moisture Content,soil_moisture_content,土壌水分,土壌水分量
-env,32000,Soil Moisture,32105,Soil Moisture Content (5cm),soil_moisture_content_depth5cm,土壌水分,土壌水分量 (深度5cm)
-env,32000,Soil Moisture,32110,Soil Moisture Content (10cm),soil_moisture_content_depth10cm,土壌水分,土壌水分量 (深度10cm)
-env,32000,Soil Moisture,32115,Soil Moisture Content (15cm),soil_moisture_content_depth15cm,土壌水分,土壌水分量 (深度15cm)
-env,32000,Soil Moisture,32120,Soil Moisture Content (20cm),soil_moisture_content_depth20cm,土壌水分,土壌水分量 (深度20cm)
-env,32000,Soil Moisture,32125,Soil Moisture Content (25cm),soil_moisture_content_depth25cm,土壌水分,土壌水分量 (深度25cm)
-env,32000,Soil Moisture,32130,Soil Moisture Content (30cm),soil_moisture_content_depth30cm,土壌水分,土壌水分量 (深度30cm)
-env,32000,Soil Moisture,32135,Soil Moisture Content (35cm),soil_moisture_content_depth35cm,土壌水分,土壌水分量 (深度35cm)
-env,32000,Soil Moisture,32140,Soil Moisture Content (40cm),soil_moisture_content_depth40cm,土壌水分,土壌水分量 (深度40cm)
-env,32000,Soil Moisture,32145,Soil Moisture Content (45cm),soil_moisture_content_depth45cm,土壌水分,土壌水分量 (深度45cm)
-env,32000,Soil Moisture,32150,Soil Moisture Content (50cm),soil_moisture_content_depth50cm,土壌水分,土壌水分量 (深度50cm)
-env,32000,Soil Moisture,32155,Soil Moisture Content (55cm),soil_moisture_content_depth55cm,土壌水分,土壌水分量 (深度55cm)
-env,32000,Soil Moisture,32160,Soil Moisture Content (60cm),soil_moisture_content_depth60cm,土壌水分,土壌水分量 (深度60cm)
-env,32000,Soil Moisture,32200,Soil Volumetric Water Content,soil_volumetric_water_content,土壌水分,土壌体積含水率
-env,32000,Soil Moisture,32205,Soil Volumetric Water Content (5cm),soil_volumetric_water_content_depth5cm,土壌水分,土壌体積含水率 (深度5cm)
-env,32000,Soil Moisture,32210,Soil Volumetric Water Content (10cm),soil_volumetric_water_content_depth10cm,土壌水分,土壌体積含水率 (深度10cm)
-env,32000,Soil Moisture,32215,Soil Volumetric Water Content (15cm),soil_volumetric_water_content_depth15cm,土壌水分,土壌体積含水率 (深度15cm)
-env,32000,Soil Moisture,32220,Soil Volumetric Water Content (20cm),soil_volumetric_water_content_depth20cm,土壌水分,土壌体積含水率 (深度20cm)
-env,32000,Soil Moisture,32225,Soil Volumetric Water Content (25cm),soil_volumetric_water_content_depth25cm,土壌水分,土壌体積含水率 (深度25cm)
-env,32000,Soil Moisture,32230,Soil Volumetric Water Content (30cm),soil_volumetric_water_content_depth30cm,土壌水分,土壌体積含水率 (深度30cm)
-env,32000,Soil Moisture,32235,Soil Volumetric Water Content (35cm),soil_volumetric_water_content_depth35cm,土壌水分,土壌体積含水率 (深度35cm)
-env,32000,Soil Moisture,32240,Soil Volumetric Water Content (40cm),soil_volumetric_water_content_depth40cm,土壌水分,土壌体積含水率 (深度40cm)
-env,32000,Soil Moisture,32245,Soil Volumetric Water Content (45cm),soil_volumetric_water_content_depth45cm,土壌水分,土壌体積含水率 (深度45cm)
-env,32000,Soil Moisture,32250,Soil Volumetric Water Content (50cm),soil_volumetric_water_content_depth50cm,土壌水分,土壌体積含水率 (深度50cm)
-env,32000,Soil Moisture,32255,Soil Volumetric Water Content (55cm),soil_volumetric_water_content_depth55cm,土壌水分,土壌体積含水率 (深度55cm)
-env,32000,Soil Moisture,32260,Soil Volumetric Water Content (60cm),soil_volumetric_water_content_depth60cm,土壌水分,土壌体積含水率 (深度60cm)
-env,32000,Soil Moisture,32300,Soil Water Matric Potential,soil_water_matric_potential,土壌水分,土壌水分ポテンシャル
-env,32000,Soil Moisture,32400,Substrate Volumetric Water Content,substrate_volumetric_water_content,土壌水分,培地体積含水率
-,,,,,,,
-env,33000,Irrigation,33100,Irrigation Water Flow (m3),total_water_flow_value,灌水,灌水流量 (m3)
-env,33000,Irrigation,33110,Irrigation Duration,irrigation_duration,灌水,灌水時間
-env,33000,Irrigation,33120,Irrigation Water (L/m2),irrigation_water,灌水,灌水量 (L/m2)
-env,33000,Irrigation,33130,Tank Water Level Ratio,tank_water_level_ratio,灌水,タンク水位比率
-env,33000,Irrigation,33210,Irrigation Water Per Solar Irradiance,irrigation_water_per_solar_irradiance,灌水,日射量当たり灌水量
-env,33000,Irrigation,33300,Water Depth,water_depth,灌水,水深
-env,33000,Irrigation,33310,Water Level From Land Surface,water_level_from_land_surface,灌水,水底からの水位
-env,33000,Irrigation,33400,Irrigation EC,irrigation_EC,灌水,灌水EC
-env,33000,Irrigation,33410,Irrigation Ph,irrigation_pH,灌水,潅水pH
-env,33000,Irrigation,33500,Solution Electrical Conductivity,solution_electrical_conductivity,灌水,養液EC
-env,33000,Irrigation,33510,Solution pH,solution_pH,灌水,養液pH
-env,33000,Irrigation,33520,Solution Ammonium Nitrogen Sub Conc,solution_ammonium_nitrogen_sub_conc,灌水,養液中アンモニア態窒素
-env,33000,Irrigation,33530,Solution Nitrate Nitrogen Sub Conc,solution_nitrate_nitrogen_sub_conc,灌水,養液中硝酸態窒素
-env,33000,Irrigation,33540,Solution Phosphorus Sub Conc,solution_phosphorus_sub_conc,灌水,養液中リン酸
-env,33000,Irrigation,33550,Solution Potassium Sub Conc,solution_potassium_sub_conc,灌水,養液中カリウム
-env,33000,Irrigation,33560,Solution Calcium Sub Conc,solution_calcium_sub_conc,灌水,養液中カルシウム
-env,33000,Irrigation,33570,Solution Magnesium Sub Conc,solution_magnesium_sub_conc,灌水,養液中マグネシウム
-env,33000,Irrigation,33580,Solution Copper Sub Conc,solution_copper_sub_conc,灌水,養液中銅
-env,33000,Irrigation,33590,Solution Zinc Sub Conc,solution_zinc_sub_conc,灌水,養液中亜鉛
-env,33000,Irrigation,33600,Solution Manganese Sub Conc,solution_manganese_sub_conc,灌水,養液中マンガン
-env,33000,Irrigation,33610,Solution Boron Sub Conc,solution_boron_sub_conc,灌水,養液中ホウ素
-env,33000,Irrigation,33620,Solution Ferric Oxide Sub Conc,solution_ferric_oxide_sub_conc,灌水,養液中鉄
-env,33000,Irrigation,33630,Solution Molybdenum Sub Conc,solution_molybdenum_sub_conc,灌水,養液中モリブデン
-env,33000,Irrigation,33640,Solution Chlorine Sub Conc,solution_chlorine_sub_conc,灌水,養液中塩素
-env,33000,Irrigation,33650,Solution Sulfate Sub Conc,solution_sulfate_sub_conc,灌水,養液中硫酸
-env,33000,Irrigation,33800,Drainage Water,drainage_water,灌水,排液量
-env,33000,Irrigation,33810,Drainage Ratio,drainage_ratio,灌水,排液率
-env,33000,Irrigation,33900,Drainage Electrical Conductivity,drainage_electrical_conductivity,灌水,排液EC
-env,33000,Irrigation,33910,Drainage Ph,drainage_pH,灌水,排液pH
-env,33000,Irrigation,33920,Slab Electrical Conductivity,slab_electrical_conductivity,灌水,スラブ内EC
-env,33000,Irrigation,33930,Slab Ph,slab_pH,灌水,スラブ内pH
-,,,,,,,
-env,35000,Soil Physical Properties,35000,Soil Penetration Resistance,soil_penetration_resistance,土壌 物理性,土壌貫入抵抗
-env,35000,Soil Physical Properties,35010,Gaseous Phase Ratio,gaseous phase ratio,土壌 物理性,気相率
-env,35000,Soil Physical Properties,35020,Liquid Phase Ratio,liquid_phase_ratio,土壌 物理性,液相率
-env,35000,Soil Physical Properties,35030,Solid Phase Ratio,solid_phase_ratio,土壌 物理性,固相率
-env,35000,Soil Physical Properties,35040,Soil Bulk Density,soil_bulk_density,土壌 物理性,土壌仮比重
-env,35000,Soil Physical Properties,35050,Soil Porosity,soil_porocity,土壌 物理性,土壌孔隙率
-env,35000,Soil Physical Properties,35060,Gravitational Water Porosity,gravitational_water_porosity,土壌 物理性,重力水孔隙率
-env,35000,Soil Physical Properties,35070,Effective Water Porosity,effective_water_porosity,土壌 物理性,易有効水分孔隙率
-env,35000,Soil Physical Properties,35080,Soil Clay Mass Fraction,soil_clay_mass_fraction,土壌 物理性,土壌中粘土含量
-env,35000,Soil Physical Properties,35090,Soil Silt Mass Fraction,soil_silt_mass_fraction,土壌 物理性,土壌中シルト含量
-env,35000,Soil Physical Properties,35100,Soil Sand Mass Fraction,soil_sand_mass_fraction,土壌 物理性,土壌中砂含量
-env,35000,Soil Physical Properties,35110,Soil Fine Sand Mass Fraction,soil_fine_sand_mass_fraction,土壌 物理性,土壌中細砂含量
-env,35000,Soil Physical Properties,35120,Soil Coarse Sand Mass Fraction,soil_coarse_sand_mass_fraction,土壌 物理性,土壌中粗砂含量
-env,35000,Soil Physical Properties,35130,Soil Water Holding Capacity,soil_water_holding_capacity,土壌 物理性,土壌水分保持力
-env,35000,Soil Physical Properties,35140,Field Capacity,field_capacity,土壌 物理性,圃場容水量
-env,35000,Soil Physical Properties,35150,Soil Saturated Hydraulic Conductivity,soil_saturated_hydraulic_conductivity,土壌 物理性,飽和透水係数
-env,35000,Soil Physical Properties,35160,Soil Unsaturated Hydraulic Conductivity,soil_unsaturated_hydraulic_conductivity,土壌 物理性,不飽和透水係数
-env,35000,Soil Physical Properties,35170,Soil Air Permeability,soil_air_permeability,土壌 物理性,通気係数
-env,35000,Soil Physical Properties,35180,Soil Intrinsic Permeability,soil_intrinsic_permeability,土壌 物理性,固有透過度
-env,35000,Soil Physical Properties,35190,Soil Gas Diffusivity,soil_gas_diffusivity,土壌 物理性,ガス拡散係数
-env,35000,Soil Physical Properties,35200,Soil Thermal Conductivity,soil_thermal_conductivity,土壌 物理性,熱伝導率
-,,,,,,,
-env,36000,Soil Biological Properties,36000,Soil Humus Mass Fraction,soil_humus_mass_fraction,土壌 生物性,土壌中腐植
-env,36000,Soil Biological Properties,36010,Soil Organic Matter Mass Fraction,soil_organic_matter_mass_fraction,土壌 生物性,土壌有機物
-env,36000,Soil Biological Properties,36020,Alfa Glucosidase Activity,alfa_glucosidase_activity,土壌 生物性,αグルコシダーゼ活性
-env,36000,Soil Biological Properties,36030,Beta Glucosidase Activity,beta_glucosidase_activity,土壌 生物性,βグルコシダーゼ活性
-env,36000,Soil Biological Properties,36040,Meloidogyne Hapla Num,Meloidogyne_hapla_num,土壌 生物性,キタネコブセンチュウ
-env,36000,Soil Biological Properties,36050,Pratylenchus Penetrans Num,Pratylenchus_penetrans_num,土壌 生物性,キタネグサレセンチュウ
-env,36000,Soil Biological Properties,36060,Pratylenchus Coffeae Num,Pratylenchus_coffeae_num,土壌 生物性,ミナミネグサレセンチュウ
-env,36000,Soil Biological Properties,36070,Actinomycetes Num,Actinomycetes_num,土壌 生物性,放線菌
-env,36000,Soil Biological Properties,36080,Filamentous Fungi Num,Filamentous_fungi_num,土壌 生物性,糸状菌
-env,36000,Soil Biological Properties,36090,Escherichia Coli Num,Echerichia_coli_num,土壌 生物性,大腸菌
-env,36000,Soil Biological Properties,36100,Salmonella Num,Salmonella_num,土壌 生物性,サルモネラ
-env,36000,Soil Biological Properties,36110,Verticillium Num,Verticillium_num,土壌 生物性,バーティシリウム
-env,36000,Soil Biological Properties,36120,Streptomyces Num,Streptomyces_num,土壌 生物性,馬鈴しょそうか病
-,,,,,,,
-env,40000,Soil Chemical Properties,40000,Cation Exchange Capacity,cation_exchange_capacity,土壌 化学性,CEC
-env,40000,Soil Chemical Properties,40100,Soil EC,soil_electrical_conductivity,土壌 化学性,土壌EC
-env,40000,Soil Chemical Properties,40100,Soil EC,soil_EC,土壌 化学性,土壌EC
-env,40000,Soil Chemical Properties,40105,Soil EC (5cm),soil_electrical_conductivity_depth5cm,土壌 化学性,土壌EC (深度5cm)
-env,40000,Soil Chemical Properties,40110,Soil EC (10cm),soil_electrical_conductivity_depth10cm,土壌 化学性,土壌EC (深度10cm)
-env,40000,Soil Chemical Properties,40115,Soil EC (15cm),soil_electrical_conductivity_depth1cm,土壌 化学性,土壌EC (深度15cm)
-env,40000,Soil Chemical Properties,40120,Soil EC (20cm),soil_electrical_conductivity_depth20cm,土壌 化学性,土壌EC (深度20cm)
-env,40000,Soil Chemical Properties,40125,Soil EC (25cm),soil_electrical_conductivity_depth25cm,土壌 化学性,土壌EC (深度25cm)
-env,40000,Soil Chemical Properties,40130,Soil EC (30cm),soil_electrical_conductivity_depth30cm,土壌 化学性,土壌EC (深度30cm)
-env,40000,Soil Chemical Properties,40135,Soil EC (35cm),soil_electrical_conductivity_depth35cm,土壌 化学性,土壌EC (深度35cm)
-env,40000,Soil Chemical Properties,40140,Soil EC (40cm),soil_electrical_conductivity_depth40cm,土壌 化学性,土壌EC (深度40cm)
-env,40000,Soil Chemical Properties,40145,Soil EC (45cm),soil_electrical_conductivity_depth45cm,土壌 化学性,土壌EC (深度45cm)
-env,40000,Soil Chemical Properties,40150,Soil EC (50cm),soil_electrical_conductivity_depth50cm,土壌 化学性,土壌EC (深度50cm)
-env,40000,Soil Chemical Properties,40155,Soil EC (55cm),soil_electrical_conductivity_depth55cm,土壌 化学性,土壌EC (深度55cm)
-env,40000,Soil Chemical Properties,40160,Soil EC (60cm),soil_electrical_conductivity_depth60cm,土壌 化学性,土壌EC (深度60cm)
-env,40000,Soil Chemical Properties,40200,Soil pore EC,soil_pore_electrical_conductivity,土壌 化学性,間隙水EC
-env,40000,Soil Chemical Properties,40200,Soil pore EC,soil_pore_EC,土壌 化学性,間隙水EC
-env,40000,Soil Chemical Properties,40205,Soil pore EC (5cm),soil_pore_electrical_conductivity_depth5cm,土壌 化学性,間隙水EC (深度5cm)
-env,40000,Soil Chemical Properties,40210,Soil pore EC (10cm),soil_pore_electrical_conductivity_depth10cm,土壌 化学性,間隙水EC (深度10cm)
-env,40000,Soil Chemical Properties,40215,Soil pore EC (15cm),soil_pore_electrical_conductivity_depth15cm,土壌 化学性,間隙水EC (深度15cm)
-env,40000,Soil Chemical Properties,40220,Soil pore EC (20cm),soil_pore_electrical_conductivity_depth20cm,土壌 化学性,間隙水EC (深度20cm)
-env,40000,Soil Chemical Properties,40225,Soil pore EC (25cm),soil_pore_electrical_conductivity_depth25cm,土壌 化学性,間隙水EC (深度25cm)
-env,40000,Soil Chemical Properties,40230,Soil pore EC (30cm),soil_pore_electrical_conductivity_depth30cm,土壌 化学性,間隙水EC (深度30cm)
-env,40000,Soil Chemical Properties,40235,Soil pore EC (35cm),soil_pore_electrical_conductivity_depth35cm,土壌 化学性,間隙水EC (深度35cm)
-env,40000,Soil Chemical Properties,40240,Soil pore EC (40cm),soil_pore_electrical_conductivity_depth40cm,土壌 化学性,間隙水EC (深度40cm)
-env,40000,Soil Chemical Properties,40245,Soil pore EC (45cm),soil_pore_electrical_conductivity_depth45cm,土壌 化学性,間隙水EC (深度45cm)
-env,40000,Soil Chemical Properties,40250,Soil pore EC (50cm),soil_pore_electrical_conductivity_depth50cm,土壌 化学性,間隙水EC (深度50cm)
-env,40000,Soil Chemical Properties,40255,Soil pore EC (55cm),soil_pore_electrical_conductivity_depth55cm,土壌 化学性,間隙水EC (深度55cm)
-env,40000,Soil Chemical Properties,40260,Soil pore EC (60cm),soil_pore_electrical_conductivity_depth60cm,土壌 化学性,間隙水EC (深度60cm)
-env,40000,Soil Chemical Properties,40300,Soil bulk EC,soil_bulk_electrical_conductivity,土壌 化学性,バルクEC
-env,40000,Soil Chemical Properties,40300,Soil bulk EC,soil_bulk_EC,土壌 化学性,バルクEC
-env,40000,Soil Chemical Properties,40305,Soil bulk EC (5cm),soil_bulk_electrical_conductivity_depth5cm,土壌 化学性,バルクEC (深度5cm)
-env,40000,Soil Chemical Properties,40310,Soil bulk EC (10cm),soil_bulk_electrical_conductivity_depth10cm,土壌 化学性,バルクEC (深度10cm)
-env,40000,Soil Chemical Properties,40315,Soil bulk EC (15cm),soil_bulk_electrical_conductivity_depth15cm,土壌 化学性,バルクEC (深度15cm)
-env,40000,Soil Chemical Properties,40320,Soil bulk EC (20cm),soil_bulk_electrical_conductivity_depth20cm,土壌 化学性,バルクEC (深度20cm)
-env,40000,Soil Chemical Properties,40325,Soil bulk EC (25cm),soil_bulk_electrical_conductivity_depth25cm,土壌 化学性,バルクEC (深度25cm)
-env,40000,Soil Chemical Properties,40330,Soil bulk EC (30cm),soil_bulk_electrical_conductivity_depth30cm,土壌 化学性,バルクEC (深度30cm)
-env,40000,Soil Chemical Properties,40335,Soil bulk EC (35cm),soil_bulk_electrical_conductivity_depth35cm,土壌 化学性,バルクEC (深度35cm)
-env,40000,Soil Chemical Properties,40340,Soil bulk EC (40cm),soil_bulk_electrical_conductivity_depth40cm,土壌 化学性,バルクEC (深度40cm)
-env,40000,Soil Chemical Properties,40345,Soil bulk EC (45cm),soil_bulk_electrical_conductivity_depth45cm,土壌 化学性,バルクEC (深度45cm)
-env,40000,Soil Chemical Properties,40350,Soil bulk EC (50cm),soil_bulk_electrical_conductivity_depth50cm,土壌 化学性,バルクEC (深度50cm)
-env,40000,Soil Chemical Properties,40355,Soil bulk EC (55cm),soil_bulk_electrical_conductivity_depth55cm,土壌 化学性,バルクEC (深度55cm)
-env,40000,Soil Chemical Properties,40360,Soil bulk EC (60cm),soil_bulk_electrical_conductivity_depth60cm,土壌 化学性,バルクEC (深度60cm)
-env,40000,Soil Chemical Properties,40400,Soil electric permittivity,soil_bulk_electrical_conductivity_depth60cm,土壌 化学性,土壌 誘電率
-env,40000,Soil Chemical Properties,40500,Soil relative permittivity,soil_relative_permittivity,土壌 化学性,土壌 比誘電率
-,,,,,,,
-env,40000,Soil Chemical Properties,41100,Soil volumetric ion content,soil_volumetric_Ion_content,土壌 化学性,体積イオン含有量
-env,40000,Soil Chemical Properties,41105,Soil volumetric ion content (5cm),soil_volumetric_Ion_content_depth5cm,土壌 化学性,体積イオン含有量 (深度5cm)
-env,40000,Soil Chemical Properties,41110,Soil volumetric ion content (10cm),soil_volumetric_Ion_content_depth10cm,土壌 化学性,体積イオン含有量 (深度10cm)
-env,40000,Soil Chemical Properties,41115,Soil volumetric ion content (15cm),soil_volumetric_Ion_content_depth15cm,土壌 化学性,体積イオン含有量 (深度15cm)
-env,40000,Soil Chemical Properties,41120,Soil volumetric ion content (20cm),soil_volumetric_Ion_content_depth20cm,土壌 化学性,体積イオン含有量 (深度20cm)
-env,40000,Soil Chemical Properties,41125,Soil volumetric ion content (25cm),soil_volumetric_Ion_content_depth25cm,土壌 化学性,体積イオン含有量 (深度25cm)
-env,40000,Soil Chemical Properties,41130,Soil volumetric ion content (30cm),soil_volumetric_Ion_content_depth30cm,土壌 化学性,体積イオン含有量 (深度30cm)
-env,40000,Soil Chemical Properties,41135,Soil volumetric ion content (35cm),soil_volumetric_Ion_content_depth35cm,土壌 化学性,体積イオン含有量 (深度35cm)
-env,40000,Soil Chemical Properties,41140,Soil volumetric ion content (40cm),soil_volumetric_Ion_content_depth40cm,土壌 化学性,体積イオン含有量 (深度40cm)
-env,40000,Soil Chemical Properties,41145,Soil volumetric ion content (45cm),soil_volumetric_Ion_content_depth45cm,土壌 化学性,体積イオン含有量 (深度45cm)
-env,40000,Soil Chemical Properties,41150,Soil volumetric ion content (50cm),soil_volumetric_Ion_content_depth50cm,土壌 化学性,体積イオン含有量 (深度50cm)
-env,40000,Soil Chemical Properties,41155,Soil volumetric ion content (55cm),soil_volumetric_Ion_content_depth55cm,土壌 化学性,体積イオン含有量 (深度55cm)
-env,40000,Soil Chemical Properties,41160,Soil volumetric ion content (60cm),soil_volumetric_Ion_content_depth60cm,土壌 化学性,体積イオン含有量 (深度60cm)
-,,,,,,,
-env,40000,Soil Chemical Properties,42000,Soil Ph,soil_pH,土壌 化学性,土壌pH
-env,40000,Soil Chemical Properties,42100,Soil Ph Potassium Chloride,soil_pH_potassium_chloride,土壌 化学性,土壌pH(KCl)
-env,40000,Soil Chemical Properties,42200,Rhizosphere Ph,rhizosphere_pH,土壌 化学性,根圏pH
-env,40000,Soil Chemical Properties,45010,Soil Fertility Value,soil_fertility_value,土壌 化学性,土壌肥沃度
-env,40000,Soil Chemical Properties,45020,Soil Oxidation Reduction Potential,soil_oxidation_reduction_potential,土壌 化学性,土壌酸化還元電位
-env,40000,Soil Chemical Properties,45030,Soil Carbon Content,soil_carbon_content,土壌 化学性,土壌炭素量
-env,40000,Soil Chemical Properties,45040,Soil Cn Ratio,soil_cn_ratio,土壌 化学性,CN比
-env,40000,Soil Chemical Properties,45050,Soil Total Carbon Mass Fraction,soil_total_carbon_mass_fraction,土壌 化学性,土壌中全炭素
-env,40000,Soil Chemical Properties,45060,Soil Total Nitrogen Mass Fraction,soil_total_nitrogen_mass_fraction,土壌 化学性,土壌中全窒素
-env,40000,Soil Chemical Properties,45070,Soil Ammonium Nitrogen Mass Fraction,soil_ammonium_nitrogen_mass_fraction,土壌 化学性,土壌中アンモニア態窒素
-env,40000,Soil Chemical Properties,45080,Soil Nitrate Nitrogen Mass Fraction,soil_nitrate_nitrogen_mass_fraction,土壌 化学性,土壌中硝酸態窒素
-env,40000,Soil Chemical Properties,45090,Soil Hot Water Extractable Nitrogen Mass Fraction,soil_hot_water_extractable_nitrogen_mass_fraction,土壌 化学性,土壌中熱水抽出性窒素
-env,40000,Soil Chemical Properties,45100,Soil Phosphorus Absorptive Coefficient,soil_phosphorus_absorptive_coefficient,土壌 化学性,土壌リン酸吸収係数
-env,40000,Soil Chemical Properties,45110,Soil Available Phosphorus Mass Fraction,soil_available_phosphorus_mass_fraction,土壌 化学性,土壌中有効態リン酸
-env,40000,Soil Chemical Properties,45120,Soil Exchangeable Potassium Mass Fraction,soil_exchangable_potassium_mass_fraction,土壌 化学性,土壌中交換性カリウム
-env,40000,Soil Chemical Properties,45130,Soil Exchangeable Calcium Mass Fraction,soil_exchangable_calcium_mass_fraction,土壌 化学性,土壌中交換性カルシウム
-env,40000,Soil Chemical Properties,45140,Soil Carbonate Mass Fraction,soil_carbonate_mass_fraction,土壌 化学性,土壌中炭酸カルシウム
-env,40000,Soil Chemical Properties,45150,Soil Gypsum Mass Fraction,soil_gypsum_mass_fraction,土壌 化学性,土壌中石膏
-env,40000,Soil Chemical Properties,45160,Soil Exchangeable Magnesium Mass Fraction,soil_exchangable_magnesium_mass_fraction,土壌 化学性,土壌中交換性マグネシウム
-env,40000,Soil Chemical Properties,45170,Soil Magnesium Potassium Ratio,soil_magnesium_potassium_ratio,土壌 化学性,土壌中苦土カリ比
-env,40000,Soil Chemical Properties,45180,Soil Calcium Magnesium Ratio,soil_calcium_magnesium_ratio,土壌 化学性,土壌石灰苦土比
-env,40000,Soil Chemical Properties,45190,Soil Calcium Saturation Ratio,soil_calcium_saturation_ratio,土壌 化学性,土壌石灰飽和度
-env,40000,Soil Chemical Properties,45200,Soil Base Cation Saturation Ratio,soil_base_cation_saturation_ratio,土壌 化学性,土壌塩基飽和度
-env,40000,Soil Chemical Properties,45210,Soil Soluble Copper Mass Fraction,soil_soluble_copper_mass_fraction,土壌 化学性,土壌中可溶性銅
-env,40000,Soil Chemical Properties,45220,Soil Soluble Zinc Mass Fraction,soil_soluble_zinc_mass_fraction,土壌 化学性,土壌中可溶性亜鉛
-env,40000,Soil Chemical Properties,45230,Soil Easily Reducible Manganese Mass Fraction,soil_easily_reducible_manganese_mass_fraction,土壌 化学性,土壌中易還元性マンガン
-env,40000,Soil Chemical Properties,45240,Soil Exchangeable Manganese Mass Fraction,soil_exchangable_manganese_mass_fraction,土壌 化学性,土壌中交換性マンガン
-env,40000,Soil Chemical Properties,45250,Soil Hot Water Soluble Boron Mass Fraction,soil_hot_water_soluble_boron_mass_fraction,土壌 化学性,土壌中熱水可溶性ホウ素
-env,40000,Soil Chemical Properties,45260,Soil Ferric Oxide Mass Fraction,soil_ferric_oxide_mass_fraction,土壌 化学性,土壌中遊離酸化鉄
-env,40000,Soil Chemical Properties,45270,Soil Available Silicic Acid Mass Fraction,soil_available_silic_acid_mass_fraction,土壌 化学性,土壌中有効態ケイ酸
-env,40000,Soil Chemical Properties,45280,Soil Available Molybdenum Mass Fraction,soil_available_molybdenum_mass_fraction,土壌 化学性,土壌中有効態モリブデン
-env,40000,Soil Chemical Properties,45290,Soil Chlorine Mass Fraction,soil_chlorine_mass_fraction,土壌 化学性,土壌中塩素
-env,40000,Soil Chemical Properties,45300,Soil Sulfate Sulfate Mass Fraction,soil_sulfate_sulfate_mass_fraction,土壌 化学性,土壌中硫黄
-env,40000,Soil Chemical Properties,45310,Soil Exchangeable Aluminium Mass Fraction,soil_exchangable_aluminium_mass_fraction,土壌 化学性,土壌中交換性アルミニウム
-env,40000,Soil Chemical Properties,45320,Soil Cadmium Mass Fraction,soil_cadmium_mass_fraction,土壌 化学性,土壌中カドミウム
-env,40000,Soil Chemical Properties,45330,Soil Arsenic Mass Fraction,soil_arsenic_mass_fraction,土壌 化学性,土壌中ヒ素
-,,,,,,,
-env,50000,Water,50100,Water Depth,water_depth,水,水深
-env,50000,Water,50110,Water Level From Land Surface,water_level_from_land_surface,水,水底からの水位
-env,50000,Water,50200,Volume of Water,water_volume,水,水量
-env,50000,Water,50800,Drainage Water,drainage_water,水,排水量
-env,50000,Water,50810,Drainage Ratio,drainage_ratio,水,排水率
-,,,,,,,
-env,51000,Water Temperature,51000,Water Temperature,water_temperature,水温,水温
-env,51000,Water Temperature,51001,Water Temperature Ave,average_water_temperature,水温,水温 [平均]
-env,51000,Water Temperature,51002,Water Temperature Max,maximum_water_temperature,水温,水温 [最高]
-env,51000,Water Temperature,51003,Water Temperature Min,minimum_water_temperature,水温,水温 [最低]
-,,,,,,,
-env,54000,Water content,54010,Water EC,water_EC,水中成分,水中EC
-env,54000,Water content,54010,Water EC,water_electrical_conductivity,水中成分,水中EC
-env,54000,Water content,54020,Dissolved oxygen (DO),water_oxygen_sub_conc,水中成分,溶存 酸素 (DO)
-env,54000,Water content,54020,Dissolved oxygen (DO),water_do,水中成分,溶存 酸素 (DO)
-env,54000,Water content,54030,Water pH,water_pH,水中成分,水中 pH
-env,54000,Water content,54040,Water Ammonia [NH3],water_ammonia,水中成分,水中アンモニア [NH3]
-env,54000,Water content,54045,Water Ammonium Nitrogen Sub Conc,water_ammonium_nitrogen_sub_conc,水中成分,水中アンモニア態窒素
-env,54000,Water content,54050,Water Nitrate [NO3-],water_nitrate_sub_conc,水中成分,水中 硝酸塩 [NO3-]
-env,54000,Water content,54055,Water Nitrate Nitrogen [NO3-N],water_nitrate_nitrogen_sub_conc,水中成分,水中 硝酸態窒素 [NO3-N]
-env,54000,Water content,54060,Water Nitrite [NO2-],water_nitrite_sub_conc,水中成分,水中 亜硝酸塩 [NO2-]
-env,54000,Water content,54070,Water Phosphorus Sub Conc,water_phosphorus_sub_conc,水中成分,水中 リン酸
-env,54000,Water content,54080,Water Potassium Sub Conc,water_potassium_sub_conc,水中成分,水中 カリウム [K+]
-env,54000,Water content,54090,Water Calcium Sub Conc,water_calcium_sub_conc,水中成分,水中 カルシウム [Ca2+]
-env,54000,Water content,54100,Water Magnesium Sub Conc,water_magnesium_sub_conc,水中成分,水中 マグネシウム [Mg2+]
-env,54000,Water content,54110,Water Copper Sub Conc,water_copper_sub_conc,水中成分,水中銅
-env,54000,Water content,54120,Water Zinc Sub Conc,water_zinc_sub_conc,水中成分,水中亜鉛
-env,54000,Water content,54130,Water Manganese Sub Conc,water_manganese_sub_conc,水中成分,水中マンガン
-env,54000,Water content,54140,Water Boron Sub Conc,water_boron_sub_conc,水中成分,水中ホウ素
-env,54000,Water content,54150,Water Ferric Oxide Sub Conc,water_ferric_oxide_sub_conc,水中成分,水中鉄
-env,54000,Water content,54160,Water Molybdenum Sub Conc,water_molybdenum_sub_conc,水中成分,水中モリブデン
-env,54000,Water content,54170,Water Chlorine Sub Conc,water_chlorine_sub_conc,水中成分,水中塩素
-env,54000,Water content,54180,Water Sulfate Sub Conc,water_sulfate_sub_conc,水中成分,水中硫酸
-env,54000,Water content,54200,Water Salinity Sub Conc,water_salinity_sub_conc,水中成分,塩分濃度
-env,54000,Water content,54220,KH,water_KH,水中成分,KH
-env,54000,Water content,54230,TDS,water_TDS,水中成分,TDS
-,,,,,,,
-env,56000,Water Biological,56010,chlorophyll,water_chlorophyll_sub_conc,水中生物性,クロロフィル
-env,56000,Water Biological,56410,Biofloc,water_BF,水中生物性,BF(バイオフロック)量
-,,,,,,,
-env,61000,Visual,61010,Cloudy Water,water_color_white,目視,白濁
-env,61000,Visual,61020,Green Water,water_color_green,目視,緑色
-env,61000,Visual,61030,Brown Water,water_color_brown,目視,茶色
-env,61000,Visual,61040,Red Water,water_color_red,目視,赤色
-env,61000,Visual,61100,Water Froth,water_froth,目視,泡
-env,61000,Visual,61200,Remain Feed,water_remain_feed,目視,残餌量
-,,,,,,,
-env,64000,Smell,64010,Fermented Smell,water_smell_fermented_odor,臭い,発酵臭
-env,64000,Smell,64040,Ammonia Smell,water_smell_ammonia,臭い,アンモニア臭
-env,64000,Smell,64060,Nitrite Smell,water_smell_nitrous_acid,臭い,亜硝酸臭
-env,64000,Smell,64210,Sulfuric Acid Smell,water_smell_sulfate,臭い,硫酸臭
-,,,,,,,
-env,80000,Meter,80000,Meter,total_meter_value,メーター,メーター
-env,80000,Meter,80100,Water flow meter,total_water_flow_value,メーター,水道メーター
-env,80000,Meter,80200,Gas meter,total_gas_flow_value,メーター,ガスメーター
-,,,,,,,
-,,,,,,,
-env,90000,Device,90100,Battery Level,battery_percent,計測器,バッテリーレベル(%)
-env,90000,Device,90110,Battery Level,battery_level,計測器,バッテリーレベル(V)
-env,90000,Device,90200,Battery Temperature,battery_temppalture,計測器,バッテリー温度
-,,,,,,,
-env,90000,Device,91200,Sigfox Link Quality Indicator (OK>1),link_quality_indicator,計測器,Sigfox電波強度 LQI (OK>1)
-env,90000,Device,91300,LoRa RSSI (OK>-130),lora_rssi,計測器,LoRa電波強度 RSSI (OK>-130)
-,,,,,,,
-env,90000,Logger,92200,Logger Temperature,logger_temperature,ロガー,ロガー温度
+activity,6000,Harvest,6000,Harvest,harvest,収穫,収穫
+activity,6000,Harvest,6001,Rice Harvest,rice_harvest,収穫,稲刈
+activity,6000,Harvest,6300,Catch Bird,catch_bird,収穫,捕鳥
+activity,6000,Harvest,6500,Landing,landing,収穫,水揚げ
+activity,7000,Prepare for sell,7001,Prepare for sell,prepare_for_sell,調製,調整作業
+activity,7000,Prepare for sell,7002,Triming,triming,調製,トリミング
+activity,7600,Packaging,7600,Packaging,packaging,包装,包装
+activity,7900,Shipping,7900,Shipping,shipping,出荷,出荷
+activity,8000,Sales,8001,Sales Activity,sales_activity,販売,販売活動
+activity,8000,Sales,8002,Delivery,delivery,販売,配送
+activity,9000,Indirect Labor,9000,Machine Maintain,machine_maintain,間接労働,間接労働
+activity,9000,Indirect labor,9001,Cleanup,cleanup,間接労働,清掃
+activity,9100,Move,9101,Move,move,移動・運搬,移動
+activity,9100,Move,9102,Transport,transport,移動・運搬,運搬
+activity,9200,Planning,9200,Planning,planning,計画作成,計画作成
+activity,9300,Meeting,9300,Meeting,meeting,会議,会議
+activity,9300,Meeting,9301,Daily Meeting,daily_meeting,会議,朝昼夕会
+activity,9400,Education,9400,Education,education,研修,研修
+activity,9500,Fertilizer Manufacturing,9501,Fertilizer Manufacturing,fertilizer_manufacturing,肥料製造,肥料製造
+activity,9600,Maintain,9600,Maintain,maintain,整備,整備
+activity,9600,Maintain,9601,Maintain,maintain,整備,整備
+activity,9600,Maintain,9610,Disinfection,disinfection,整備,消毒
+activity,9600,Maintain,9611,Disinfection,disinfection,整備,消毒
+activity,9600,Maintain,9620,Cleaning,cleaning,整備,清掃
+activity,9600,Maintain,9621,Cleaning,cleaning,整備,設備清掃
+activity,9600,Maintain,9630,Cleaning,cleaning,整備,逆洗浄
