@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>環境センサーデータ一覧 | Environment Sensor Data Name List</title>
+  <title>活動データ一覧(準備中バージョン) | Activity Data Name List(Preparing Ver.)</title>
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
@@ -128,9 +128,9 @@
 </head>
 <body>
   <div class="header-container">
-    <h1>環境センサーデータ名一覧 | Environment Sensor Data Name List</h1>
+    <h1>活動データ名一覧(準備中バージョン) | Activity Data Name List(Preparing Version)</h1>
     <div class="download-button">
-      <a href="environment_sensor_data_list.csv" download>CSV Download</a>
+      <a href="activity_data_list.csv" download>CSV Download</a>
     </div>
   </div>
 
@@ -177,7 +177,7 @@
       }, 1500);
     }
 
-    fetch('environment_sensor_data_list.csv')
+    fetch('activity_data_list.csv')
       .then(res => res.text())
       .then(csv => {
         const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });

@@ -1,0 +1,105 @@
+# redocly.yaml
+# Redocly CLI の設定ファイルです。
+# 詳細なオプションについては https://redocly.com/docs/cli/configuration/ を参照してください。
+
+apis:
+  main: openapi.yaml # ここにメインのOpenAPI定義ファイル（例: openapi.yaml, swagger.json）へのパスを指定します。
+
+theme:
+  openapi:
+    # === 機能設定 ===
+    # [2, 5, 7]
+
+    # スクロールオフセット: 固定ヘッダーがある場合に、ページ内リンクで隠れないように調整します。
+    # 例: HTML内に <header id="site-header"></header> がある場合
+    scrollYOffset: "#site-header"
+
+    # レスポンスのデフォルト展開: 成功レスポンス（200, 201）をデフォルトで展開します。
+    expandResponses: "200,201"
+
+    # 検索機能: 有効化し、最低3文字から検索を開始します。
+    disableSearch: false
+    minCharacterLengthToInitSearch: 3
+
+    # コードサンプル: curl, JavaScript, Python のサンプルを生成し、デフォルトはcurlにします。
+    generateCodeSamples:
+      languages:
+        - lang: curl
+          label: cURL # 表示ラベルのカスタマイズ例
+        - lang: JavaScript
+        - lang: Python
+      defaultSampleLanguage: curl
+      # skipOptionalParameters: true # trueにするとオプションパラメータをサンプルから除外
+
+    # スキーマの展開レベル: デフォルトでスキーマを2階層まで展開します。
+    # 'all' を指定すると全階層展開しますが、パフォーマンスに影響する場合があります。
+    schemaExpansionLevel: 2
+    jsonSampleExpandLevel: 2 # JSONサンプルの展開レベルも同様に設定
+
+    # 「Try It」パネル: Redoclyのプレミアム機能です。Community Editionでは利用できません。
+    # hideTryItPanel: false # true で非表示 (CEではデフォルトで非表示または存在しない)
+    # corsProxyUrl: "https://cors.redoc.ly" # プレミアム機能で利用する場合のプロキシURL
+
+    # === テーマ設定 ===
+    # [3, 5]
+    theme:
+      # ロゴ設定
+      logo:
+        image:./public/logo.png # ここにロゴ画像ファイルへのパスを指定します。
+        gutter: "10px" # ロゴ周囲の余白
+
+      # 配色設定
+      colors:
+        primary:
+          main: "#32329F" # プライマリカラー (例: Act Nodeのサイトヘッダーに近い色)
+        text:
+          primary: "#333333"   # 基本テキストカラー
+          secondary: "#555555" # セカンダリテキストカラー
+        links:
+          color: "#32329F"     # リンクカラー (プライマリカラーと統一)
+          hover: "#20207A"     # リンクホバーカラー
+        # HTTPメソッドの色 (任意で設定可能)
+        # http:
+        #   get: "#61AFFE"
+        #   post: "#49CC90"
+        #   put: "#FCA130"
+        #   delete: "#F93E3E"
+
+      # タイポグラフィ設定 (フォントは別途HTML/CSSで読み込む必要があります)
+      typography:
+        fontFamily: "Roboto, sans-serif" # 例: Google FontsのRoboto
+        fontSize: "15px"                 # 基本フォントサイズ
+        lineHeight: "1.6"                # 行の高さ
+        headings:
+          fontFamily: "Montserrat, sans-serif" # 見出し用フォント (例: Google FontsのMontserrat)
+          fontWeight: "700"                  # 見出しの太さ
+          lineHeight: "1.4"                  # 見出しの行の高さ
+        code:
+          fontFamily: "Source Code Pro, monospace" # コード用フォント (例: Google FontsのSource Code Pro)
+          fontSize: "14px"
+          backgroundColor: "#f4f4f4"
+          color: "#333333"
+
+      # サイドバー設定
+      sidebar:
+        backgroundColor: "#ffffff"       # サイドバー背景色
+        textColor: "#333333"           # サイドバーテキストカラー
+        activeTextColor: "#32329F"     # アクティブなアイテムのテキストカラー
+        width: "280px"                 # サイドバーの幅
+        # level1Items, groupItems などで各レベルのスタイルも調整可能 [5]
+
+      # 右パネル設定 (コードサンプルなどが表示されるエリア)
+      rightPanel:
+        backgroundColor: "#f9f9f9"
+        textColor: "#333333"
+        width: "45%" # 右パネルの幅の割合
+
+      # その他
+      # breakpoints: # レスポンシブデザインのブレークポイント [3]
+      #   small: '50rem'
+      #   medium: '85rem'
+      #   large: '105rem'
+      # spacing: # 全体的なスペーシングユニット [5]
+      #   unit: 5
+      # shape: # 角丸などの形状設定 [3]
+      #   borderRadius: '4px'
