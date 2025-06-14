@@ -1,0 +1,66 @@
+[
+            {
+                "deviceTypeCode": "LSN50V2",
+                "deviceTypeName": "LSN50V2 Temperature & Humidity Sensor",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "温度", "data_name": "temperature", "unit": "°C" },
+                    { "name": "湿度(相対)", "data_name": "relative_humidity", "unit": "%" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "LSE01",
+                "deviceTypeName": "LSE01 Soil Moisture, Temperature & EC Sensor",
+                "num_of_data": 4,
+                "data": [
+                    { "name": "土壌水分", "data_name": "soil_volumetric_water_content", "unit": "%" },
+                    { "name": "土壌温度", "data_name": "soil_temperature", "unit": "°C" },
+                    { "name": "土壌EC", "data_name": "soil_electrical_conductivity", "unit": "uS/cm" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "LSPH01",
+                "deviceTypeName": "LSPH01 Soil pH Sensor",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "土壌pH", "data_name": "soil_pH", "unit": "pH" },
+                    { "name": "土壌温度", "data_name": "soil_temperature", "unit": "°C" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "SW3L",
+                "deviceTypeName": "SW3L Outdoor Flow Sensor",
+                "num_of_data": 1,
+                "data": [
+                    { "name": "水量", "data_name": "Water_flow_value", "unit": "L" },
+                    { "name": "最終パルス", "data_name": "Last_pulse", "unit": "" },
+                    { "name": "総パルス", "data_name": "Total_pulse", "unit": "" },
+                    { "name": "モード", "data_name": "MOD", "unit": "" },
+                    { "name": "計算フラグ", "data_name": "Calculate_flag", "unit": "" },
+                    { "name": "アラーム", "data_name": "Alarm", "unit": "" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "SKMLIOT",
+                "deviceTypeName": "SKMLIOT Rain meter",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "漏水状態", "data_name": "WATER_LEAK_STATUS", "unit": "" },
+                    { "name": "漏水時間", "data_name": "WATER_LEAK_TIMES", "unit": "" },
+                    { "name": "漏水間隔", "data_name": "LAST_WATER_LEAK_DURATION", "unit": "" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "BUTTON1",
+                "deviceTypeName": "LORA Button 1",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "ボタン", "data_name": "BUTTON_STATUS", "unit": "" }
+                ]
+            }
+        ]

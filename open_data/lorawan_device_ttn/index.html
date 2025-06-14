@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デバイスデータ一覧</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        .data-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .data-list li {
+            background-color: #e9e9e9;
+            margin-bottom: 5px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>デバイスデータ詳細</h1>
+
+    <div id="deviceTableContainer"></div>
+
+    <script>
+        const jsonData = [
+            {
+                "deviceTypeCode": "LSN50V2",
+                "deviceTypeName": "LSN50V2 Temperature & Humidity Sensor",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "温度", "data_name": "temperature", "unit": "°C" },
+                    { "name": "湿度(相対)", "data_name": "relative_humidity", "unit": "%" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "LSE01",
+                "deviceTypeName": "LSE01 Soil Moisture, Temperature & EC Sensor",
+                "num_of_data": 4,
+                "data": [
+                    { "name": "土壌水分", "data_name": "soil_volumetric_water_content", "unit": "%" },
+                    { "name": "土壌温度", "data_name": "soil_temperature", "unit": "°C" },
+                    { "name": "土壌EC", "data_name": "soil_electrical_conductivity", "unit": "uS/cm" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "LSPH01",
+                "deviceTypeName": "LSPH01 Soil pH Sensor",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "土壌pH", "data_name": "soil_pH", "unit": "pH" },
+                    { "name": "土壌温度", "data_name": "soil_temperature", "unit": "°C" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "SW3L",
+                "deviceTypeName": "SW3L Outdoor Flow Sensor",
+                "num_of_data": 1,
+                "data": [
+                    { "name": "水量", "data_name": "Water_flow_value", "unit": "L" },
+                    { "name": "最終パルス", "data_name": "Last_pulse", "unit": "" },
+                    { "name": "総パルス", "data_name": "Total_pulse", "unit": "" },
+                    { "name": "モード", "data_name": "MOD", "unit": "" },
+                    { "name": "計算フラグ", "data_name": "Calculate_flag", "unit": "" },
+                    { "name": "アラーム", "data_name": "Alarm", "unit": "" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "SKMLIOT",
+                "deviceTypeName": "SKMLIOT Rain meter",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "漏水状態", "data_name": "WATER_LEAK_STATUS", "unit": "" },
+                    { "name": "漏水時間", "data_name": "WATER_LEAK_TIMES", "unit": "" },
+                    { "name": "漏水間隔", "data_name": "LAST_WATER_LEAK_DURATION", "unit": "" },
+                    { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+                ]
+            },
+            {
+                "deviceTypeCode": "BUTTON1",
+                "deviceTypeName": "LORA Button 1",
+                "num_of_data": 2,
+                "data": [
+                    { "name": "ボタン", "data_name": "BUTTON_STATUS", "unit": "" }
+                ]
+            }
+        ];
+
+        const container = document.getElementById('deviceTableContainer');
+
+        jsonData.forEach(device => {
+            const deviceSection = document.createElement('div');
+            deviceSection.innerHTML = `<h2>${device.deviceTypeName} (デバイスタイプコード: ${device.deviceTypeCode})</h2>`;
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+
+            // テーブルヘッダーの作成
+            let headerRow = '<tr><th>データ名</th><th>データ識別子</th><th>単位</th></tr>';
+            thead.innerHTML = headerRow;
+            table.appendChild(thead);
+
+            // テーブルボディの作成
+            device.data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.data_name}</td>
+                    <td>${item.unit || ''}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            deviceSection.appendChild(table);
+            container.appendChild(deviceSection);
+        });
+    </script>
+
+</body>
+</html>
