@@ -11,6 +11,34 @@
             background-color: #f4f4f4;
             color: #333;
         }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .control-button {
+            padding: 10px 20px;
+            background-color: #179C9C;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .control-button:hover {
+            background-color: #127070;
+        }
+        .control-button.active {
+            background-color: #0f5555;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -31,41 +59,116 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+        h1 {
+            margin: 0;
+        }
         h2 {
             color: #333;
             border-bottom: 2px solid #179C9C;
             padding-bottom: 5px;
             margin-top: 30px;
         }
-        .data-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .data-list li {
-            background-color: #e9e9e9;
-            margin-bottom: 5px;
-            padding: 8px;
-            border-radius: 4px;
-        }
         #loading {
             font-weight: bold;
             color: #555;
+            padding: 20px;
+        }
+        .error-message {
+            color: #d32f2f;
+            padding: 20px;
+            background-color: #ffebee;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .button-container {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .control-button {
+                flex: 1;
+                min-width: 100px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>LoRaWAN Sensor via TTN | LoRaWAN 接続センサー TTN経由</h1>
+    <div class="header-container">
+        <h1 id="pageTitle">LoRaWAN センサー TTN経由</h1>
+        <div class="button-container">
+            <button id="langToggleJP" class="control-button active">日本語</button>
+            <button id="langToggleEN" class="control-button">English</button>
+            <button id="downloadJSON" class="control-button">JSONダウンロード</button>
+        </div>
+    </div>
 
     <div id="loading">データを読み込み中...</div>
     <div id="deviceTableContainer"></div>
 
     <script>
+        let currentLang = 'jp';
+        let jsonData = null;
+
         document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('deviceTableContainer');
             const loadingMessage = document.getElementById('loading');
+            const langToggleJP = document.getElementById('langToggleJP');
+            const langToggleEN = document.getElementById('langToggleEN');
+            const downloadBtn = document.getElementById('downloadJSON');
+            const pageTitle = document.getElementById('pageTitle');
 
+            // 言語切り替えボタンのイベントリスナー
+            langToggleJP.addEventListener('click', () => {
+                if (currentLang !== 'jp') {
+                    currentLang = 'jp';
+                    langToggleJP.classList.add('active');
+                    langToggleEN.classList.remove('active');
+                    pageTitle.textContent = 'LoRaWAN センサー TTN経由';
+                    downloadBtn.textContent = 'JSONダウンロード';
+                    updateDisplay();
+                }
+            });
+
+            langToggleEN.addEventListener('click', () => {
+                if (currentLang !== 'en') {
+                    currentLang = 'en';
+                    langToggleEN.classList.add('active');
+                    langToggleJP.classList.remove('active');
+                    pageTitle.textContent = 'LoRaWAN Sensor via TTN';
+                    downloadBtn.textContent = 'Download JSON';
+                    updateDisplay();
+                }
+            });
+
+            // JSONダウンロードボタンのイベントリスナー
+            downloadBtn.addEventListener('click', () => {
+                try {
+                    if (jsonData) {
+                        const dataStr = JSON.stringify(jsonData, null, 2);
+                        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                        const url = URL.createObjectURL(dataBlob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'device_list.json';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    } else {
+                        alert(currentLang === 'jp' ? 'データが読み込まれていません' : 'Data not loaded');
+                    }
+                } catch (error) {
+                    console.error('Download error:', error);
+                    alert(currentLang === 'jp' ? 'ダウンロードエラー' : 'Download error');
+                }
+            });
+
+            // JSONデータの取得
             fetch('device_list.json')
                 .then(response => {
                     if (!response.ok) {
@@ -73,40 +176,106 @@
                     }
                     return response.json();
                 })
-                .then(jsonData => {
-                    loadingMessage.style.display = 'none'; // ロードメッセージを非表示にする
-                    jsonData.forEach(device => {
-                        const deviceSection = document.createElement('div');
-                        deviceSection.innerHTML = `<h2>${device.deviceTypeName} (デバイスタイプコード: ${device.deviceTypeCode})</h2>`;
-
-                        const table = document.createElement('table');
-                        const thead = document.createElement('thead');
-                        const tbody = document.createElement('tbody');
-
-                        // テーブルヘッダーの作成
-                        let headerRow = '<tr><th>データ名(JP)</th><th>data_name</th><th>unit</th></tr>';
-                        thead.innerHTML = headerRow;
-                        table.appendChild(thead);
-
-                        // テーブルボディの作成
-                        device.data.forEach(item => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${item.name}</td>
-                                <td>${item.data_name}</td>
-                                <td>${item.unit || ''}</td>
-                            `;
-                            tbody.appendChild(row);
-                        });
-                        table.appendChild(tbody);
-                        deviceSection.appendChild(table);
-                        container.appendChild(deviceSection);
-                    });
+                .then(data => {
+                    jsonData = data;
+                    loadingMessage.style.display = 'none';
+                    updateDisplay();
                 })
                 .catch(error => {
-                    loadingMessage.textContent = `データの読み込み中にエラーが発生しました: ${error.message}`;
+                    const errorMsg = currentLang === 'jp' 
+                        ? `データの読み込み中にエラーが発生しました: ${error.message}`
+                        : `Error loading data: ${error.message}`;
+                    loadingMessage.innerHTML = `<div class="error-message">${errorMsg}</div>`;
                     console.error('Error fetching JSON:', error);
                 });
+
+            // 表示を更新する関数
+            function updateDisplay() {
+                if (!jsonData) {
+                    console.log('No data available');
+                    return;
+                }
+
+                try {
+                    container.innerHTML = '';
+                    
+                    jsonData.forEach((device, deviceIndex) => {
+                        try {
+                            const deviceSection = document.createElement('div');
+                            
+                            // デバイス名の取得（言語別）
+                            let deviceName = device.deviceTypeName; // デフォルト値
+                            if (device.deviceNameList) {
+                                deviceName = device.deviceNameList[currentLang] || 
+                                           device.deviceNameList.jp || 
+                                           device.deviceNameList.en || 
+                                           device.deviceTypeName;
+                            }
+                            
+                            deviceSection.innerHTML = `<h2>${deviceName} (${device.deviceTypeCode})</h2>`;
+
+                            const table = document.createElement('table');
+                            const thead = document.createElement('thead');
+                            const tbody = document.createElement('tbody');
+
+                            // テーブルヘッダーの作成（言語別）
+                            let headerRow = '';
+                            if (currentLang === 'jp') {
+                                headerRow = '<tr><th>data_name</th><th>単位</th><th>データ名</th></tr>';
+                            } else {
+                                headerRow = '<tr><th>data_name</th><th>unit</th><th>Data Name</th></tr>';
+                            }
+                            thead.innerHTML = headerRow;
+                            table.appendChild(thead);
+
+                            // テーブルボディの作成
+                            if (device.data && Array.isArray(device.data)) {
+                                device.data.forEach((item, itemIndex) => {
+                                    try {
+                                        const row = document.createElement('tr');
+                                        
+                                        // nameListから適切な言語のデータ名を取得
+                                        let dataName = item.name || ''; // デフォルト値
+                                        if (item.nameList) {
+                                            dataName = item.nameList[currentLang] || 
+                                                     item.nameList.jp || 
+                                                     item.nameList.en || 
+                                                     item.name || 
+                                                     '';
+                                        }
+                                        
+                                        row.innerHTML = `
+                                            <td>${item.data_name || ''}</td>
+                                            <td>${item.unit || ''}</td>
+                                            <td>${dataName}</td>
+                                        `;
+                                        tbody.appendChild(row);
+                                    } catch (itemError) {
+                                        console.error(`Error processing item ${itemIndex} in device ${deviceIndex}:`, itemError);
+                                    }
+                                });
+                            } else {
+                                // データがない場合の処理
+                                const row = document.createElement('tr');
+                                const noDataMsg = currentLang === 'jp' ? 'データなし' : 'No data';
+                                row.innerHTML = `<td colspan="3" style="text-align: center;">${noDataMsg}</td>`;
+                                tbody.appendChild(row);
+                            }
+                            
+                            table.appendChild(tbody);
+                            deviceSection.appendChild(table);
+                            container.appendChild(deviceSection);
+                        } catch (deviceError) {
+                            console.error(`Error processing device ${deviceIndex}:`, deviceError);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error updating display:', error);
+                    container.innerHTML = `<div class="error-message">
+                        ${currentLang === 'jp' ? '表示エラーが発生しました' : 'Display error occurred'}
+                    </div>`;
+                }
+            }
         });
     </script>
 
