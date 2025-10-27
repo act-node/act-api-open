@@ -16,7 +16,7 @@
         "data": [
             { "data_name": "soil_volumetric_water_content", "unit": "%",    "name": "土壌水分", "nameList": { "jp": "土壌水分", "en": "Soil volumetric water content" } },
             { "data_name": "soil_temperature",              "unit": "°C",   "name": "土壌温度", "nameList": { "jp": "土壌温度", "en": "Soil temperature" } },
-            { "data_name": "soil_electrical_conductivity",  "unit": "uS/cm","name": "土壌EC",   "nameList": { "jp": "土壌EC", "en": "soil EC" } },
+            { "data_name": "soil_electrical_conductivity",  "unit": "uS/cm","name": "土壌EC",   "nameList": { "jp": "土壌EC", "en": "Soil EC" } },
             { "data_name": "battery_voltage",               "unit": "V",    "name": "電圧",     "nameList": { "jp": "電圧", "en": "Voltage" } }
         ]
     },
@@ -27,10 +27,10 @@
         "data": [
             { "data_name": "water_SOIL_1",      "unit": "%",        "name": "土壌水分", "nameList": { "jp": "土壌水分", "en": "Soil volumetric water content" } },
             { "data_name": "temp_SOIL_1",       "unit": "°C",       "name": "土壌温度", "nameList": { "jp": "土壌温度", "en": "Soil temperature" } },
-            { "data_name": "conduct_SOIL_1",    "unit": "uS/cm",    "name": "土壌EC",   "nameList": { "jp": "土壌EC", "en": "soil EC" } },
+            { "data_name": "conduct_SOIL_1",    "unit": "uS/cm",    "name": "土壌EC",   "nameList": { "jp": "土壌EC", "en": "Soil EC" } },
             { "data_name": "water_SOIL_2",      "unit": "%",        "name": "土壌水分", "nameList": { "jp": "土壌水分", "en": "Soil volumetric water content" } },
             { "data_name": "temp_SOIL_2",       "unit": "°C",       "name": "土壌温度", "nameList": { "jp": "土壌温度", "en": "Soil temperature" } },
-            { "data_name": "conduct_SOIL_2",    "unit": "uS/cm",    "name": "土壌EC",   "nameList": { "jp": "土壌EC", "en": "soil EC" } },
+            { "data_name": "conduct_SOIL_2",    "unit": "uS/cm",    "name": "土壌EC",   "nameList": { "jp": "土壌EC", "en": "Soil EC" } },
             { "data_name": "Bat",               "unit": "V",        "name": "電圧",     "nameList": { "jp": "電圧", "en": "Voltage" } }
         ]
     },
