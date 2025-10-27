@@ -22,7 +22,42 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
+        
+        /* 言語切り替えトグルボタン（画像のデザインに合わせて） */
+        .lang-toggle-wrapper {
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid #d32f2f;
+            border-radius: 25px;
+            padding: 8px 20px;
+            background-color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+        .lang-toggle-wrapper span {
+            font-size: 14px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .lang-toggle-wrapper .lang-jp {
+            color: #333;
+        }
+        .lang-toggle-wrapper .lang-en {
+            color: #999;
+        }
+        .lang-toggle-wrapper .separator {
+            margin: 0 8px;
+            color: #999;
+        }
+        .lang-toggle-wrapper.en-active .lang-jp {
+            color: #999;
+        }
+        .lang-toggle-wrapper.en-active .lang-en {
+            color: #333;
+        }
+        
         .control-button {
             padding: 10px 20px;
             background-color: #179C9C;
@@ -36,9 +71,7 @@
         .control-button:hover {
             background-color: #127070;
         }
-        .control-button.active {
-            background-color: #0f5555;
-        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -57,8 +90,65 @@
             font-weight: bold;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f9f9f9;
         }
+        
+        /* 行のホバー効果 */
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+        tbody tr:hover {
+            background-color: #e3f2fd !important;
+        }
+        
+        /* data_nameセルをクリック可能に */
+        td.data-name-cell {
+            cursor: pointer;
+            position: relative;
+        }
+        td.data-name-cell:hover {
+            background-color: #bbdefb;
+        }
+        td.data-name-cell:active {
+            background-color: #90caf9;
+        }
+        
+        /* コピー成功の通知 */
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out, slideOut 0.3s ease-in 2.7s;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
         h1 {
             margin: 0;
         }
@@ -101,8 +191,11 @@
     <div class="header-container">
         <h1 id="pageTitle">LoRaWAN センサー TTN経由</h1>
         <div class="button-container">
-            <button id="langToggleJP" class="control-button active">日本語</button>
-            <button id="langToggleEN" class="control-button">English</button>
+            <div id="langToggle" class="lang-toggle-wrapper">
+                <span class="lang-jp">JP</span>
+                <span class="separator">/</span>
+                <span class="lang-en">EN</span>
+            </div>
             <button id="downloadJSON" class="control-button">JSONダウンロード</button>
         </div>
     </div>
@@ -117,32 +210,24 @@
         document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('deviceTableContainer');
             const loadingMessage = document.getElementById('loading');
-            const langToggleJP = document.getElementById('langToggleJP');
-            const langToggleEN = document.getElementById('langToggleEN');
+            const langToggle = document.getElementById('langToggle');
             const downloadBtn = document.getElementById('downloadJSON');
             const pageTitle = document.getElementById('pageTitle');
 
-            // 言語切り替えボタンのイベントリスナー
-            langToggleJP.addEventListener('click', () => {
-                if (currentLang !== 'jp') {
-                    currentLang = 'jp';
-                    langToggleJP.classList.add('active');
-                    langToggleEN.classList.remove('active');
-                    pageTitle.textContent = 'LoRaWAN センサー TTN経由';
-                    downloadBtn.textContent = 'JSONダウンロード';
-                    updateDisplay();
-                }
-            });
-
-            langToggleEN.addEventListener('click', () => {
-                if (currentLang !== 'en') {
+            // 言語切り替えトグルボタンのイベントリスナー
+            langToggle.addEventListener('click', () => {
+                if (currentLang === 'jp') {
                     currentLang = 'en';
-                    langToggleEN.classList.add('active');
-                    langToggleJP.classList.remove('active');
+                    langToggle.classList.add('en-active');
                     pageTitle.textContent = 'LoRaWAN Sensor via TTN';
                     downloadBtn.textContent = 'Download JSON';
-                    updateDisplay();
+                } else {
+                    currentLang = 'jp';
+                    langToggle.classList.remove('en-active');
+                    pageTitle.textContent = 'LoRaWAN センサー TTN経由';
+                    downloadBtn.textContent = 'JSONダウンロード';
                 }
+                updateDisplay();
             });
 
             // JSONダウンロードボタンのイベントリスナー
@@ -188,6 +273,50 @@
                     loadingMessage.innerHTML = `<div class="error-message">${errorMsg}</div>`;
                     console.error('Error fetching JSON:', error);
                 });
+
+            // クリップボードにコピーする関数
+            function copyToClipboard(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showCopyNotification(text);
+                    }).catch(err => {
+                        console.error('Failed to copy:', err);
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            }
+
+            // フォールバック用のコピー関数
+            function fallbackCopy(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopyNotification(text);
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                }
+                document.body.removeChild(textArea);
+            }
+
+            // コピー成功の通知を表示
+            function showCopyNotification(text) {
+                const notification = document.createElement('div');
+                notification.className = 'copy-notification';
+                notification.textContent = currentLang === 'jp' 
+                    ? `コピーしました: ${text}` 
+                    : `Copied: ${text}`;
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 3000);
+            }
 
             // 表示を更新する関数
             function updateDisplay() {
@@ -244,11 +373,28 @@
                                                      '';
                                         }
                                         
-                                        row.innerHTML = `
-                                            <td>${item.data_name || ''}</td>
-                                            <td>${item.unit || ''}</td>
-                                            <td>${dataName}</td>
-                                        `;
+                                        const dataNameCell = document.createElement('td');
+                                        dataNameCell.className = 'data-name-cell';
+                                        dataNameCell.textContent = item.data_name || '';
+                                        dataNameCell.title = currentLang === 'jp' 
+                                            ? 'クリックしてコピー' 
+                                            : 'Click to copy';
+                                        
+                                        // クリックイベントを追加
+                                        dataNameCell.addEventListener('click', () => {
+                                            copyToClipboard(item.data_name || '');
+                                        });
+                                        
+                                        const unitCell = document.createElement('td');
+                                        unitCell.textContent = item.unit || '';
+                                        
+                                        const nameCell = document.createElement('td');
+                                        nameCell.textContent = dataName;
+                                        
+                                        row.appendChild(dataNameCell);
+                                        row.appendChild(unitCell);
+                                        row.appendChild(nameCell);
+                                        
                                         tbody.appendChild(row);
                                     } catch (itemError) {
                                         console.error(`Error processing item ${itemIndex} in device ${deviceIndex}:`, itemError);
