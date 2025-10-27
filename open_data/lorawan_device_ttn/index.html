@@ -220,12 +220,12 @@
                     currentLang = 'en';
                     langToggle.classList.add('en-active');
                     pageTitle.textContent = 'LoRaWAN Sensor via TTN';
-                    downloadBtn.textContent = 'Download JSON';
+                    downloadBtn.textContent = 'Download as JSON';
                 } else {
                     currentLang = 'jp';
                     langToggle.classList.remove('en-active');
                     pageTitle.textContent = 'LoRaWAN センサー TTN経由';
-                    downloadBtn.textContent = 'JSONダウンロード';
+                    downloadBtn.textContent = 'Download as JSON';
                 }
                 updateDisplay();
             });
@@ -350,9 +350,9 @@
                             // テーブルヘッダーの作成（言語別）
                             let headerRow = '';
                             if (currentLang === 'jp') {
-                                headerRow = '<tr><th>data_name</th><th>単位</th><th>データ名</th></tr>';
+                                headerRow = '<tr><th>data_name (clickでCopy)</th><th>単位</th><th>Name [和名]</th></tr>';
                             } else {
-                                headerRow = '<tr><th>data_name</th><th>unit</th><th>Data Name</th></tr>';
+                                headerRow = '<tr><th>data_name (Click to copy)</th><th>unit</th><th>Name [English]</th></tr>';
                             }
                             thead.innerHTML = headerRow;
                             table.appendChild(thead);
