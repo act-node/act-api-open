@@ -59,6 +59,17 @@
         ]
     },
     {
+        "deviceTypeCode": "SN50_V3_WF_TSK_LNB13RC_01", "deviceTypeName": "TOYOKEIKI LNB13RC Outdoor Flow Sensor",
+        "deviceNameList": { "jp": "流量センサー", "en": "Outdoor Flow Sensor" },
+        "num_of_data": 5, "credit": 2,
+        "data": [
+            { "data_name": "Pulse_count",        "unit": "",     "name": "パルスカウント",   "nameList": { "jp": "パルスカウント", "en": "Pulse count" } },
+            { "data_name": "Water_flow_value",  "unit": "L",    "name": "水量",         "nameList": { "jp": "水量", "en": "Water flow" } },
+            { "data_name": "Unit",       "unit": "",     "name": "単位",     "nameList": { "jp": "単位", "en": "Unit" } },
+            { "data_name": "battery_voltage",   "unit": "V",    "name": "電圧",         "nameList": { "jp": "電圧", "en": "Voltage" } }
+        ]
+    },
+    {
         "deviceTypeCode": "SKMLIOT", "deviceTypeName": "SKMLIOT Rain meter",
         "deviceNameList": { "jp": "サキミル降水センサー", "en": "Sakimiru rainfall Sensor" },
         "num_of_data": 4, "credit": 2,
