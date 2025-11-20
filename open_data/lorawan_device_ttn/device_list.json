@@ -10,6 +10,16 @@
         ]
     },
     {
+        "deviceTypeCode": "LSN50-S31", "deviceTypeName": "LSN50-S31 Temperature & Humidity Sensor",
+        "deviceNameList": { "jp": "屋外温湿度センサー", "en": "Temperature & Humidity Sensor" },
+        "num_of_data": 3, "credit": 2,
+        "data": [
+            { "data_name": "temperature",       "unit": "°C",   "name": "温度",         "nameList": { "jp": "温度", "en": "Temperature" } },
+            { "data_name": "relative_humidity", "unit": "%",    "name": "湿度(相対)",   "nameList": { "jp": "湿度(相対)", "en": "Humidity(Relative)" } },
+            { "data_name": "battery_voltage",   "unit": "V",    "name": "電圧",         "nameList": { "jp": "電圧", "en": "Voltage" } }
+        ]
+    },
+    {
         "deviceTypeCode": "LSE01", "deviceTypeName": "LSE01 Soil Moisture, Temperature & EC Sensor",
         "deviceNameList": { "jp": "土壌水分 & ECセンサー", "en": "Soil Moisture & EC Sensor" },
         "num_of_data": 4, "credit": 2,
@@ -60,8 +70,8 @@
     },
     {
         "deviceTypeCode": "SN50_V3_WF_TSK_LNB13RC_01", "deviceTypeName": "TOYOKEIKI LNB13RC Outdoor Flow Sensor",
-        "deviceNameList": { "jp": "流量センサー", "en": "Outdoor Flow Sensor" },
-        "num_of_data": 5, "credit": 2,
+        "deviceNameList": { "jp": "LoRaWAN 東洋計器 LNB13RC 流量センサー", "en": "LoRaWAN Connected TOYOKEIKI LNB13RC Flow Sensor" },
+        "num_of_data": 4, "credit": 2,
         "data": [
             { "data_name": "Pulse_count",        "unit": "",     "name": "パルスカウント",   "nameList": { "jp": "パルスカウント", "en": "Pulse count" } },
             { "data_name": "Water_flow_value",  "unit": "L",    "name": "水量",         "nameList": { "jp": "水量", "en": "Water flow" } },
