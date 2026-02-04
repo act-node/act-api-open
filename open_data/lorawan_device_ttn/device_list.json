@@ -31,6 +31,17 @@
         ]
     },
     {
+        "deviceTypeCode": "SE01-LB",
+        "deviceTypeName": "SE01-LB Soil Moisture, Temperature & EC Sensor",
+        "num_of_data": 3,
+        "data": [
+            { "name": "土壌水分", "data_name": "soil_volumetric_water_content", "unit": "%" },
+            { "name": "土壌温度", "data_name": "soil_temperature", "unit": "°C" },
+            { "name": "土壌EC", "data_name": "soil_electrical_conductivity", "unit": "uS/cm" },
+            { "name": "電圧", "data_name": "battery_voltage", "unit": "V" }
+        ]
+    },
+    {
         "deviceTypeCode": "SE02-LB", "deviceTypeName": "SE02-LB Soil Moisture, Temperature & EC Sensor",
         "deviceNameList": { "jp": "ダブル土壌 & ECセンサー", "en": "Temperature & Humidity Sensor x 2" },
         "num_of_data": 7, "credit": 4,
