@@ -109,5 +109,34 @@
             { "data_name": "BUTTON_STATUS", "unit": "", "name": "ボタン", "nameList": { "jp": "ボタン", "en": "Button" } },
             { "data_name": "battery_voltage",           "unit": "V",    "name": "電圧",     "nameList": { "jp": "電圧", "en": "Voltage" } }
         ]
+    },
+    {
+        "deviceTypeCode": "SHT31", "deviceTypeName": "SHT31 Temperature & Humidity Sensor",
+        "deviceNameList": { "jp": "屋外温湿度センサー", "en": "Temperature & Humidity Sensor" },
+        "num_of_data": 3, "credit": 2,
+        "data": [
+            { "data_name": "temperature_c", "unit": "°C", "name": "温度", "nameList": { "jp": "温度", "en": "Temperature" } },
+            { "data_name": "humidity_percent", "unit": "%", "name": "湿度(相対)", "nameList": { "jp": "湿度(相対)", "en": "Humidity(Relative)" } },
+            { "data_name": "BatV", "unit": "V", "name": "電圧", "nameList": { "jp": "電圧", "en": "Voltage" } }
+        ]
+        },
+    {
+        "deviceTypeCode": "S31-LB", "deviceTypeName": "S31-LB Temperature & Humidity Sensor",
+        "deviceNameList": { "jp": "屋外温湿度センサー", "en": "Temperature & Humidity Sensor" },
+        "num_of_data": 3, "credit": 2,
+        "data": [
+            { "data_name": "temperature", "unit": "°C", "name": "温度", "nameList": { "jp": "温度", "en": "Temperature" } },
+            { "data_name": "relative_humidity", "unit": "%", "name": "湿度(相対)", "nameList": { "jp": "湿度(相対)", "en": "Humidity(Relative)" } },
+            { "data_name": "battery_voltage", "unit": "V", "name": "電圧", "nameList": { "jp": "電圧", "en": "Voltage" } }
+        ]
+    },
+    {
+        "deviceTypeCode": "DS1603", "deviceTypeName": "DS1603 Liquid Level Sensor",
+        "deviceNameList": {"jp": "液面レベルセンサー", "en": "Liquid Level Sensor"},
+        "num_of_data": 2, "credit": 2,
+        "data": [
+            { "data_name": "liquid_depth", "unit": "mm", "name": "液体の深さ", "nameList": { "jp": "液体の深さ", "en": "Liquid Depth" } },
+            { "data_name": "battery_voltage", "unit": "V", "name": "電圧", "nameList": { "jp": "電圧", "en": "Battery Voltage" } }
+        ]
     }
 ]
