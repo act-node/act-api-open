@@ -115,11 +115,11 @@
         "deviceNameList": { "jp": "屋外温湿度センサー", "en": "Temperature & Humidity Sensor" },
         "num_of_data": 3, "credit": 2,
         "data": [
-            { "data_name": "temperature_c", "unit": "°C", "name": "温度", "nameList": { "jp": "温度", "en": "Temperature" } },
-            { "data_name": "humidity_percent", "unit": "%", "name": "湿度(相対)", "nameList": { "jp": "湿度(相対)", "en": "Humidity(Relative)" } },
-            { "data_name": "BatV", "unit": "V", "name": "電圧", "nameList": { "jp": "電圧", "en": "Voltage" } }
+            { "data_name": "temperature", "unit": "°C", "name": "温度", "nameList": { "jp": "温度", "en": "Temperature" } },
+            { "data_name": "relative_humidity", "unit": "%", "name": "湿度(相対)", "nameList": { "jp": "湿度(相対)", "en": "Humidity(Relative)" } },
+            { "data_name": "battery_voltage", "unit": "V", "name": "電圧", "nameList": { "jp": "電圧", "en": "Voltage" } }
         ]
-        },
+    },
     {
         "deviceTypeCode": "S31-LB", "deviceTypeName": "S31-LB Temperature & Humidity Sensor",
         "deviceNameList": { "jp": "屋外温湿度センサー", "en": "Temperature & Humidity Sensor" },
