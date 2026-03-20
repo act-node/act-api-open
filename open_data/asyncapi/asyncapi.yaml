@@ -17,10 +17,10 @@ info:
     - ブローカー: AWS IoT Core
 
     ## QoS ポリシー
-    | QoS | 対象トピック            | 理由                     |
-    |-----|----------------------|--------------------------|
-    | 1   | command / response / event | 取りこぼすと制御不整合   |
-    | 0   | telemetry / health   | 次回データで補完可能     |
+    | QoS | 対象トピック | 理由 |
+    |-----|------------|------|
+    | 1   | command / response / event | 取りこぼすと制御不整合 |
+    | 0   | telemetry / health | 次回データで補完可能 |
 
   contact:
     name: ACT Node Inc.
@@ -48,7 +48,7 @@ channels:
     address: "{device_id}/curtain/command"
     description: |
       クラウド / Event Router から Control Logic へのモーター制御指示。
-      全コマンドに `command_id` を含め、Control Logic は必ず `response` トピックで結果を返す。
+      全コマンドに command_id を含め、Control Logic は必ず response トピックで結果を返す。
     parameters:
       device_id:
         $ref: "#/components/parameters/device_id"
@@ -60,7 +60,7 @@ channels:
     address: "{device_id}/curtain/response"
     description: |
       Control Logic から Event Router へのコマンド実行結果。
-      `command_id` で要求と応答を照合する。
+      command_id で要求と応答を照合する。
     parameters:
       device_id:
         $ref: "#/components/parameters/device_id"
@@ -226,40 +226,135 @@ components:
       summary: Event Router から Control Logic へのモーター制御指示
       contentType: application/json
       payload:
-        $ref: "./schemas/command.json"
+        type: object
+        required:
+          - command_id
+          - issued_at
+          - source
+          - motors
+          - options
+        properties:
+          command_id:
+            type: string
+            description: コマンドの一意識別子。response との照合に使用
+            example: cmd-abc123
+          issued_at:
+            type: string
+            format: date-time
+            description: コマンド発行時刻（ISO 8601 / UTC）
+            example: "2025-03-20T09:15:00Z"
+          source:
+            type: string
+            description: コマンド発行元の種別
+            enum:
+              - "event:motor_state"
+              - "event:limiter"
+              - "event:emergency_stop"
+              - zone_transition
+              - timer
+              - manual
+              - shadow_delta
+              - timeout_retry
+            example: zone_transition
+          zone_id:
+            type: string
+            nullable: true
+            description: コマンド発行時のアクティブゾーンID。手動操作時は null
+            example: daytime_auto
+          motors:
+            type: object
+            description: "モーターごとの指示。キーは M1 または M2"
+            properties:
+              M1:
+                type: object
+                properties:
+                  command:
+                    type: string
+                    enum: [forward, reverse, stop]
+                    description: "forward=開、reverse=閉、stop=停止"
+                  target_direction:
+                    type: string
+                    enum: [forward, reverse, stopped]
+                  skip:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum: [override, override_false, already_at_target, cooldown]
+              M2:
+                type: object
+                properties:
+                  command:
+                    type: string
+                    enum: [forward, reverse, stop]
+                  target_direction:
+                    type: string
+                    enum: [forward, reverse, stopped]
+                  skip:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum: [override, override_false, already_at_target, cooldown]
+          options:
+            type: object
+            required:
+              - cooldown_sec
+            properties:
+              stop_before_reverse_ms:
+                type: integer
+                minimum: 0
+                description: 逆転前の停止待機時間（ミリ秒）。接触器消弧のため
+                default: 500
+                example: 500
+              cooldown_sec:
+                type: integer
+                minimum: 0
+                description: 動作後のクールダウン秒数
+                default: 30
+                example: 30
+          trigger:
+            type: object
+            description: コマンド発行のトリガー情報（オプション）
+            properties:
+              event_type:
+                type: string
+                example: motor_state
+              temperature_c:
+                type: number
+                description: トリガーとなった温度（℃）
+                example: 30.6
       examples:
         - name: 自動閾値越えによる開コマンド
           payload:
-            command_id: "cmd-abc123"
+            command_id: cmd-abc123
             issued_at: "2025-03-20T09:15:00Z"
             source: "event:motor_state"
-            zone_id: "daytime_auto"
+            zone_id: daytime_auto
             motors:
               M1:
-                command: "forward"
-                target_direction: "forward"
+                command: forward
+                target_direction: forward
               M2:
-                command: "forward"
-                target_direction: "forward"
+                command: forward
+                target_direction: forward
             options:
               stop_before_reverse_ms: 500
               cooldown_sec: 30
             trigger:
-              event_type: "motor_state"
+              event_type: motor_state
               temperature_c: 30.6
         - name: ゾーン切替による強制クローズ
           payload:
-            command_id: "cmd-def456"
+            command_id: cmd-def456
             issued_at: "2025-03-20T18:00:01Z"
-            source: "zone_transition"
-            zone_id: "evening_close"
+            source: zone_transition
+            zone_id: evening_close
             motors:
               M1:
-                command: "reverse"
-                target_direction: "reverse"
+                command: reverse
+                target_direction: reverse
               M2:
-                command: "reverse"
-                target_direction: "reverse"
+                command: reverse
+                target_direction: reverse
             options:
               stop_before_reverse_ms: 500
               cooldown_sec: 30
@@ -270,47 +365,121 @@ components:
       summary: Control Logic から Event Router へのコマンド応答
       contentType: application/json
       payload:
-        $ref: "./schemas/response.json"
+        type: object
+        required:
+          - command_id
+          - responded_at
+          - motors
+        properties:
+          command_id:
+            type: string
+            description: 対応するコマンドの command_id
+            example: cmd-abc123
+          responded_at:
+            type: string
+            format: date-time
+            description: 応答生成時刻（ISO 8601 / UTC）
+            example: "2025-03-20T09:15:08Z"
+          motors:
+            type: object
+            description: モーターごとの実行結果
+            properties:
+              M1:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success, pending, skipped, error]
+                    description: "success=成功 / pending=保留 / skipped=スキップ / error=エラー"
+                  direction:
+                    type: string
+                    enum: [forward, reverse, stopped]
+                  cooldown_active:
+                    type: boolean
+                  cooldown_until:
+                    type: number
+                    nullable: true
+                  reason:
+                    type: string
+                    enum:
+                      - cooldown
+                      - override
+                      - override_false
+                      - already_at_target
+                      - emergency_stop_active
+                      - limiter_active
+                      - motor_error
+                      - invalid_command
+                  retry_after_sec:
+                    type: integer
+                    minimum: 0
+                  pending_command:
+                    type: string
+                    enum: [forward, reverse]
+                  error_code:
+                    type: string
+              M2:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    enum: [success, pending, skipped, error]
+                  direction:
+                    type: string
+                    enum: [forward, reverse, stopped]
+                  cooldown_active:
+                    type: boolean
+                  cooldown_until:
+                    type: number
+                    nullable: true
+                  reason:
+                    type: string
+                  retry_after_sec:
+                    type: integer
+                  pending_command:
+                    type: string
+                  error_code:
+                    type: string
       examples:
         - name: 成功応答
           payload:
-            command_id: "cmd-abc123"
+            command_id: cmd-abc123
             responded_at: "2025-03-20T09:15:08Z"
             motors:
               M1:
-                result: "success"
-                direction: "forward"
+                result: success
+                direction: forward
                 cooldown_active: true
                 cooldown_until: 1710300038
               M2:
-                result: "success"
-                direction: "forward"
+                result: success
+                direction: forward
                 cooldown_active: true
                 cooldown_until: 1710300043
         - name: 緊急停止中の拒否
           payload:
-            command_id: "cmd-ghi789"
+            command_id: cmd-ghi789
             responded_at: "2025-03-20T09:22:05Z"
             motors:
               M1:
-                result: "error"
-                reason: "emergency_stop_active"
+                result: error
+                reason: emergency_stop_active
               M2:
-                result: "error"
-                reason: "emergency_stop_active"
+                result: error
+                reason: emergency_stop_active
         - name: クールダウン中の保留
           payload:
-            command_id: "cmd-jkl012"
+            command_id: cmd-jkl012
             responded_at: "2025-03-20T09:20:01Z"
             motors:
               M1:
-                result: "pending"
-                reason: "cooldown"
+                result: pending
+                reason: cooldown
                 retry_after_sec: 18
-                pending_command: "reverse"
+                pending_command: reverse
               M2:
-                result: "success"
-                direction: "reverse"
+                result: success
+                direction: reverse
                 cooldown_active: true
                 cooldown_until: 1710300061
 
@@ -319,62 +488,198 @@ components:
       title: リミッター状態変化イベント
       contentType: application/json
       payload:
-        $ref: "./schemas/event_limiter.json"
+        type: object
+        required:
+          - device_id
+          - event_type
+          - motor_id
+          - limiter
+          - state
+          - previous_state
+          - timestamp
+        properties:
+          device_id:
+            type: string
+            example: x320-curtain-01
+          event_type:
+            type: string
+            enum: [limiter]
+          motor_id:
+            type: string
+            enum: [M1, M2]
+          limiter:
+            type: string
+            enum: [upper, lower]
+            description: "upper=上限リミッター / lower=下限リミッター"
+          state:
+            type: string
+            enum: [active, inactive]
+            description: "active=到達（接点ON） / inactive=未到達（接点OFF）"
+          previous_state:
+            type: string
+            enum: [active, inactive]
+          timestamp:
+            type: number
+            description: Unix epoch 秒
       examples:
         - name: 上限リミッター到達
           payload:
-            device_id: "x320-curtain-01"
-            event_type: "limiter"
-            motor_id: "M1"
-            limiter: "upper"
-            state: "active"
-            previous_state: "inactive"
+            device_id: x320-curtain-01
+            event_type: limiter
+            motor_id: M1
+            limiter: upper
+            state: active
+            previous_state: inactive
             timestamp: 1710300060.0
 
     EmergencyStopEvent:
       name: EmergencyStopEvent
       title: 緊急停止イベント
+      description: 物理緊急停止ボタンの状態変化。MQTT コマンドでの制御不可
       contentType: application/json
       payload:
-        $ref: "./schemas/event_emergency_stop.json"
+        type: object
+        required:
+          - device_id
+          - event_type
+          - state
+          - timestamp
+        properties:
+          device_id:
+            type: string
+            example: x320-curtain-01
+          event_type:
+            type: string
+            enum: [emergency_stop]
+          state:
+            type: string
+            enum: [active, inactive]
+            description: "active=ボタン押下中 / inactive=解除"
+          timestamp:
+            type: number
+            description: Unix epoch 秒
       examples:
         - name: 緊急停止ボタン押下
           payload:
-            device_id: "x320-curtain-01"
-            event_type: "emergency_stop"
-            state: "active"
+            device_id: x320-curtain-01
+            event_type: emergency_stop
+            state: active
             timestamp: 1710300120.0
+        - name: 緊急停止解除
+          payload:
+            device_id: x320-curtain-01
+            event_type: emergency_stop
+            state: inactive
+            timestamp: 1710300180.0
 
     MotorStateEvent:
       name: MotorStateEvent
       title: モーター状態変化イベント
       contentType: application/json
       payload:
-        $ref: "./schemas/event_motor_state.json"
+        type: object
+        required:
+          - device_id
+          - event_type
+          - motor_id
+          - direction
+          - previous_direction
+          - reason
+          - timestamp
+        properties:
+          device_id:
+            type: string
+            example: x320-curtain-01
+          event_type:
+            type: string
+            enum: [motor_state]
+          motor_id:
+            type: string
+            enum: [M1, M2]
+          direction:
+            type: string
+            enum: [forward, reverse, stopped]
+            description: "forward=開方向 / reverse=閉方向 / stopped=停止"
+          previous_direction:
+            type: string
+            enum: [forward, reverse, stopped]
+          reason:
+            type: string
+            enum: [command, limiter, emergency_stop, auto_threshold, error]
+            description: 状態変化の原因
+          error_code:
+            type: string
+            description: "reason=error の場合のエラーコード（E01/E02/E03）"
+            example: E01
+          timestamp:
+            type: number
+            description: Unix epoch 秒
       examples:
         - name: 自動閾値による起動
           payload:
-            device_id: "x320-curtain-01"
-            event_type: "motor_state"
-            motor_id: "M1"
-            direction: "forward"
-            previous_direction: "stopped"
-            reason: "auto_threshold"
+            device_id: x320-curtain-01
+            event_type: motor_state
+            motor_id: M1
+            direction: forward
+            previous_direction: stopped
+            reason: auto_threshold
             timestamp: 1710300000.0
+        - name: リミッターによる停止
+          payload:
+            device_id: x320-curtain-01
+            event_type: motor_state
+            motor_id: M1
+            direction: stopped
+            previous_direction: forward
+            reason: limiter
+            timestamp: 1710300060.1
+        - name: エラーによる停止
+          payload:
+            device_id: x320-curtain-01
+            event_type: motor_state
+            motor_id: M2
+            direction: stopped
+            previous_direction: reverse
+            reason: error
+            error_code: E01
+            timestamp: 1710300200.0
 
     ModeChangeEvent:
       name: ModeChangeEvent
       title: 動作モード変更イベント
       contentType: application/json
       payload:
-        $ref: "./schemas/event_mode_change.json"
+        type: object
+        required:
+          - device_id
+          - event_type
+          - mode
+          - previous_mode
+          - timestamp
+        properties:
+          device_id:
+            type: string
+            example: x320-curtain-01
+          event_type:
+            type: string
+            enum: [mode_change]
+          mode:
+            type: string
+            enum: [manual, auto]
+            description: "manual=手動モード / auto=自動モード"
+          previous_mode:
+            type: string
+            enum: [manual, auto]
+          timestamp:
+            type: number
+            description: Unix epoch 秒
       examples:
-        - name: 手動→自動切替
+        - name: 手動から自動への切替
           payload:
-            device_id: "x320-curtain-01"
-            event_type: "mode_change"
-            mode: "auto"
-            previous_mode: "manual"
+            device_id: x320-curtain-01
+            event_type: mode_change
+            mode: auto
+            previous_mode: manual
             timestamp: 1710300000.0
 
     SensorTelemetry:
@@ -383,11 +688,66 @@ components:
       summary: 30秒間隔の定期センサーデータ
       contentType: application/json
       payload:
-        $ref: "./schemas/telemetry.json"
+        type: object
+        required:
+          - device_id
+          - timestamp
+          - sensors
+          - sampled_at
+        properties:
+          device_id:
+            type: string
+            example: x320-curtain-01
+          timestamp:
+            type: number
+            description: Unix epoch 秒
+          sensors:
+            type: object
+            properties:
+              temperature:
+                type: object
+                required:
+                  - value_celsius
+                  - raw_value
+                  - read_at
+                properties:
+                  value_celsius:
+                    type: number
+                    minimum: -40
+                    maximum: 85
+                    description: AD変換後の温度（℃）
+                    example: 28.4
+                  raw_value:
+                    type: integer
+                    minimum: 0
+                    maximum: 4095
+                    description: "AD変換生データ（12bit）。0/4095 は断線・短絡の可能性あり"
+                    example: 2150
+                  read_at:
+                    type: number
+                    description: センサー読取時刻（Unix epoch 秒）
+                    example: 1710299998.5
+              humidity_pct:
+                type: number
+                minimum: 0
+                maximum: 100
+                description: 相対湿度（%）
+                example: 71.2
+              co2_ppm:
+                type: integer
+                minimum: 0
+                maximum: 10000
+                description: CO2濃度（ppm）。CO2センサーデバイスのみ
+                example: 850
+          sampled_at:
+            type: string
+            format: date-time
+            description: MQTT 送信時刻（ISO 8601 / UTC）
+            example: "2025-03-20T09:15:00Z"
       examples:
         - name: 温度・湿度テレメトリ
           payload:
-            device_id: "x320-curtain-01"
+            device_id: x320-curtain-01
             timestamp: 1710300000.0
             sensors:
               temperature:
@@ -396,6 +756,18 @@ components:
                 read_at: 1710299998.5
               humidity_pct: 71.2
             sampled_at: "2025-03-20T09:15:00Z"
+        - name: CO2センサーテレメトリ
+          payload:
+            device_id: x320-co2-01
+            timestamp: 1710300000.0
+            sensors:
+              co2_ppm: 850
+              temperature:
+                value_celsius: 27.8
+                raw_value: 2100
+                read_at: 1710299998.0
+              humidity_pct: 70.5
+            sampled_at: "2025-03-20T09:15:00Z"
 
     CurtainHealth:
       name: CurtainHealth
@@ -403,23 +775,78 @@ components:
       summary: 300秒間隔のデバイス死活情報
       contentType: application/json
       payload:
-        $ref: "./schemas/health.json"
+        type: object
+        required:
+          - device_id
+          - timestamp
+          - uptime_sec
+          - mqtt_connected
+          - firmware
+          - rssi_dbm
+          - ai_available
+          - errors
+        properties:
+          device_id:
+            type: string
+            example: x320-curtain-01
+          timestamp:
+            type: number
+            description: Unix epoch 秒
+          uptime_sec:
+            type: integer
+            minimum: 0
+            description: 起動からの経過秒数。前回より大幅に小さい場合は再起動を示す
+            example: 86400
+          mqtt_connected:
+            type: boolean
+            description: MQTT ブローカーへの接続状態
+          firmware:
+            type: string
+            description: ファームウェアバージョン（セマンティックバージョン）
+            example: "1.4.2"
+          rssi_dbm:
+            type: integer
+            minimum: -120
+            maximum: 0
+            description: "Wi-Fi 受信電波強度（dBm）。-70 以下で通信不安定の目安"
+            example: -65
+          do_channels:
+            type: array
+            items:
+              type: string
+            description: 利用可能なデジタル出力チャンネル一覧（X320固有）
+            example: [EXT_DO0, EXT_DO1, EXT_DO2, EXT_DO3]
+          di_channels:
+            type: array
+            items:
+              type: string
+            description: 利用可能なデジタル入力チャンネル一覧（X320固有）
+            example: [Filtered_DI0, Filtered_DI1, Filtered_DI2, Filtered_DI3, Filtered_DI4]
+          ai_available:
+            type: boolean
+            description: "アナログ入力（温度センサー用AD変換）が利用可能かどうか。false の場合 telemetry の temperature は無効"
+          errors:
+            type: array
+            items:
+              type: string
+            description: "現在発生中のエラー一覧。モーターID:エラーコード 形式。空配列が正常状態"
+            example: []
       examples:
-        - name: 正常
+        - name: 正常ヘルスチェック
           payload:
-            device_id: "x320-curtain-01"
+            device_id: x320-curtain-01
             timestamp: 1710300000.0
             uptime_sec: 86400
             mqtt_connected: true
             firmware: "1.4.2"
             rssi_dbm: -65
-            do_channels: ["EXT_DO0","EXT_DO1","EXT_DO2","EXT_DO3"]
-            di_channels: ["Filtered_DI0","Filtered_DI1","Filtered_DI2","Filtered_DI3","Filtered_DI4"]
+            do_channels: [EXT_DO0, EXT_DO1, EXT_DO2, EXT_DO3]
+            di_channels: [Filtered_DI0, Filtered_DI1, Filtered_DI2, Filtered_DI3, Filtered_DI4]
             ai_available: true
             errors: []
         - name: エラーあり
           payload:
-            device_id: "x320-curtain-01"
+            device_id: x320-curtain-01
             timestamp: 1710300300.0
             uptime_sec: 86700
             mqtt_connected: true
@@ -427,3 +854,13 @@ components:
             rssi_dbm: -65
             ai_available: true
             errors: ["M2:E01"]
+        - name: 再起動直後
+          payload:
+            device_id: x320-curtain-01
+            timestamp: 1710300800.0
+            uptime_sec: 120
+            mqtt_connected: true
+            firmware: "1.4.2"
+            rssi_dbm: -68
+            ai_available: true
+            errors: []
