@@ -6,37 +6,50 @@
   <title>ACT Connect IoT API ドキュメント</title>
   <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@1.4.9/styles/default.min.css">
   <style>
-    body { margin: 0; padding: 0; }
-    #asyncapi { min-height: 100vh; }
-    #loading { padding: 40px; font-family: sans-serif; color: #555; }
-    #error { padding: 40px; font-family: sans-serif; color: red; white-space: pre-wrap; }
+    body { margin: 0; padding: 0; font-family: sans-serif; }
+    #loading { padding: 40px; color: #555; }
+    #error   { padding: 40px; color: red; white-space: pre-wrap; display: none; }
   </style>
 </head>
 <body>
   <div id="loading">読み込み中...</div>
-  <div id="error" style="display:none"></div>
+  <div id="error"></div>
   <div id="asyncapi"></div>
 
+  <!-- js-yaml: YAML → JS object に変換 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <!-- AsyncAPI React Component standalone -->
   <script src="https://unpkg.com/@asyncapi/react-component@1.4.9/browser/standalone/index.js"></script>
+
   <script>
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none';
+      var el = document.getElementById('error');
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+
     fetch('./asyncapi.yaml')
       .then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.url);
+        if (!res.ok) throw new Error('asyncapi.yaml の取得失敗: HTTP ' + res.status);
         return res.text();
       })
       .then(function(yamlText) {
+        // YAML → JS object
+        var schema = jsyaml.load(yamlText);
         document.getElementById('loading').style.display = 'none';
+
         AsyncApiStandalone.render(
           {
-            schema: { source: yamlText },
+            schema: schema,
             config: {
               show: {
-                sidebar: true,
-                info: true,
-                servers: true,
+                sidebar:    true,
+                info:       true,
+                servers:    true,
                 operations: true,
-                messages: true,
-                schemas: true,
+                messages:   true,
+                schemas:    true,
               },
             },
           },
@@ -44,9 +57,7 @@
         );
       })
       .catch(function(err) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').style.display = 'block';
-        document.getElementById('error').textContent = 'エラー: ' + err.message;
+        showError('エラー: ' + err.message + '\n\n' + err.stack);
         console.error(err);
       });
   </script>
