@@ -1,45 +1,35 @@
 asyncapi: 3.0.0
+
 info:
   title: ACT Connect カーテン制御 IoT API
   version: 1.0.0
-  description: 'ACT Connect のカーテン開閉デバイス（X320）と
-
+  description: |
+    ACT Connect のカーテン開閉デバイス（X320）と
     クラウド / Greengrass アプリケーション間の MQTT メッセージ仕様。
 
-
     ## デバイス構成
-
     - x320-curtain-01 : カーテン開閉デバイス（温度・湿度センサー内蔵、モーター M1/M2）
-
     - x320-co2-01     : CO2センサーデバイス
 
-
     ## 通信仕様
-
     - プロトコル: MQTT v3.1.1 over TLS
-
     - ポート: 8883
-
     - ブローカー: AWS IoT Core
 
-
     ## QoS ポリシー
-
     | QoS | 対象トピック | 理由 |
-
     |-----|------------|------|
-
     | 1   | command / response / event | 取りこぼすと制御不整合 |
-
     | 0   | telemetry / health | 次回データで補完可能 |
 
-    '
   contact:
     name: ACT Node Inc.
     url: https://act-node.co.jp
   license:
     name: Proprietary
+
 defaultContentType: application/json
+
 servers:
   production:
     host: xxxxxxxxxxxx.iot.ap-northeast-1.amazonaws.com
@@ -49,11 +39,12 @@ servers:
     host: localhost:8883
     protocol: mqtt
     description: Greengrass IPC Pub/Sub ブローカー（エッジローカル）
+
 channels:
+
   curtainCommand:
-    address: '{device_id}/curtain/command'
-    description: クラウド / Event Router から Control Logic へのモーター制御指示。全コマンドに command_id
-      を含め、Control Logic は必ず response トピックで結果を返す。
+    address: "{device_id}/curtain/command"
+    description: クラウド / Event Router から Control Logic へのモーター制御指示。全コマンドに command_id を含め、Control Logic は必ず response トピックで結果を返す。
     messages:
       CurtainCommand:
         name: CurtainCommand
@@ -61,12 +52,7 @@ channels:
         contentType: application/json
         payload:
           type: object
-          required:
-          - command_id
-          - issued_at
-          - source
-          - motors
-          - options
+          required: [command_id, issued_at, source, motors, options]
           properties:
             command_id:
               type: string
@@ -76,18 +62,10 @@ channels:
               type: string
               format: date-time
               description: コマンド発行時刻（ISO 8601 / UTC）
-              example: '2025-03-20T09:15:00Z'
+              example: "2025-03-20T09:15:00Z"
             source:
               type: string
-              enum:
-              - event:motor_state
-              - event:limiter
-              - event:emergency_stop
-              - zone_transition
-              - timer
-              - manual
-              - shadow_delta
-              - timeout_retry
+              enum: [event:motor_state, event:limiter, event:emergency_stop, zone_transition, timer, manual, shadow_delta, timeout_retry]
               description: コマンド発行元の種別
             zone_id:
               type: string
@@ -95,57 +73,37 @@ channels:
               description: コマンド発行時のアクティブゾーンID
             motors:
               type: object
-              description: モーターごとの指示（M1 / M2）
+              description: "モーターごとの指示（M1 / M2）"
               properties:
                 M1:
                   type: object
                   properties:
                     command:
                       type: string
-                      enum:
-                      - forward
-                      - reverse
-                      - stop
-                      description: forward=開 / reverse=閉 / stop=停止
+                      enum: [forward, reverse, stop]
+                      description: "forward=開 / reverse=閉 / stop=停止"
                     target_direction:
                       type: string
-                      enum:
-                      - forward
-                      - reverse
-                      - stopped
+                      enum: [forward, reverse, stopped]
                     skip:
                       type: boolean
                     reason:
                       type: string
-                      enum:
-                      - override
-                      - override_false
-                      - already_at_target
-                      - cooldown
+                      enum: [override, override_false, already_at_target, cooldown]
                 M2:
                   type: object
                   properties:
                     command:
                       type: string
-                      enum:
-                      - forward
-                      - reverse
-                      - stop
+                      enum: [forward, reverse, stop]
                     target_direction:
                       type: string
-                      enum:
-                      - forward
-                      - reverse
-                      - stopped
+                      enum: [forward, reverse, stopped]
                     skip:
                       type: boolean
                     reason:
                       type: string
-                      enum:
-                      - override
-                      - override_false
-                      - already_at_target
-                      - cooldown
+                      enum: [override, override_false, already_at_target, cooldown]
             options:
               type: object
               properties:
@@ -168,43 +126,30 @@ channels:
                   type: number
                   description: トリガーとなった温度（℃）
         examples:
-        - name: 自動閾値越えによる開コマンド
-          payload:
-            command_id: cmd-abc123
-            issued_at: '2025-03-20T09:15:00Z'
-            source: event:motor_state
-            zone_id: daytime_auto
-            motors:
-              M1:
-                command: forward
-                target_direction: forward
-              M2:
-                command: forward
-                target_direction: forward
-            options:
-              stop_before_reverse_ms: 500
-              cooldown_sec: 30
-            trigger:
-              event_type: motor_state
-              temperature_c: 30.6
-        - name: ゾーン切替による強制クローズ
-          payload:
-            command_id: cmd-def456
-            issued_at: '2025-03-20T18:00:01Z'
-            source: zone_transition
-            zone_id: evening_close
-            motors:
-              M1:
-                command: reverse
-                target_direction: reverse
-              M2:
-                command: reverse
-                target_direction: reverse
-            options:
-              stop_before_reverse_ms: 500
-              cooldown_sec: 30
+          - name: 自動閾値越えによる開コマンド
+            payload:
+              command_id: cmd-abc123
+              issued_at: "2025-03-20T09:15:00Z"
+              source: "event:motor_state"
+              zone_id: daytime_auto
+              motors:
+                M1: {command: forward, target_direction: forward}
+                M2: {command: forward, target_direction: forward}
+              options: {stop_before_reverse_ms: 500, cooldown_sec: 30}
+              trigger: {event_type: motor_state, temperature_c: 30.6}
+          - name: ゾーン切替による強制クローズ
+            payload:
+              command_id: cmd-def456
+              issued_at: "2025-03-20T18:00:01Z"
+              source: zone_transition
+              zone_id: evening_close
+              motors:
+                M1: {command: reverse, target_direction: reverse}
+                M2: {command: reverse, target_direction: reverse}
+              options: {stop_before_reverse_ms: 500, cooldown_sec: 30}
+
   curtainResponse:
-    address: '{device_id}/curtain/response'
+    address: "{device_id}/curtain/response"
     description: Control Logic から Event Router へのコマンド実行結果。command_id で要求と応答を照合する。
     messages:
       CurtainResponse:
@@ -213,10 +158,7 @@ channels:
         contentType: application/json
         payload:
           type: object
-          required:
-          - command_id
-          - responded_at
-          - motors
+          required: [command_id, responded_at, motors]
           properties:
             command_id:
               type: string
@@ -232,17 +174,10 @@ channels:
                   properties:
                     result:
                       type: string
-                      enum:
-                      - success
-                      - pending
-                      - skipped
-                      - error
+                      enum: [success, pending, skipped, error]
                     direction:
                       type: string
-                      enum:
-                      - forward
-                      - reverse
-                      - stopped
+                      enum: [forward, reverse, stopped]
                     cooldown_active:
                       type: boolean
                     cooldown_until:
@@ -261,17 +196,10 @@ channels:
                   properties:
                     result:
                       type: string
-                      enum:
-                      - success
-                      - pending
-                      - skipped
-                      - error
+                      enum: [success, pending, skipped, error]
                     direction:
                       type: string
-                      enum:
-                      - forward
-                      - reverse
-                      - stopped
+                      enum: [forward, reverse, stopped]
                     cooldown_active:
                       type: boolean
                     cooldown_until:
@@ -286,49 +214,30 @@ channels:
                     error_code:
                       type: string
         examples:
-        - name: 成功応答
-          payload:
-            command_id: cmd-abc123
-            responded_at: '2025-03-20T09:15:08Z'
-            motors:
-              M1:
-                result: success
-                direction: forward
-                cooldown_active: true
-                cooldown_until: 1710300038
-              M2:
-                result: success
-                direction: forward
-                cooldown_active: true
-                cooldown_until: 1710300043
-        - name: 緊急停止中の拒否
-          payload:
-            command_id: cmd-ghi789
-            responded_at: '2025-03-20T09:22:05Z'
-            motors:
-              M1:
-                result: error
-                reason: emergency_stop_active
-              M2:
-                result: error
-                reason: emergency_stop_active
-        - name: クールダウン中の保留
-          payload:
-            command_id: cmd-jkl012
-            responded_at: '2025-03-20T09:20:01Z'
-            motors:
-              M1:
-                result: pending
-                reason: cooldown
-                retry_after_sec: 18
-                pending_command: reverse
-              M2:
-                result: success
-                direction: reverse
-                cooldown_active: true
-                cooldown_until: 1710300061
+          - name: 成功応答
+            payload:
+              command_id: cmd-abc123
+              responded_at: "2025-03-20T09:15:08Z"
+              motors:
+                M1: {result: success, direction: forward, cooldown_active: true, cooldown_until: 1710300038}
+                M2: {result: success, direction: forward, cooldown_active: true, cooldown_until: 1710300043}
+          - name: 緊急停止中の拒否
+            payload:
+              command_id: cmd-ghi789
+              responded_at: "2025-03-20T09:22:05Z"
+              motors:
+                M1: {result: error, reason: emergency_stop_active}
+                M2: {result: error, reason: emergency_stop_active}
+          - name: クールダウン中の保留
+            payload:
+              command_id: cmd-jkl012
+              responded_at: "2025-03-20T09:20:01Z"
+              motors:
+                M1: {result: pending, reason: cooldown, retry_after_sec: 18, pending_command: reverse}
+                M2: {result: success, direction: reverse, cooldown_active: true, cooldown_until: 1710300061}
+
   curtainEvent:
-    address: '{device_id}/curtain/event'
+    address: "{device_id}/curtain/event"
     description: Control Logic から Event Router への状態変化即時通知。リミッター到達・緊急停止・モーター状態変化・モード変更時に発行される。
     messages:
       LimiterEvent:
@@ -337,57 +246,41 @@ channels:
         contentType: application/json
         payload:
           type: object
-          required:
-          - device_id
-          - event_type
-          - motor_id
-          - limiter
-          - state
-          - previous_state
-          - timestamp
+          required: [device_id, event_type, motor_id, limiter, state, previous_state, timestamp]
           properties:
             device_id:
               type: string
               example: x320-curtain-01
             event_type:
               type: string
-              enum:
-              - limiter
+              enum: [limiter]
             motor_id:
               type: string
-              enum:
-              - M1
-              - M2
+              enum: [M1, M2]
             limiter:
               type: string
-              enum:
-              - upper
-              - lower
-              description: upper=上限リミッター / lower=下限リミッター
+              enum: [upper, lower]
+              description: "upper=上限リミッター / lower=下限リミッター"
             state:
               type: string
-              enum:
-              - active
-              - inactive
-              description: active=到達（接点ON） / inactive=未到達（接点OFF）
+              enum: [active, inactive]
+              description: "active=到達（接点ON） / inactive=未到達（接点OFF）"
             previous_state:
               type: string
-              enum:
-              - active
-              - inactive
+              enum: [active, inactive]
             timestamp:
               type: number
               description: Unix epoch 秒
         examples:
-        - name: 上限リミッター到達
-          payload:
-            device_id: x320-curtain-01
-            event_type: limiter
-            motor_id: M1
-            limiter: upper
-            state: active
-            previous_state: inactive
-            timestamp: 1710300060.0
+          - name: 上限リミッター到達
+            payload:
+              device_id: x320-curtain-01
+              event_type: limiter
+              motor_id: M1
+              limiter: upper
+              state: active
+              previous_state: inactive
+              timestamp: 1710300060.0
       EmergencyStopEvent:
         name: EmergencyStopEvent
         title: 緊急停止イベント
@@ -395,147 +288,110 @@ channels:
         contentType: application/json
         payload:
           type: object
-          required:
-          - device_id
-          - event_type
-          - state
-          - timestamp
+          required: [device_id, event_type, state, timestamp]
           properties:
             device_id:
               type: string
               example: x320-curtain-01
             event_type:
               type: string
-              enum:
-              - emergency_stop
+              enum: [emergency_stop]
             state:
               type: string
-              enum:
-              - active
-              - inactive
-              description: active=ボタン押下中 / inactive=解除
+              enum: [active, inactive]
+              description: "active=ボタン押下中 / inactive=解除"
             timestamp:
               type: number
         examples:
-        - name: 緊急停止ボタン押下
-          payload:
-            device_id: x320-curtain-01
-            event_type: emergency_stop
-            state: active
-            timestamp: 1710300120.0
+          - name: 緊急停止ボタン押下
+            payload:
+              device_id: x320-curtain-01
+              event_type: emergency_stop
+              state: active
+              timestamp: 1710300120.0
       MotorStateEvent:
         name: MotorStateEvent
         title: モーター状態変化イベント
         contentType: application/json
         payload:
           type: object
-          required:
-          - device_id
-          - event_type
-          - motor_id
-          - direction
-          - previous_direction
-          - reason
-          - timestamp
+          required: [device_id, event_type, motor_id, direction, previous_direction, reason, timestamp]
           properties:
             device_id:
               type: string
             event_type:
               type: string
-              enum:
-              - motor_state
+              enum: [motor_state]
             motor_id:
               type: string
-              enum:
-              - M1
-              - M2
+              enum: [M1, M2]
             direction:
               type: string
-              enum:
-              - forward
-              - reverse
-              - stopped
-              description: forward=開方向 / reverse=閉方向 / stopped=停止
+              enum: [forward, reverse, stopped]
+              description: "forward=開方向 / reverse=閉方向 / stopped=停止"
             previous_direction:
               type: string
-              enum:
-              - forward
-              - reverse
-              - stopped
+              enum: [forward, reverse, stopped]
             reason:
               type: string
-              enum:
-              - command
-              - limiter
-              - emergency_stop
-              - auto_threshold
-              - error
+              enum: [command, limiter, emergency_stop, auto_threshold, error]
             error_code:
               type: string
-              description: reason=error の場合のエラーコード（E01/E02/E03）
+              description: "reason=error の場合のエラーコード（E01/E02/E03）"
             timestamp:
               type: number
         examples:
-        - name: 自動閾値による起動
-          payload:
-            device_id: x320-curtain-01
-            event_type: motor_state
-            motor_id: M1
-            direction: forward
-            previous_direction: stopped
-            reason: auto_threshold
-            timestamp: 1710300000.0
-        - name: リミッターによる停止
-          payload:
-            device_id: x320-curtain-01
-            event_type: motor_state
-            motor_id: M1
-            direction: stopped
-            previous_direction: forward
-            reason: limiter
-            timestamp: 1710300060.1
+          - name: 自動閾値による起動
+            payload:
+              device_id: x320-curtain-01
+              event_type: motor_state
+              motor_id: M1
+              direction: forward
+              previous_direction: stopped
+              reason: auto_threshold
+              timestamp: 1710300000.0
+          - name: リミッターによる停止
+            payload:
+              device_id: x320-curtain-01
+              event_type: motor_state
+              motor_id: M1
+              direction: stopped
+              previous_direction: forward
+              reason: limiter
+              timestamp: 1710300060.1
       ModeChangeEvent:
         name: ModeChangeEvent
         title: 動作モード変更イベント
         contentType: application/json
         payload:
           type: object
-          required:
-          - device_id
-          - event_type
-          - mode
-          - previous_mode
-          - timestamp
+          required: [device_id, event_type, mode, previous_mode, timestamp]
           properties:
             device_id:
               type: string
             event_type:
               type: string
-              enum:
-              - mode_change
+              enum: [mode_change]
             mode:
               type: string
-              enum:
-              - manual
-              - auto
-              description: manual=手動モード / auto=自動モード
+              enum: [manual, auto]
+              description: "manual=手動モード / auto=自動モード"
             previous_mode:
               type: string
-              enum:
-              - manual
-              - auto
+              enum: [manual, auto]
             timestamp:
               type: number
         examples:
-        - name: 手動から自動への切替
-          payload:
-            device_id: x320-curtain-01
-            event_type: mode_change
-            mode: auto
-            previous_mode: manual
-            timestamp: 1710300000.0
+          - name: 手動から自動への切替
+            payload:
+              device_id: x320-curtain-01
+              event_type: mode_change
+              mode: auto
+              previous_mode: manual
+              timestamp: 1710300000.0
+
   sensorTelemetry:
-    address: '{device_id}/sensor/telemetry'
+    address: "{device_id}/sensor/telemetry"
     description: Control Logic から Sensor Aggregator への定期センサーデータ。30秒間隔で送信。QoS 0 のため欠損の可能性がある。
     messages:
       SensorTelemetry:
@@ -545,11 +401,7 @@ channels:
         contentType: application/json
         payload:
           type: object
-          required:
-          - device_id
-          - timestamp
-          - sensors
-          - sampled_at
+          required: [device_id, timestamp, sensors, sampled_at]
           properties:
             device_id:
               type: string
@@ -593,31 +445,26 @@ channels:
               format: date-time
               description: MQTT 送信時刻（ISO 8601 / UTC）
         examples:
-        - name: 温度・湿度テレメトリ
-          payload:
-            device_id: x320-curtain-01
-            timestamp: 1710300000.0
-            sensors:
-              temperature:
-                value_celsius: 28.4
-                raw_value: 2150
-                read_at: 1710299998.5
-              humidity_pct: 71.2
-            sampled_at: '2025-03-20T09:15:00Z'
-        - name: CO2センサーテレメトリ
-          payload:
-            device_id: x320-co2-01
-            timestamp: 1710300000.0
-            sensors:
-              co2_ppm: 850
-              temperature:
-                value_celsius: 27.8
-                raw_value: 2100
-                read_at: 1710299998.0
-              humidity_pct: 70.5
-            sampled_at: '2025-03-20T09:15:00Z'
+          - name: 温度・湿度テレメトリ
+            payload:
+              device_id: x320-curtain-01
+              timestamp: 1710300000.0
+              sensors:
+                temperature: {value_celsius: 28.4, raw_value: 2150, read_at: 1710299998.5}
+                humidity_pct: 71.2
+              sampled_at: "2025-03-20T09:15:00Z"
+          - name: CO2センサーテレメトリ
+            payload:
+              device_id: x320-co2-01
+              timestamp: 1710300000.0
+              sensors:
+                co2_ppm: 850
+                temperature: {value_celsius: 27.8, raw_value: 2100, read_at: 1710299998.0}
+                humidity_pct: 70.5
+              sampled_at: "2025-03-20T09:15:00Z"
+
   curtainHealth:
-    address: '{device_id}/curtain/health'
+    address: "{device_id}/curtain/health"
     description: Control Logic から Health Reporter へのデバイス死活情報。300秒間隔で送信。QoS 0 のため欠損の可能性がある。
     messages:
       CurtainHealth:
@@ -627,15 +474,7 @@ channels:
         contentType: application/json
         payload:
           type: object
-          required:
-          - device_id
-          - timestamp
-          - uptime_sec
-          - mqtt_connected
-          - firmware
-          - rssi_dbm
-          - ai_available
-          - errors
+          required: [device_id, timestamp, uptime_sec, mqtt_connected, firmware, rssi_dbm, ai_available, errors]
           properties:
             device_id:
               type: string
@@ -652,12 +491,12 @@ channels:
             firmware:
               type: string
               description: ファームウェアバージョン
-              example: 1.4.2
+              example: "1.4.2"
             rssi_dbm:
               type: integer
               minimum: -120
               maximum: 0
-              description: Wi-Fi 受信電波強度（dBm）。-70 以下で通信不安定の目安
+              description: "Wi-Fi 受信電波強度（dBm）。-70 以下で通信不安定の目安"
             do_channels:
               type: array
               items:
@@ -675,37 +514,124 @@ channels:
               type: array
               items:
                 type: string
-              description: 現在発生中のエラー一覧。モーターID:エラーコード 形式
+              description: "現在発生中のエラー一覧。モーターID:エラーコード 形式"
         examples:
-        - name: 正常ヘルスチェック
-          payload:
-            device_id: x320-curtain-01
-            timestamp: 1710300000.0
-            uptime_sec: 86400
-            mqtt_connected: true
-            firmware: 1.4.2
-            rssi_dbm: -65
-            do_channels:
-            - EXT_DO0
-            - EXT_DO1
-            - EXT_DO2
-            - EXT_DO3
-            di_channels:
-            - Filtered_DI0
-            - Filtered_DI1
-            - Filtered_DI2
-            - Filtered_DI3
-            - Filtered_DI4
-            ai_available: true
-            errors: []
-        - name: エラーあり
-          payload:
-            device_id: x320-curtain-01
-            timestamp: 1710300300.0
-            uptime_sec: 86700
-            mqtt_connected: true
-            firmware: 1.4.2
-            rssi_dbm: -65
-            ai_available: true
-            errors:
-            - M2:E01
+          - name: 正常ヘルスチェック
+            payload:
+              device_id: x320-curtain-01
+              timestamp: 1710300000.0
+              uptime_sec: 86400
+              mqtt_connected: true
+              firmware: "1.4.2"
+              rssi_dbm: -65
+              do_channels: [EXT_DO0, EXT_DO1, EXT_DO2, EXT_DO3]
+              di_channels: [Filtered_DI0, Filtered_DI1, Filtered_DI2, Filtered_DI3, Filtered_DI4]
+              ai_available: true
+              errors: []
+          - name: エラーあり
+            payload:
+              device_id: x320-curtain-01
+              timestamp: 1710300300.0
+              uptime_sec: 86700
+              mqtt_connected: true
+              firmware: "1.4.2"
+              rssi_dbm: -65
+              ai_available: true
+              errors: ["M2:E01"]
+
+operations:
+
+  sendCommand:
+    action: send
+    channel:
+      $ref: "#/channels/curtainCommand"
+    summary: モーター制御コマンドを送信する（Event Router → Control Logic）
+    bindings:
+      mqtt:
+        qos: 1
+        retain: false
+
+  receiveCommand:
+    action: receive
+    channel:
+      $ref: "#/channels/curtainCommand"
+    summary: モーター制御コマンドを受信する（Control Logic）
+    bindings:
+      mqtt:
+        qos: 1
+
+  publishResponse:
+    action: send
+    channel:
+      $ref: "#/channels/curtainResponse"
+    summary: コマンド実行結果を送信する（Control Logic → Event Router）
+    bindings:
+      mqtt:
+        qos: 1
+        retain: false
+
+  receiveResponse:
+    action: receive
+    channel:
+      $ref: "#/channels/curtainResponse"
+    summary: コマンド実行結果を受信する（Event Router）
+    bindings:
+      mqtt:
+        qos: 1
+
+  publishEvent:
+    action: send
+    channel:
+      $ref: "#/channels/curtainEvent"
+    summary: 状態変化イベントを送信する（Control Logic → Event Router）
+    bindings:
+      mqtt:
+        qos: 1
+        retain: false
+
+  receiveEvent:
+    action: receive
+    channel:
+      $ref: "#/channels/curtainEvent"
+    summary: 状態変化イベントを受信する（Event Router）
+    bindings:
+      mqtt:
+        qos: 1
+
+  publishTelemetry:
+    action: send
+    channel:
+      $ref: "#/channels/sensorTelemetry"
+    summary: 定期センサーデータを送信する（Control Logic → Sensor Aggregator）
+    bindings:
+      mqtt:
+        qos: 0
+        retain: false
+
+  receiveTelemetry:
+    action: receive
+    channel:
+      $ref: "#/channels/sensorTelemetry"
+    summary: 定期センサーデータを受信する（Sensor Aggregator）
+    bindings:
+      mqtt:
+        qos: 0
+
+  publishHealth:
+    action: send
+    channel:
+      $ref: "#/channels/curtainHealth"
+    summary: ヘルスチェック情報を送信する（Control Logic → Health Reporter）
+    bindings:
+      mqtt:
+        qos: 0
+        retain: false
+
+  receiveHealth:
+    action: receive
+    channel:
+      $ref: "#/channels/curtainHealth"
+    summary: ヘルスチェック情報を受信する（Health Reporter）
+    bindings:
+      mqtt:
+        qos: 0
