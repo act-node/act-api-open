@@ -4,14 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ACT Connect IoT API ドキュメント</title>
+  <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@1.4.9/styles/default.min.css">
+  <style>
+    body { margin: 0; padding: 0; }
+    #asyncapi { min-height: 100vh; }
+    #loading { padding: 40px; font-family: sans-serif; color: #555; }
+    #error { padding: 40px; font-family: sans-serif; color: red; white-space: pre-wrap; }
+  </style>
 </head>
 <body>
-  <script src="https://unpkg.com/@asyncapi/web-component@1.4.9/lib/asyncapi-web-component.js"
-    defer></script>
+  <div id="loading">読み込み中...</div>
+  <div id="error" style="display:none"></div>
+  <div id="asyncapi"></div>
 
-  <asyncapi-component
-    schemaUrl="./asyncapi.yaml"
-    cssImportPath="https://unpkg.com/@asyncapi/react-component@1.4.9/styles/default.min.css">
-  </asyncapi-component>
+  <script src="https://unpkg.com/@asyncapi/react-component@1.4.9/browser/standalone/index.js"></script>
+  <script>
+    fetch('./asyncapi.yaml')
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.url);
+        return res.text();
+      })
+      .then(function(yamlText) {
+        document.getElementById('loading').style.display = 'none';
+        AsyncApiStandalone.render(
+          {
+            schema: { source: yamlText },
+            config: {
+              show: {
+                sidebar: true,
+                info: true,
+                servers: true,
+                operations: true,
+                messages: true,
+                schemas: true,
+              },
+            },
+          },
+          document.getElementById('asyncapi')
+        );
+      })
+      .catch(function(err) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'エラー: ' + err.message;
+        console.error(err);
+      });
+  </script>
 </body>
 </html>
