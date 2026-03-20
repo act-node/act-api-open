@@ -16,15 +16,10 @@
 
   <script src="https://unpkg.com/@asyncapi/react-component@1.0.0-next.54/browser/standalone/index.js"></script>
   <script>
-    // サブパス対応: スクリプトと同じディレクトリの asyncapi.yaml を参照
-    const base = document.currentScript
-      ? document.currentScript.src.replace(/\/[^/]*$/, '/')
-      : './';
-
     AsyncApiStandalone.render(
       {
         schema: {
-          url: base + 'asyncapi.yaml',
+          url: './asyncapi.yaml',
         },
         config: {
           show: {
