@@ -3,7 +3,7 @@ name: Deploy AsyncAPI Docs to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - master          # master ブランチを監視
   workflow_dispatch:
 
 permissions:
@@ -28,16 +28,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: docs/ を GitHub Pages アーティファクトとしてアップロード
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs'
+          path: '.'   # 実際のパスに修正
 
-      - name: GitHub Pages にデプロイ
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: 公開 URL を表示
-        run: |
-          echo "✅ デプロイ完了"
-          echo "🌐 URL: https://act-node.github.io/act-api-open/"
