@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "event_motor_state.json",
+  "title": "MotorStateEvent",
+  "description": "モーターの動作状態変化イベント",
+  "type": "object",
+  "required": ["device_id","event_type","motor_id","direction","previous_direction","reason","timestamp"],
+  "properties": {
+    "device_id":           { "type": "string", "example": "x320-curtain-01" },
+    "event_type":          { "type": "string", "enum": ["motor_state"] },
+    "motor_id":            { "type": "string", "enum": ["M1","M2"] },
+    "direction":           { "type": "string", "enum": ["forward","reverse","stopped"] },
+    "previous_direction":  { "type": "string", "enum": ["forward","reverse","stopped"] },
+    "reason": {
+      "type": "string",
+      "enum": ["command","limiter","emergency_stop","auto_threshold","error"],
+      "description": "状態変化の原因"
+    },
+    "error_code": {
+      "type": "string",
+      "description": "reason=error の場合のエラーコード（E01/E02/E03）",
+      "example": "E01"
+    },
+    "timestamp": { "type": "number", "description": "Unix epoch 秒" }
+  }
+}

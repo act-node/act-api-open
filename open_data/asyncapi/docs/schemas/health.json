@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "health.json",
+  "title": "CurtainHealth",
+  "description": "300秒間隔のデバイス死活情報。QoS 0 のため欠損の可能性あり",
+  "type": "object",
+  "required": ["device_id","timestamp","uptime_sec","mqtt_connected","firmware","rssi_dbm","ai_available","errors"],
+  "properties": {
+    "device_id":       { "type": "string", "example": "x320-curtain-01" },
+    "timestamp":       { "type": "number", "description": "Unix epoch 秒" },
+    "uptime_sec": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "起動からの経過秒数。前回より大幅に小さい場合は再起動を示す",
+      "example": 86400
+    },
+    "mqtt_connected":  { "type": "boolean", "description": "MQTT ブローカーへの接続状態" },
+    "firmware": {
+      "type": "string",
+      "description": "ファームウェアバージョン（セマンティックバージョン）",
+      "example": "1.4.2"
+    },
+    "rssi_dbm": {
+      "type": "integer",
+      "minimum": -120,
+      "maximum": 0,
+      "description": "Wi-Fi 受信電波強度（dBm）。-70 以下で通信不安定の目安",
+      "example": -65
+    },
+    "do_channels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "利用可能なデジタル出力チャンネル一覧（X320固有）",
+      "example": ["EXT_DO0","EXT_DO1","EXT_DO2","EXT_DO3"]
+    },
+    "di_channels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "利用可能なデジタル入力チャンネル一覧（X320固有）",
+      "example": ["Filtered_DI0","Filtered_DI1","Filtered_DI2","Filtered_DI3","Filtered_DI4"]
+    },
+    "ai_available": {
+      "type": "boolean",
+      "description": "アナログ入力（温度センサー用AD変換）が利用可能かどうか。false の場合 telemetry の temperature は無効"
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "現在発生中のエラー一覧。'モーターID:エラーコード' 形式。空配列が正常状態",
+      "example": ["M2:E01"]
+    }
+  }
+}

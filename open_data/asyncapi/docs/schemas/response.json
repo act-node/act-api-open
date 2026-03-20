@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "response.json",
+  "title": "CurtainResponse",
+  "description": "Control Logic から Event Router へのコマンド実行結果",
+  "type": "object",
+  "required": ["command_id", "responded_at", "motors"],
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "description": "対応するコマンドの command_id",
+      "example": "cmd-abc123"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "応答生成時刻（ISO 8601 / UTC）",
+      "example": "2025-03-20T09:15:08Z"
+    },
+    "motors": {
+      "type": "object",
+      "description": "モーターごとの実行結果",
+      "properties": {
+        "M1": { "$ref": "#/definitions/MotorResult" },
+        "M2": { "$ref": "#/definitions/MotorResult" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "MotorResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "成功",
+          "required": ["result", "direction"],
+          "properties": {
+            "result": { "type": "string", "enum": ["success"] },
+            "direction": {
+              "type": "string",
+              "enum": ["forward", "reverse", "stopped"],
+              "description": "実行後の動作方向"
+            },
+            "cooldown_active": {
+              "type": "boolean",
+              "description": "クールダウン中かどうか"
+            },
+            "cooldown_until": {
+              "type": ["number", "null"],
+              "description": "クールダウン解除時刻（Unix epoch 秒）"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "title": "保留（クールダウン中）",
+          "required": ["result", "reason"],
+          "properties": {
+            "result": { "type": "string", "enum": ["pending"] },
+            "reason": { "type": "string", "enum": ["cooldown"] },
+            "retry_after_sec": {
+              "type": "integer",
+              "description": "クールダウン残り秒数",
+              "minimum": 0
+            },
+            "pending_command": {
+              "type": "string",
+              "enum": ["forward", "reverse"],
+              "description": "保留されたコマンド"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "title": "スキップ",
+          "required": ["result", "reason"],
+          "properties": {
+            "result": { "type": "string", "enum": ["skipped"] },
+            "reason": {
+              "type": "string",
+              "enum": ["override", "override_false", "already_at_target"],
+              "description": "スキップ理由"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "title": "エラー",
+          "required": ["result", "reason"],
+          "properties": {
+            "result": { "type": "string", "enum": ["error"] },
+            "reason": {
+              "type": "string",
+              "enum": [
+                "emergency_stop_active",
+                "limiter_active",
+                "motor_error",
+                "invalid_command"
+              ],
+              "description": "エラー理由"
+            },
+            "error_code": {
+              "type": "string",
+              "description": "詳細エラーコード",
+              "example": "E01"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
