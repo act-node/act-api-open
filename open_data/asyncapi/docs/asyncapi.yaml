@@ -12,18 +12,9 @@ info:
     - x320-curtain-01 : カーテン開閉デバイス（温度・湿度センサー内蔵、モーター M1/M2）
     - Sensor-co2      : LoRaWAN CO2センサー
 
-    ## 通信仕様
-    - プロトコル: MQTT v3.1.1 over TLS
-    - ポート: 8883
-    - ブローカー: AWS IoT Core
-
-    ## QoS ポリシー
-    | QoS | 対象トピック | 理由 |
-    |-----|------------|------|
-    | 1   | command / response / event / Shadow update | 取りこぼすと制御不整合 |
-    | 0   | telemetry / health | 次回データで補完可能 |
-
     ## Named Shadow 一覧
+    各 Shadow のフィールド定義・サンプルは画面下部の **Schemas** セクションに記載しています。
+
     | Shadow 名 | Thing | 用途 |
     |-----------|-------|------|
     | curtain-ctrl | x320-curtain-01 | モーター制御・スケジュール・状態 |
@@ -32,6 +23,16 @@ info:
     | zone-env | x320-Edge-Node | エリア内全センサー集約値 |
     | aggregator-config | x320-Edge-Node | Sensor Aggregator ルーティング設定 |
     | health-reporter-config | x320-Edge-Node | Health Reporter ルーティング設定 |
+
+    ## 通信仕様
+    - プロトコル: MQTT v3.1.1 / Greengrass IPC
+    - ブローカー: Greengrass IPC Pub/Sub（コンポーネント間）/ LAN 内 MQTT ブローカー（別ノード間）
+
+    ## QoS ポリシー
+    | QoS | 対象トピック | 理由 |
+    |-----|------------|------|
+    | 1   | command / response / event / Shadow update | 取りこぼすと制御不整合 |
+    | 0   | telemetry / health | 次回データで補完可能 |
 
   contact:
     name: ACT Node Inc.
