@@ -1374,10 +1374,6 @@ components:
         - reported.device: 300秒ごと（health 受信時）
         ## サンプル
 
-        <details>
-        <summary>Shadow 完全サンプル（クリックで展開）</summary>
-
-        ```json
         {
           "state": {
             "desired": {
@@ -1496,9 +1492,7 @@ components:
             }
           }
         }
-        ```
 
-        </details>
       properties:
         state:
           type: object
@@ -1856,10 +1850,6 @@ components:
         - 差が大きい場合はデバイス内バッファリングや送信遅延を示す
         ## サンプル
 
-        <details>
-        <summary>Shadow 完全サンプル（クリックで展開）</summary>
-
-        ```json
         {
           "state": {
             "desired": {
@@ -1889,9 +1879,7 @@ components:
             }
           }
         }
-        ```
 
-        </details>
       properties:
         state:
           type: object
@@ -2007,10 +1995,6 @@ components:
         - reported.device: 300秒ごと
         ## サンプル
 
-        <details>
-        <summary>Shadow 完全サンプル（クリックで展開）</summary>
-
-        ```json
         {
           "state": {
             "desired": {
@@ -2040,9 +2024,7 @@ components:
             }
           }
         }
-        ```
 
-        </details>
       properties:
         state:
           type: object
@@ -2152,10 +2134,6 @@ components:
         故障調査・データ可視化・複数センサー平均計算に対応できる。
         ## サンプル
 
-        <details>
-        <summary>Shadow 完全サンプル（クリックで展開）</summary>
-
-        ```json
         {
           "state": {
             "desired": {
@@ -2193,9 +2171,7 @@ components:
             }
           }
         }
-        ```
 
-        </details>
       properties:
         state:
           type: object
@@ -2335,10 +2311,6 @@ components:
         差異がある間は Sensor Aggregator が再起動中または未起動の可能性がある。
         ## サンプル
 
-        <details>
-        <summary>Shadow 完全サンプル（クリックで展開）</summary>
-
-        ```json
         {
           "state": {
             "desired": {
@@ -2395,9 +2367,7 @@ components:
             }
           }
         }
-        ```
 
-        </details>
       properties:
         state:
           type: object
@@ -2508,10 +2478,6 @@ components:
         2つの Shadow を持つため、両方の reported.device を更新する必要がある。
         ## サンプル
 
-        <details>
-        <summary>Shadow 完全サンプル（クリックで展開）</summary>
-
-        ```json
         {
           "state": {
             "desired": {
@@ -2570,9 +2536,7 @@ components:
             }
           }
         }
-        ```
 
-        </details>
       properties:
         state:
           type: object
