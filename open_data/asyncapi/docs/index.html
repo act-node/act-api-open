@@ -9,6 +9,12 @@
     body { margin: 0; padding: 0; font-family: sans-serif; }
     #loading { padding: 40px; color: #555; }
     #error   { padding: 40px; color: red; white-space: pre-wrap; display: none; }
+    /* examples を強制展開 */
+    [class*="example" i],
+    [class*="Example" i] {
+      display: block !important;
+      max-height: none !important;
+    }
   </style>
 </head>
 <body>
@@ -16,9 +22,7 @@
   <div id="error"></div>
   <div id="asyncapi"></div>
 
-  <!-- js-yaml: YAML → JS object に変換 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-  <!-- AsyncAPI 3.0 対応版 -->
   <script src="https://unpkg.com/@asyncapi/react-component@2.4.0/browser/standalone/index.js"></script>
 
   <script>
@@ -43,13 +47,14 @@
             schema: schema,
             config: {
               show: {
-                sidebar:    true,
-                info:       true,
-                servers:    true,
-                operations: true,
-                messages:   true,
-                schemas:    true,
-                errors:     true,
+                sidebar:         true,
+                info:            true,
+                servers:         true,
+                operations:      true,
+                messages:        true,
+                schemas:         true,
+                errors:          true,
+                messageExamples: true,
               },
               sidebar: {
                 showOperations: 'byDefault',
@@ -61,6 +66,19 @@
           },
           document.getElementById('asyncapi')
         );
+
+        /* レンダリング後に examples ボタンを自動クリックして展開 */
+        setTimeout(function() {
+          var btns = document.querySelectorAll('button');
+          btns.forEach(function(btn) {
+            var txt = btn.textContent || btn.innerText || '';
+            if (txt.toLowerCase().includes('example') ||
+                txt.includes('サンプル') ||
+                txt.includes('展開')) {
+              try { btn.click(); } catch(e) {}
+            }
+          });
+        }, 2000);
       })
       .catch(function(err) {
         showError('エラー: ' + err.message);

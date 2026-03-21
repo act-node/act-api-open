@@ -1372,6 +1372,133 @@ components:
         - desired: 設定変更時のみ
         - reported.motors: コマンド実行後
         - reported.device: 300秒ごと（health 受信時）
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "mode": "auto",
+              "motors": {
+                "M1": {
+                  "override": false,
+                  "command": null,
+                  "threshold": {
+                    "open_temp": 28.0,
+                    "close_temp": 25.0,
+                    "hysteresis": 1.0
+                  }
+                },
+                "M2": {
+                  "override": false,
+                  "command": null,
+                  "threshold": {
+                    "open_temp": 30.0,
+                    "close_temp": 27.0,
+                    "hysteresis": 1.5
+                  }
+                }
+              },
+              "schedule": {
+                "enabled": true,
+                "timezone": "Asia/Tokyo",
+                "time_zones": [
+                  {
+                    "id": "night_close",
+                    "from": "00:00",
+                    "to": "08:00",
+                    "control": "force_close"
+                  },
+                  {
+                    "id": "daytime_auto",
+                    "from": "08:00",
+                    "to": "18:00",
+                    "control": "temperature"
+                  },
+                  {
+                    "id": "evening_close",
+                    "from": "18:00",
+                    "to": "24:00",
+                    "control": "force_close"
+                  }
+                ]
+              },
+              "motor_config": {
+                "stop_before_reverse_ms": 500,
+                "cooldown_sec": 30
+              }
+            },
+            "reported": {
+              "mode": "auto",
+              "emergency_stop": "inactive",
+              "motors": {
+                "M1": {
+                  "direction": "stopped",
+                  "limit_upper": "inactive",
+                  "limit_lower": "inactive",
+                  "cooldown_active": false,
+                  "cooldown_until": null,
+                  "pending_command": null,
+                  "last_command": "forward",
+                  "last_operated_at": "2025-03-20T08:00:05Z",
+                  "operation_count": 1205,
+                  "error_code": null
+                },
+                "M2": {
+                  "direction": "stopped",
+                  "limit_upper": "inactive",
+                  "limit_lower": "inactive",
+                  "cooldown_active": false,
+                  "cooldown_until": null,
+                  "pending_command": null,
+                  "last_command": "forward",
+                  "last_operated_at": "2025-03-20T08:00:10Z",
+                  "operation_count": 986,
+                  "error_code": null
+                }
+              },
+              "active_zone": {
+                "id": "daytime_auto",
+                "control": "temperature",
+                "entered_at": "2025-03-20T08:00:01Z"
+              },
+              "schedule": {
+                "last_executed_zone": "night_close",
+                "last_executed_at": "2025-03-20T08:00:01Z",
+                "next_zone": "evening_close",
+                "next_zone_at": "2025-03-20T18:00:00Z"
+              },
+              "device": {
+                "online": true,
+                "firmware": "1.4.2",
+                "rssi_dbm": -65,
+                "uptime_sec": 86400,
+                "do_channels": [
+                  "EXT_DO0",
+                  "EXT_DO1",
+                  "EXT_DO2",
+                  "EXT_DO3"
+                ],
+                "di_channels": [
+                  "Filtered_DI0",
+                  "Filtered_DI1",
+                  "Filtered_DI2",
+                  "Filtered_DI3",
+                  "Filtered_DI4"
+                ],
+                "ai_available": true,
+                "errors": [],
+                "last_health_at": "2025-03-20T09:00:00Z"
+              }
+            }
+          }
+        }
+        ```
+
+        </details>
       properties:
         state:
           type: object
@@ -1727,6 +1854,44 @@ components:
         - read_at: センサーチップが値を読み取った時刻（Unix epoch 秒）
         - sampled_at: MQTT として送信した時刻（ISO 8601）
         - 差が大きい場合はデバイス内バッファリングや送信遅延を示す
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "config": {
+                "interval_sec": 30,
+                "unit_temperature": "celsius"
+              }
+            },
+            "reported": {
+              "environment": {
+                "temperature": {
+                  "value_celsius": 28.4,
+                  "raw_value": 2150,
+                  "read_at": 1710300000.0
+                },
+                "humidity_pct": 71.2,
+                "sampled_at": "2025-03-20T09:15:00Z"
+              },
+              "device": {
+                "online": true,
+                "firmware": "1.4.2",
+                "rssi_dbm": -65,
+                "ai_available": true,
+                "errors": [],
+                "last_health_at": "2025-03-20T09:00:00Z"
+              }
+            }
+          }
+        }
+        ```
+
+        </details>
       properties:
         state:
           type: object
@@ -1840,6 +2005,44 @@ components:
         ## 更新頻度
         - reported.environment: 30秒ごと
         - reported.device: 300秒ごと
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "config": {
+                "interval_sec": 30,
+                "co2_calibration_ppm": 0
+              }
+            },
+            "reported": {
+              "environment": {
+                "co2_ppm": 850,
+                "temperature": {
+                  "value_celsius": 27.8,
+                  "raw_value": 2100,
+                  "read_at": 1710299990.0
+                },
+                "humidity_pct": 70.5,
+                "sampled_at": "2025-03-20T09:14:50Z"
+              },
+              "device": {
+                "online": true,
+                "firmware": "2.1.0",
+                "rssi_dbm": -72,
+                "errors": [],
+                "last_health_at": "2025-03-20T09:00:00Z"
+              }
+            }
+          }
+        }
+        ```
+
+        </details>
       properties:
         state:
           type: object
@@ -1947,6 +2150,52 @@ components:
         ## source_device の意義
         どのデバイスから来たデータかを記録することで
         故障調査・データ可視化・複数センサー平均計算に対応できる。
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "config": {
+                "stale_threshold_sec": 120
+              }
+            },
+            "reported": {
+              "sensors": {
+                "temperature": {
+                  "value_celsius": 28.4,
+                  "raw_value": 2150,
+                  "read_at": 1710300000.0,
+                  "source_device": "x320-curtain-01",
+                  "source_shadow": "curtain-sensor",
+                  "sampled_at": "2025-03-20T09:15:00Z",
+                  "stale": false
+                },
+                "humidity_pct": {
+                  "value": 71.2,
+                  "source_device": "x320-curtain-01",
+                  "source_shadow": "curtain-sensor",
+                  "sampled_at": "2025-03-20T09:15:00Z",
+                  "stale": false
+                },
+                "co2_ppm": {
+                  "value": 850,
+                  "source_device": "Sensor-co2",
+                  "source_shadow": "co2-sensor",
+                  "sampled_at": "2025-03-20T09:14:50Z",
+                  "stale": false
+                }
+              },
+              "updated_at": "2025-03-20T09:15:02Z"
+            }
+          }
+        }
+        ```
+
+        </details>
       properties:
         state:
           type: object
@@ -2084,6 +2333,71 @@ components:
         ## desired == reported の意味
         desired と reported が一致している状態が「設定適用済み」を示す。
         差異がある間は Sensor Aggregator が再起動中または未起動の可能性がある。
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "stale_threshold_sec": 120,
+              "routing": [
+                {
+                  "device_id": "x320-curtain-01",
+                  "shadow_name": "curtain-sensor",
+                  "sensor_keys": [
+                    "temperature",
+                    "humidity_pct"
+                  ],
+                  "zone_thing": "x320-Edge-Node",
+                  "zone_shadow": "zone-env"
+                },
+                {
+                  "device_id": "Sensor-co2",
+                  "shadow_name": "co2-sensor",
+                  "sensor_keys": [
+                    "co2_ppm",
+                    "temperature",
+                    "humidity_pct"
+                  ],
+                  "zone_thing": "x320-Edge-Node",
+                  "zone_shadow": "zone-env"
+                }
+              ]
+            },
+            "reported": {
+              "stale_threshold_sec": 120,
+              "routing": [
+                {
+                  "device_id": "x320-curtain-01",
+                  "shadow_name": "curtain-sensor",
+                  "sensor_keys": [
+                    "temperature",
+                    "humidity_pct"
+                  ],
+                  "zone_thing": "x320-Edge-Node",
+                  "zone_shadow": "zone-env"
+                },
+                {
+                  "device_id": "Sensor-co2",
+                  "shadow_name": "co2-sensor",
+                  "sensor_keys": [
+                    "co2_ppm",
+                    "temperature",
+                    "humidity_pct"
+                  ],
+                  "zone_thing": "x320-Edge-Node",
+                  "zone_shadow": "zone-env"
+                }
+              ]
+            }
+          }
+        }
+        ```
+
+        </details>
       properties:
         state:
           type: object
@@ -2192,6 +2506,73 @@ components:
         ## x320-curtain-01 が 2つの Shadow を持つ理由
         カーテン開閉デバイスは curtain-ctrl と curtain-sensor の
         2つの Shadow を持つため、両方の reported.device を更新する必要がある。
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "offline_threshold_sec": 600,
+              "routing": [
+                {
+                  "device_id": "x320-curtain-01",
+                  "target_shadows": [
+                    {
+                      "thing": "x320-curtain-01",
+                      "shadow": "curtain-ctrl"
+                    },
+                    {
+                      "thing": "x320-curtain-01",
+                      "shadow": "curtain-sensor"
+                    }
+                  ]
+                },
+                {
+                  "device_id": "Sensor-co2",
+                  "target_shadows": [
+                    {
+                      "thing": "Sensor-co2",
+                      "shadow": "co2-sensor"
+                    }
+                  ]
+                }
+              ]
+            },
+            "reported": {
+              "offline_threshold_sec": 600,
+              "routing": [
+                {
+                  "device_id": "x320-curtain-01",
+                  "target_shadows": [
+                    {
+                      "thing": "x320-curtain-01",
+                      "shadow": "curtain-ctrl"
+                    },
+                    {
+                      "thing": "x320-curtain-01",
+                      "shadow": "curtain-sensor"
+                    }
+                  ]
+                },
+                {
+                  "device_id": "Sensor-co2",
+                  "target_shadows": [
+                    {
+                      "thing": "Sensor-co2",
+                      "shadow": "co2-sensor"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+        ```
+
+        </details>
       properties:
         state:
           type: object
