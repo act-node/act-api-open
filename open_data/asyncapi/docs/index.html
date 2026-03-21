@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ACT Connect IoT API ドキュメント</title>
+  <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@2.4.0/styles/default.min.css">
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; }
     #loading { padding: 40px; color: #555; }
@@ -15,10 +16,10 @@
   <div id="error"></div>
   <div id="asyncapi"></div>
 
+  <!-- js-yaml: YAML → JS object に変換 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <!-- AsyncAPI 3.0 対応版 -->
   <script src="https://unpkg.com/@asyncapi/react-component@2.4.0/browser/standalone/index.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@2.4.0/styles/default.min.css">
 
   <script>
     function showError(msg) {
@@ -36,6 +37,7 @@
       .then(function(yamlText) {
         var schema = jsyaml.load(yamlText);
         document.getElementById('loading').style.display = 'none';
+
         AsyncApiStandalone.render(
           {
             schema: schema,
@@ -47,6 +49,13 @@
                 operations: true,
                 messages:   true,
                 schemas:    true,
+                errors:     true,
+              },
+              sidebar: {
+                showOperations: 'byDefault',
+              },
+              expand: {
+                messageExamples: false,
               },
             },
           },
