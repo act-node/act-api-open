@@ -70,7 +70,7 @@ channels:
     description: |
       curtain-ctrl Shadow の desired / reported を更新する。
       - desired 書き込み: Event Router / ACT.app
-      - reported 書き込み: Control Logic / Event Router
+      - reported 書き込み: Event Router（curtain/response 受信後）
     messages:
       CurtainCtrlDesiredUpdate:
         name: CurtainCtrlDesiredUpdate
@@ -192,7 +192,7 @@ channels:
                   motor_config: {stop_before_reverse_ms: 500, cooldown_sec: 30}
       CurtainCtrlReportedUpdate:
         name: CurtainCtrlReportedUpdate
-        title: curtain-ctrl reported 更新（実態報告）
+        title: curtain-ctrl reported 更新（Event Router が反映）
         contentType: application/json
         payload:
           type: object
@@ -1220,6 +1220,7 @@ operations:
     channel:
       $ref: "#/channels/shadowCurtainCtrlUpdate"
     summary: curtain-ctrl Shadow を更新する（Event Router / ACT.app）
+    description: Control Logic は Shadow に直接書き込まない。Event Router が curtain/response・event を受信後に reported を更新する。
     bindings:
       mqtt: {qos: 1, retain: false}
 
@@ -1372,9 +1373,9 @@ components:
         | セクション | 書込主体 |
         |-----------|---------|
         | desired.mode / motors / schedule / motor_config | Event Router / ACT.app |
-        | reported.mode / emergency_stop / motors | Control Logic |
+        | reported.mode / emergency_stop / motors | Event Router（curtain/response 受信後） |
         | reported.active_zone / schedule | Event Router |
-        | reported.device | Health Reporter |
+        | reported.device | Health Reporter（curtain/health 受信後） |
 
         ## 更新頻度
         - desired: 設定変更時のみ
