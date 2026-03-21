@@ -42,14 +42,21 @@ info:
 defaultContentType: application/json
 
 servers:
-  production:
-    host: xxxxxxxxxxxx.iot.ap-northeast-1.amazonaws.com
-    protocol: mqtts
-    description: AWS IoT Core（東京リージョン）
-  greengrass:
-    host: localhost:8883
+  greengrass-ipc:
+    host: /greengrass/v2/ipc.socket
+    protocol: greengrassv2
+    description: |
+      Greengrass IPC Pub/Sub ブローカー。
+      同一デバイス上のアプリコンポーネント間通信に使用。
+      Event Router / Sensor Aggregator / Health Reporter と
+      Control Logic 間のメッセージ交換はすべてこの経路を通る。
+  local-mqtt:
+    host: x320-Edge-Node.local:1883
     protocol: mqtt
-    description: Greengrass IPC Pub/Sub ブローカー（エッジローカル）
+    description: |
+      LAN 内 MQTT ブローカー（Greengrass MQTT Bridge 経由）。
+      同一 LAN 上の別ノード（ACT.app サーバー・他の x320 デバイスなど）
+      との通信に使用。インターネット接続不要。
 
 channels:
 
@@ -1374,6 +1381,10 @@ components:
         - reported.device: 300秒ごと（health 受信時）
         ## サンプル
 
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
         {
           "state": {
             "desired": {
@@ -1492,6 +1503,9 @@ components:
             }
           }
         }
+        ```
+
+        </details>
 
       properties:
         state:
@@ -1850,6 +1864,10 @@ components:
         - 差が大きい場合はデバイス内バッファリングや送信遅延を示す
         ## サンプル
 
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
         {
           "state": {
             "desired": {
@@ -1879,6 +1897,9 @@ components:
             }
           }
         }
+        ```
+
+        </details>
 
       properties:
         state:
@@ -1995,6 +2016,10 @@ components:
         - reported.device: 300秒ごと
         ## サンプル
 
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
         {
           "state": {
             "desired": {
@@ -2024,6 +2049,9 @@ components:
             }
           }
         }
+        ```
+
+        </details>
 
       properties:
         state:
@@ -2134,6 +2162,10 @@ components:
         故障調査・データ可視化・複数センサー平均計算に対応できる。
         ## サンプル
 
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
         {
           "state": {
             "desired": {
@@ -2171,6 +2203,9 @@ components:
             }
           }
         }
+        ```
+
+        </details>
 
       properties:
         state:
@@ -2311,6 +2346,10 @@ components:
         差異がある間は Sensor Aggregator が再起動中または未起動の可能性がある。
         ## サンプル
 
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
         {
           "state": {
             "desired": {
@@ -2367,6 +2406,9 @@ components:
             }
           }
         }
+        ```
+
+        </details>
 
       properties:
         state:
@@ -2478,6 +2520,10 @@ components:
         2つの Shadow を持つため、両方の reported.device を更新する必要がある。
         ## サンプル
 
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
         {
           "state": {
             "desired": {
@@ -2536,6 +2582,9 @@ components:
             }
           }
         }
+        ```
+
+        </details>
 
       properties:
         state:
