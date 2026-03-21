@@ -8,19 +8,9 @@ info:
     クラウド / Greengrass アプリケーション間の MQTT メッセージ仕様。
 
     ## デバイス構成
+    - x320-Edge-Node  : Edge-IoT-Controller Node 棟単位の仮想Thing（zone-env / 設定Shadow）
     - x320-curtain-01 : カーテン開閉デバイス（温度・湿度センサー内蔵、モーター M1/M2）
-    - x320-co2-01     : CO2センサーデバイス
-    - GGW-BARN1       : 棟単位の仮想Thing（zone-env / 設定Shadow）
-
-    ## Named Shadow 一覧
-    | Shadow 名 | Thing | 用途 |
-    |-----------|-------|------|
-    | curtain-ctrl | x320-curtain-01 | モーター制御・スケジュール・状態 |
-    | curtain-sensor | x320-curtain-01 | 温度・湿度センサー計測値 |
-    | co2-sensor | x320-co2-01 | CO2・温度・湿度計測値 |
-    | zone-env | GGW-BARN1 | エリア内全センサー集約値 |
-    | aggregator-config | GGW-BARN1 | Sensor Aggregator ルーティング設定 |
-    | health-reporter-config | GGW-BARN1 | Health Reporter ルーティング設定 |
+    - Sensor-co2      : LoRaWAN CO2センサー
 
     ## 通信仕様
     - プロトコル: MQTT v3.1.1 over TLS
@@ -32,6 +22,16 @@ info:
     |-----|------------|------|
     | 1   | command / response / event / Shadow update | 取りこぼすと制御不整合 |
     | 0   | telemetry / health | 次回データで補完可能 |
+
+    ## Named Shadow 一覧
+    | Shadow 名 | Thing | 用途 |
+    |-----------|-------|------|
+    | curtain-ctrl | x320-curtain-01 | モーター制御・スケジュール・状態 |
+    | curtain-sensor | x320-curtain-01 | 温度・湿度センサー計測値 |
+    | co2-sensor | Sensor-co2 | CO2・温度・湿度計測値（LoRaWAN）|
+    | zone-env | x320-Edge-Node | エリア内全センサー集約値 |
+    | aggregator-config | x320-Edge-Node | Sensor Aggregator ルーティング設定 |
+    | health-reporter-config | x320-Edge-Node | Health Reporter ルーティング設定 |
 
   contact:
     name: ACT Node Inc.
@@ -50,8 +50,6 @@ servers:
     host: localhost:8883
     protocol: mqtt
     description: Greengrass IPC Pub/Sub ブローカー（エッジローカル）
-
-
 
 channels:
 
@@ -608,7 +606,7 @@ channels:
                   sensors:
                     temperature: {value_celsius: 28.4, raw_value: 2150, read_at: 1710300000.0, source_device: x320-curtain-01, source_shadow: curtain-sensor, sampled_at: "2025-03-20T09:15:00Z", stale: false}
                     humidity_pct: {value: 71.2, source_device: x320-curtain-01, source_shadow: curtain-sensor, sampled_at: "2025-03-20T09:15:00Z", stale: false}
-                    co2_ppm: {value: 850, source_device: x320-co2-01, source_shadow: co2-sensor, sampled_at: "2025-03-20T09:14:50Z", stale: false}
+                    co2_ppm: {value: 850, source_device: Sensor-co2, source_shadow: co2-sensor, sampled_at: "2025-03-20T09:14:50Z", stale: false}
                   updated_at: "2025-03-20T09:15:02Z"
           - name: CO2センサー stale 状態
             payload:
@@ -616,7 +614,7 @@ channels:
                 reported:
                   sensors:
                     temperature: {value_celsius: 28.4, raw_value: 2150, read_at: 1710300000.0, source_device: x320-curtain-01, source_shadow: curtain-sensor, sampled_at: "2025-03-20T09:15:00Z", stale: false}
-                    co2_ppm: {value: null, source_device: x320-co2-01, source_shadow: co2-sensor, sampled_at: null, stale: true}
+                    co2_ppm: {value: null, source_device: Sensor-co2, source_shadow: co2-sensor, sampled_at: null, stale: true}
                   updated_at: "2025-03-20T09:15:02Z"
 
   shadowAggregatorConfigUpdate:
@@ -661,7 +659,7 @@ channels:
                             example: [temperature, humidity_pct]
                           zone_thing:
                             type: string
-                            example: GGW-BARN1
+                            example: x320-Edge-Node
                           zone_shadow:
                             type: string
                             example: zone-env
@@ -672,13 +670,13 @@ channels:
                 desired:
                   stale_threshold_sec: 120
                   routing:
-                    - {device_id: x320-curtain-01, shadow_name: curtain-sensor, sensor_keys: [temperature, humidity_pct], zone_thing: GGW-BARN1, zone_shadow: zone-env}
-                    - {device_id: x320-co2-01, shadow_name: co2-sensor, sensor_keys: [co2_ppm, temperature, humidity_pct], zone_thing: GGW-BARN1, zone_shadow: zone-env}
+                    - {device_id: x320-curtain-01, shadow_name: curtain-sensor, sensor_keys: [temperature, humidity_pct], zone_thing: x320-Edge-Node, zone_shadow: zone-env}
+                    - {device_id: Sensor-co2, shadow_name: co2-sensor, sensor_keys: [co2_ppm, temperature, humidity_pct], zone_thing: x320-Edge-Node, zone_shadow: zone-env}
                 reported:
                   stale_threshold_sec: 120
                   routing:
-                    - {device_id: x320-curtain-01, shadow_name: curtain-sensor, sensor_keys: [temperature, humidity_pct], zone_thing: GGW-BARN1, zone_shadow: zone-env}
-                    - {device_id: x320-co2-01, shadow_name: co2-sensor, sensor_keys: [co2_ppm, temperature, humidity_pct], zone_thing: GGW-BARN1, zone_shadow: zone-env}
+                    - {device_id: x320-curtain-01, shadow_name: curtain-sensor, sensor_keys: [temperature, humidity_pct], zone_thing: x320-Edge-Node, zone_shadow: zone-env}
+                    - {device_id: Sensor-co2, shadow_name: co2-sensor, sensor_keys: [co2_ppm, temperature, humidity_pct], zone_thing: x320-Edge-Node, zone_shadow: zone-env}
 
   shadowHealthReporterConfigUpdate:
     address: "$aws/things/{thing_name}/shadow/name/health-reporter-config/update"
@@ -733,9 +731,6 @@ channels:
                       target_shadows:
                         - {thing: x320-curtain-01, shadow: curtain-ctrl}
                         - {thing: x320-curtain-01, shadow: curtain-sensor}
-                    - device_id: x320-co2-01
-                      target_shadows:
-                        - {thing: x320-co2-01, shadow: co2-sensor}
                 reported:
                   offline_threshold_sec: 600
                   routing:
@@ -743,9 +738,6 @@ channels:
                       target_shadows:
                         - {thing: x320-curtain-01, shadow: curtain-ctrl}
                         - {thing: x320-curtain-01, shadow: curtain-sensor}
-                    - device_id: x320-co2-01
-                      target_shadows:
-                        - {thing: x320-co2-01, shadow: co2-sensor}
 
   # ============================================================
   # GG IPC Pub/Sub チャンネル
@@ -1139,7 +1131,7 @@ channels:
               sampled_at: "2025-03-20T09:15:00Z"
           - name: CO2センサーテレメトリ
             payload:
-              device_id: x320-co2-01
+              device_id: Sensor-co2
               timestamp: 1710300000.0
               sensors:
                 co2_ppm: 850
@@ -1354,6 +1346,7 @@ operations:
 # ============================================================
 # components.schemas: Named Shadow 完全スキーマ定義
 # ============================================================
+
 components:
   schemas:
 
@@ -1829,13 +1822,13 @@ components:
 
     # ----------------------------------------------------------
     # co2-sensor Shadow
-    # Thing: x320-co2-01
+    # Thing: Sensor-co2
     # ----------------------------------------------------------
     Co2SensorShadow:
       type: object
       title: co2-sensor Shadow
       description: |
-        CO2センサーデバイスの計測値（CO2・温度・湿度）を管理する。
+        LoRaWAN CO2センサーの計測値（CO2・温度・湿度）を管理する。
 
         ## 書込主体
         | セクション | 書込主体 |
@@ -1932,7 +1925,7 @@ components:
 
     # ----------------------------------------------------------
     # zone-env Shadow
-    # Thing: GGW-BARN1（棟単位の仮想Thing）
+    # Thing: x320-Edge-Node（棟単位の仮想Thing）
     # ----------------------------------------------------------
     ZoneEnvShadow:
       type: object
@@ -2058,7 +2051,7 @@ components:
                 stale: false
               co2_ppm:
                 value: 850
-                source_device: x320-co2-01
+                source_device: Sensor-co2
                 source_shadow: co2-sensor
                 sampled_at: "2025-03-20T09:14:50Z"
                 stale: false
@@ -2066,7 +2059,7 @@ components:
 
     # ----------------------------------------------------------
     # aggregator-config Shadow
-    # Thing: GGW-BARN1
+    # Thing: x320-Edge-Node
     # ----------------------------------------------------------
     AggregatorConfigShadow:
       type: object
@@ -2145,12 +2138,12 @@ components:
               - device_id: x320-curtain-01
                 shadow_name: curtain-sensor
                 sensor_keys: [temperature, humidity_pct]
-                zone_thing: GGW-BARN1
+                zone_thing: x320-Edge-Node
                 zone_shadow: zone-env
-              - device_id: x320-co2-01
+              - device_id: Sensor-co2
                 shadow_name: co2-sensor
                 sensor_keys: [co2_ppm, temperature, humidity_pct]
-                zone_thing: GGW-BARN1
+                zone_thing: x320-Edge-Node
                 zone_shadow: zone-env
           reported:
             stale_threshold_sec: 120
@@ -2158,17 +2151,17 @@ components:
               - device_id: x320-curtain-01
                 shadow_name: curtain-sensor
                 sensor_keys: [temperature, humidity_pct]
-                zone_thing: GGW-BARN1
+                zone_thing: x320-Edge-Node
                 zone_shadow: zone-env
-              - device_id: x320-co2-01
+              - device_id: Sensor-co2
                 shadow_name: co2-sensor
                 sensor_keys: [co2_ppm, temperature, humidity_pct]
-                zone_thing: GGW-BARN1
+                zone_thing: x320-Edge-Node
                 zone_shadow: zone-env
 
     # ----------------------------------------------------------
     # health-reporter-config Shadow
-    # Thing: GGW-BARN1
+    # Thing: x320-Edge-Node
     # ----------------------------------------------------------
     HealthReporterConfigShadow:
       type: object
@@ -2191,6 +2184,10 @@ components:
         offline_threshold_sec（デフォルト600秒）以内に health が届かない場合、
         Health Reporter が target_shadows 全件の reported.device.online を false にする。
         health が再び届いた場合は online を true に戻す。
+
+        ## LoRaWAN デバイス（Sensor-co2）について
+        LoRaWAN デバイスは MQTT health トピックを使用しないため
+        health-reporter-config のルーティング対象から除外する。
 
         ## x320-curtain-01 が 2つの Shadow を持つ理由
         カーテン開閉デバイスは curtain-ctrl と curtain-sensor の
@@ -2251,9 +2248,9 @@ components:
                     shadow: curtain-ctrl
                   - thing: x320-curtain-01
                     shadow: curtain-sensor
-              - device_id: x320-co2-01
+              - device_id: Sensor-co2
                 target_shadows:
-                  - thing: x320-co2-01
+                  - thing: Sensor-co2
                     shadow: co2-sensor
           reported:
             offline_threshold_sec: 600
@@ -2264,7 +2261,7 @@ components:
                     shadow: curtain-ctrl
                   - thing: x320-curtain-01
                     shadow: curtain-sensor
-              - device_id: x320-co2-01
+              - device_id: Sensor-co2
                 target_shadows:
-                  - thing: x320-co2-01
+                  - thing: Sensor-co2
                     shadow: co2-sensor
