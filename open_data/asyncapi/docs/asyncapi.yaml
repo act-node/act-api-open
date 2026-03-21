@@ -1215,76 +1215,19 @@ channels:
 
 operations:
 
-  updateShadowCurtainCtrl:
-    action: send
-    channel:
-      $ref: "#/channels/shadowCurtainCtrlUpdate"
-    summary: curtain-ctrl Shadow を更新する（Event Router / ACT.app）
-    description: Control Logic は Shadow に直接書き込まない。Event Router が curtain/response・event を受信後に reported を更新する。
-    bindings:
-      mqtt: {qos: 1, retain: false}
-
-  receiveShadowCurtainCtrlDelta:
-    action: receive
-    channel:
-      $ref: "#/channels/shadowCurtainCtrlDelta"
-    summary: curtain-ctrl Shadow の delta を受信する（Event Router）
-    bindings:
-      mqtt: {qos: 1}
-
-  updateShadowCurtainSensor:
-    action: send
-    channel:
-      $ref: "#/channels/shadowCurtainSensorUpdate"
-    summary: curtain-sensor Shadow を更新する（Sensor Aggregator）
-    bindings:
-      mqtt: {qos: 1, retain: false}
-
-  updateShadowCo2Sensor:
-    action: send
-    channel:
-      $ref: "#/channels/shadowCo2SensorUpdate"
-    summary: co2-sensor Shadow を更新する（Sensor Aggregator）
-    bindings:
-      mqtt: {qos: 1, retain: false}
-
-  updateShadowZoneEnv:
-    action: send
-    channel:
-      $ref: "#/channels/shadowZoneEnvUpdate"
-    summary: zone-env Shadow を更新する（Sensor Aggregator）
-    bindings:
-      mqtt: {qos: 1, retain: false}
-
-  updateShadowAggregatorConfig:
-    action: send
-    channel:
-      $ref: "#/channels/shadowAggregatorConfigUpdate"
-    summary: aggregator-config Shadow を更新する（ACT.app / Sensor Aggregator）
-    bindings:
-      mqtt: {qos: 1, retain: false}
-
-  updateShadowHealthReporterConfig:
-    action: send
-    channel:
-      $ref: "#/channels/shadowHealthReporterConfigUpdate"
-    summary: health-reporter-config Shadow を更新する（ACT.app / Health Reporter）
-    bindings:
-      mqtt: {qos: 1, retain: false}
-
-  sendCommand:
-    action: send
-    channel:
-      $ref: "#/channels/curtainCommand"
-    summary: モーター制御コマンドを送信する（Event Router → Control Logic）
-    bindings:
-      mqtt: {qos: 1, retain: false}
+  # ============================================================
+  # Control Logic（x320-curtain-01）が使用する Operations
+  # Shadow への反映は Event Router / Sensor Aggregator / Health Reporter が担当
+  # ============================================================
 
   receiveCommand:
     action: receive
     channel:
       $ref: "#/channels/curtainCommand"
-    summary: モーター制御コマンドを受信する（Control Logic）
+    summary: モーター制御コマンドを受信する
+    description: |
+      Event Router からモーター制御指示を受け取る。
+      コマンド実行後は必ず publishResponse で結果を返す。
     bindings:
       mqtt: {qos: 1}
 
@@ -1292,65 +1235,50 @@ operations:
     action: send
     channel:
       $ref: "#/channels/curtainResponse"
-    summary: コマンド実行結果を送信する（Control Logic → Event Router）
+    summary: コマンド実行結果を送信する
+    description: |
+      receiveCommand で受け取ったコマンドの実行結果を Event Router へ返す。
+      Event Router はこの結果を元に curtain-ctrl Shadow の reported を更新する。
     bindings:
       mqtt: {qos: 1, retain: false}
-
-  receiveResponse:
-    action: receive
-    channel:
-      $ref: "#/channels/curtainResponse"
-    summary: コマンド実行結果を受信する（Event Router）
-    bindings:
-      mqtt: {qos: 1}
 
   publishEvent:
     action: send
     channel:
       $ref: "#/channels/curtainEvent"
-    summary: 状態変化イベントを送信する（Control Logic → Event Router）
+    summary: 状態変化イベントを送信する
+    description: |
+      以下の状態変化が発生した時に即時送信する。
+      - リミッタースイッチ到達（LimiterEvent）
+      - 緊急停止ボタン押下・解除（EmergencyStopEvent）
+      - モーター動作状態変化（MotorStateEvent）
+      - 動作モード変更（ModeChangeEvent）
     bindings:
       mqtt: {qos: 1, retain: false}
-
-  receiveEvent:
-    action: receive
-    channel:
-      $ref: "#/channels/curtainEvent"
-    summary: 状態変化イベントを受信する（Event Router）
-    bindings:
-      mqtt: {qos: 1}
 
   publishTelemetry:
     action: send
     channel:
       $ref: "#/channels/sensorTelemetry"
-    summary: 定期センサーデータを送信する（Control Logic → Sensor Aggregator）
+    summary: 定期センサーデータを送信する
+    description: |
+      30秒間隔で温度・湿度センサーの計測値を送信する。
+      Sensor Aggregator がこのデータを受け取り
+      curtain-sensor Shadow と zone-env Shadow を更新する。
     bindings:
       mqtt: {qos: 0, retain: false}
-
-  receiveTelemetry:
-    action: receive
-    channel:
-      $ref: "#/channels/sensorTelemetry"
-    summary: 定期センサーデータを受信する（Sensor Aggregator）
-    bindings:
-      mqtt: {qos: 0}
 
   publishHealth:
     action: send
     channel:
       $ref: "#/channels/curtainHealth"
-    summary: ヘルスチェック情報を送信する（Control Logic → Health Reporter）
+    summary: ヘルスチェック情報を送信する
+    description: |
+      300秒間隔でデバイスの死活情報を送信する。
+      Health Reporter がこのデータを受け取り
+      curtain-ctrl・curtain-sensor Shadow の reported.device を更新する。
     bindings:
       mqtt: {qos: 0, retain: false}
-
-  receiveHealth:
-    action: receive
-    channel:
-      $ref: "#/channels/curtainHealth"
-    summary: ヘルスチェック情報を受信する（Health Reporter）
-    bindings:
-      mqtt: {qos: 0}
 
 # ============================================================
 # components.schemas: Named Shadow 完全スキーマ定義
