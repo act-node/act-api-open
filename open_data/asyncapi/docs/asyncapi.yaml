@@ -52,12 +52,13 @@ servers:
       Event Router / Sensor Aggregator / Health Reporter と
       Control Logic 間のメッセージ交換はすべてこの経路を通る。
   local-mqtt:
-    host: x320-Edge-Node.local:1883
-    protocol: mqtt
+    host: x320-Edge-Node.local:8883
+    protocol: mqtts
     description: |
-      LAN 内 MQTT ブローカー（Greengrass MQTT Bridge 経由）。
-      同一 LAN 上の別ノード（ACT.app サーバー・他の x320 デバイスなど）
-      との通信に使用。インターネット接続不要。
+      LAN 内 MQTT ブローカー（Greengrass MQTT Bridge / MQTTS）。
+      別筐体の Control Logic や同一 LAN 上の別ノードが
+      AWS IoT Device SDK v2 で接続する。
+      X.509 証明書で認証。インターネット接続不要。
 
 channels:
 
