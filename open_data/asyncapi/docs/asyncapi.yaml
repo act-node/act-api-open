@@ -1415,3 +1415,1020 @@ operations:
     summary: health-reporter-config Shadow を更新する（ACT.app / Health Reporter）
     bindings:
       mqtt: {qos: 1, retain: false}
+
+# ============================================================
+# components.schemas: Named Shadow 完全スキーマ定義
+# 各 Shadow の desired / reported の全フィールドを定義する
+# ============================================================
+
+components:
+  schemas:
+
+    # ----------------------------------------------------------
+    # 共通サブスキーマ
+    # ----------------------------------------------------------
+
+    TemperatureReading:
+      type: object
+      title: 温度計測値
+      description: AD変換付き温度センサーの計測結果
+      required: [value_celsius, raw_value, read_at]
+      properties:
+        value_celsius:
+          type: number
+          minimum: -40
+          maximum: 85
+          description: AD変換後の温度（℃）
+          example: 28.4
+        raw_value:
+          type: integer
+          minimum: 0
+          maximum: 4095
+          description: AD変換生データ（12bit）。0=断線・4095=短絡の可能性あり
+          example: 2150
+        read_at:
+          type: number
+          description: センサー読取時刻（Unix epoch 秒）
+          example: 1710299998.5
+
+    DeviceStatus:
+      type: object
+      title: デバイス状態
+      description: Health Reporter が書き込むデバイスの死活・ハードウェア情報
+      properties:
+        online:
+          type: boolean
+          description: デバイスの疎通状態。offline_threshold_sec 秒無通信で false になる
+        firmware:
+          type: string
+          description: ファームウェアバージョン（セマンティックバージョン）
+          example: "1.4.2"
+        rssi_dbm:
+          type: integer
+          minimum: -120
+          maximum: 0
+          description: "Wi-Fi 受信電波強度（dBm）。目安: -50以上=良好 / -70以下=不安定"
+          example: -65
+        uptime_sec:
+          type: integer
+          minimum: 0
+          description: 起動からの経過秒数。前回より大幅に小さい場合は再起動を示す
+          example: 86400
+        ai_available:
+          type: boolean
+          description: アナログ入力（温度センサー用AD変換）が利用可能かどうか
+        errors:
+          type: array
+          items:
+            type: string
+          description: "現在発生中のエラー一覧。形式: モーターID:エラーコード（例: M2:E01）"
+          example: []
+        last_health_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: 最後に health メッセージを受信した時刻（ISO 8601 / UTC）
+
+    MotorState:
+      type: object
+      title: モーター状態（reported）
+      description: Control Logic が書き込むモーター1台分の現在状態
+      properties:
+        direction:
+          type: string
+          enum: [forward, reverse, stopped]
+          description: "現在の回転方向。forward=開 / reverse=閉 / stopped=停止"
+        limit_upper:
+          type: string
+          enum: [active, inactive]
+          description: "上限リミッター。active=到達（接点ON）→ forward を拒否"
+        limit_lower:
+          type: string
+          enum: [active, inactive]
+          description: "下限リミッター。active=到達（接点ON）→ reverse を拒否"
+        cooldown_active:
+          type: boolean
+          description: true=クールダウン中。新規コマンドは pending_command に保留
+        cooldown_until:
+          type: number
+          nullable: true
+          description: クールダウン解除時刻（Unix epoch 秒）。未使用時は null
+        pending_command:
+          type: string
+          enum: [forward, reverse]
+          nullable: true
+          description: クールダウン中に受けた保留コマンド。解除後に自動実行
+        last_command:
+          type: string
+          enum: [forward, reverse, stop]
+          nullable: true
+          description: 最後に実行したコマンド。同方向コマンド無視の判定基準
+        last_operated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: 最終動作時刻（ISO 8601 / UTC）
+        operation_count:
+          type: integer
+          minimum: 0
+          description: 累計動作回数。保守計画・モーター寿命管理に使用
+        error_code:
+          type: string
+          nullable: true
+          description: "最後に発生したエラーコード。null=正常 / E01=過電流 / E02=タイムアウト / E03=センサー異常"
+
+    MotorDesired:
+      type: object
+      title: モーター指示（desired）
+      description: Event Router / ACT.app が書き込むモーター1台分の制御指示
+      properties:
+        override:
+          type: boolean
+          description: "true=グループ指示を無視して command を優先（メンテナンス時など）"
+          default: false
+        command:
+          type: string
+          enum: [forward, reverse, stop]
+          nullable: true
+          description: "個別指示。override:true の時のみ有効。null=指示なし"
+        threshold:
+          type: object
+          description: 自動制御の温度閾値設定（モーターごとに個別設定可能）
+          required: [open_temp, close_temp, hysteresis]
+          properties:
+            open_temp:
+              type: number
+              description: この温度以上でカーテンを開く（℃）。close_temp より大きい値が必須
+              example: 28.0
+            close_temp:
+              type: number
+              description: この温度以下でカーテンを閉じる（℃）。open_temp より小さい値が必須
+              example: 25.0
+            hysteresis:
+              type: number
+              minimum: 0
+              description: チャタリング防止幅（℃）。open/close 判定に加算・減算して境界幅を広げる
+              example: 1.0
+
+    TimeZoneRule:
+      type: object
+      title: タイムゾーンルール
+      description: スケジュール制御の時間帯ごとのルール定義
+      required: [id, from, to, control]
+      properties:
+        id:
+          type: string
+          description: ゾーンの一意識別子
+          example: daytime_auto
+        from:
+          type: string
+          pattern: "^([01][0-9]|2[0-4]):[0-5][0-9]$"
+          description: 開始時刻（HH:MM 形式）
+          example: "08:00"
+        to:
+          type: string
+          pattern: "^([01][0-9]|2[0-4]):[0-5][0-9]$"
+          description: 終了時刻（HH:MM 形式）。"24:00" は 23:59:59 として扱う
+          example: "18:00"
+        control:
+          type: string
+          enum: [force_close, temperature, force_open]
+          description: "ゾーン内の制御方式。force_close=常に閉 / temperature=閾値で自動 / force_open=常に開"
+
+    SensorAggregated:
+      type: object
+      title: 集約センサー値
+      description: zone-env Shadow 内のセンサーキーごとの集約エントリ
+      properties:
+        value:
+          description: センサー計測値。stale=true の場合は null
+          nullable: true
+        source_device:
+          type: string
+          description: 送信元デバイスID
+          example: x320-curtain-01
+        source_shadow:
+          type: string
+          description: 送信元 Shadow 名
+          example: curtain-sensor
+        sampled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: MQTT で受信した telemetry の sampled_at
+        stale:
+          type: boolean
+          description: "true=stale_threshold_sec 秒以上無通信。Event Router は制御判断から除外する"
+
+    # ----------------------------------------------------------
+    # Shadow 完全スキーマ
+    # ----------------------------------------------------------
+
+    CurtainCtrlShadow:
+      type: object
+      title: curtain-ctrl Shadow
+      description: |
+        Thing: x320-curtain-01
+        カーテン開閉デバイスのモーター制御・スケジュール・自動制御ルール・モーター状態を管理する。
+
+        ## 書込主体
+        | セクション | 書込主体 |
+        |-----------|---------|
+        | desired.mode / motors / schedule / motor_config | Event Router / ACT.app |
+        | reported.mode / emergency_stop / motors | Control Logic |
+        | reported.active_zone / schedule | Event Router |
+        | reported.device | Health Reporter |
+
+        ## 更新頻度
+        - desired: 設定変更時のみ
+        - reported.motors: コマンド実行後
+        - reported.device: 300秒ごと（health 受信時）
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [auto, manual]
+                  description: "auto=温度・スケジュールで自動制御 / manual=手動コマンドのみ"
+                  default: auto
+                motors:
+                  type: object
+                  properties:
+                    M1:
+                      title: M1 制御指示
+                      allOf:
+                        - type: object
+                          properties:
+                            override:
+                              type: boolean
+                              default: false
+                            command:
+                              type: string
+                              enum: [forward, reverse, stop]
+                              nullable: true
+                            threshold:
+                              type: object
+                              properties:
+                                open_temp:
+                                  type: number
+                                  example: 28.0
+                                close_temp:
+                                  type: number
+                                  example: 25.0
+                                hysteresis:
+                                  type: number
+                                  example: 1.0
+                    M2:
+                      title: M2 制御指示
+                      allOf:
+                        - type: object
+                          properties:
+                            override:
+                              type: boolean
+                              default: false
+                            command:
+                              type: string
+                              enum: [forward, reverse, stop]
+                              nullable: true
+                            threshold:
+                              type: object
+                              properties:
+                                open_temp:
+                                  type: number
+                                  example: 30.0
+                                close_temp:
+                                  type: number
+                                  example: 27.0
+                                hysteresis:
+                                  type: number
+                                  example: 1.5
+                schedule:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      description: スケジュール制御の有効/無効
+                      default: true
+                    timezone:
+                      type: string
+                      description: IANA タイムゾーン識別子
+                      example: Asia/Tokyo
+                    time_zones:
+                      type: array
+                      description: 時間帯ごとのルール定義
+                      items:
+                        type: object
+                        required: [id, from, to, control]
+                        properties:
+                          id:
+                            type: string
+                            example: daytime_auto
+                          from:
+                            type: string
+                            example: "08:00"
+                          to:
+                            type: string
+                            example: "18:00"
+                          control:
+                            type: string
+                            enum: [force_close, temperature, force_open]
+                motor_config:
+                  type: object
+                  properties:
+                    stop_before_reverse_ms:
+                      type: integer
+                      minimum: 0
+                      description: 逆転前の停止待機時間（ミリ秒）。接触器消弧のため
+                      default: 500
+                    cooldown_sec:
+                      type: integer
+                      minimum: 0
+                      description: モーター動作後の冷却待機秒数
+                      default: 30
+            reported:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [auto, manual]
+                  description: 現在の動作モード
+                emergency_stop:
+                  type: string
+                  enum: [active, inactive]
+                  description: "物理緊急停止ボタンの状態。active 中は全コマンド拒否・MQTT 制御不可"
+                motors:
+                  type: object
+                  properties:
+                    M1:
+                      type: object
+                      title: M1 現在状態
+                      properties:
+                        direction:
+                          type: string
+                          enum: [forward, reverse, stopped]
+                        limit_upper:
+                          type: string
+                          enum: [active, inactive]
+                          description: "active=上限到達 → forward を拒否"
+                        limit_lower:
+                          type: string
+                          enum: [active, inactive]
+                          description: "active=下限到達 → reverse を拒否"
+                        cooldown_active:
+                          type: boolean
+                        cooldown_until:
+                          type: number
+                          nullable: true
+                          description: クールダウン解除時刻（Unix epoch 秒）
+                        pending_command:
+                          type: string
+                          nullable: true
+                          description: クールダウン中の保留コマンド。解除後に自動実行
+                        last_command:
+                          type: string
+                          nullable: true
+                        last_operated_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        operation_count:
+                          type: integer
+                          minimum: 0
+                          description: 累計動作回数
+                        error_code:
+                          type: string
+                          nullable: true
+                          description: "null=正常 / E01=過電流 / E02=タイムアウト / E03=センサー異常"
+                    M2:
+                      type: object
+                      title: M2 現在状態
+                      properties:
+                        direction:
+                          type: string
+                          enum: [forward, reverse, stopped]
+                        limit_upper:
+                          type: string
+                          enum: [active, inactive]
+                        limit_lower:
+                          type: string
+                          enum: [active, inactive]
+                        cooldown_active:
+                          type: boolean
+                        cooldown_until:
+                          type: number
+                          nullable: true
+                        pending_command:
+                          type: string
+                          nullable: true
+                        last_command:
+                          type: string
+                          nullable: true
+                        last_operated_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        operation_count:
+                          type: integer
+                          minimum: 0
+                        error_code:
+                          type: string
+                          nullable: true
+                active_zone:
+                  type: object
+                  description: 現在アクティブなスケジュールゾーン
+                  properties:
+                    id:
+                      type: string
+                      description: ゾーンID（desired.schedule.time_zones[].id と一致）
+                    control:
+                      type: string
+                      enum: [force_close, temperature, force_open]
+                    entered_at:
+                      type: string
+                      format: date-time
+                      description: このゾーンに切り替わった時刻
+                schedule:
+                  type: object
+                  description: スケジュール実行履歴と次回予定
+                  properties:
+                    last_executed_zone:
+                      type: string
+                      nullable: true
+                    last_executed_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    next_zone:
+                      type: string
+                      nullable: true
+                    next_zone_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                device:
+                  type: object
+                  description: デバイスの死活・ハードウェア情報（Health Reporter が書き込む）
+                  properties:
+                    online:
+                      type: boolean
+                    firmware:
+                      type: string
+                      example: "1.4.2"
+                    rssi_dbm:
+                      type: integer
+                    uptime_sec:
+                      type: integer
+                    do_channels:
+                      type: array
+                      items:
+                        type: string
+                      description: 利用可能なデジタル出力チャンネル一覧（X320固有）
+                    di_channels:
+                      type: array
+                      items:
+                        type: string
+                      description: 利用可能なデジタル入力チャンネル一覧（X320固有）
+                    ai_available:
+                      type: boolean
+                    errors:
+                      type: array
+                      items:
+                        type: string
+                    last_health_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+      example:
+        state:
+          desired:
+            mode: auto
+            motors:
+              M1: {override: false, command: null, threshold: {open_temp: 28.0, close_temp: 25.0, hysteresis: 1.0}}
+              M2: {override: false, command: null, threshold: {open_temp: 30.0, close_temp: 27.0, hysteresis: 1.5}}
+            schedule:
+              enabled: true
+              timezone: Asia/Tokyo
+              time_zones:
+                - {id: night_close,   from: "00:00", to: "08:00", control: force_close}
+                - {id: daytime_auto,  from: "08:00", to: "18:00", control: temperature}
+                - {id: evening_close, from: "18:00", to: "24:00", control: force_close}
+            motor_config: {stop_before_reverse_ms: 500, cooldown_sec: 30}
+          reported:
+            mode: auto
+            emergency_stop: inactive
+            motors:
+              M1: {direction: stopped, limit_upper: inactive, limit_lower: inactive, cooldown_active: false, cooldown_until: null, pending_command: null, last_command: forward, last_operated_at: "2025-03-20T08:00:05Z", operation_count: 1205, error_code: null}
+              M2: {direction: stopped, limit_upper: inactive, limit_lower: inactive, cooldown_active: false, cooldown_until: null, pending_command: null, last_command: forward, last_operated_at: "2025-03-20T08:00:10Z", operation_count: 986, error_code: null}
+            active_zone: {id: daytime_auto, control: temperature, entered_at: "2025-03-20T08:00:01Z"}
+            schedule: {last_executed_zone: night_close, last_executed_at: "2025-03-20T08:00:01Z", next_zone: evening_close, next_zone_at: "2025-03-20T18:00:00Z"}
+            device: {online: true, firmware: "1.4.2", rssi_dbm: -65, uptime_sec: 86400, do_channels: [EXT_DO0, EXT_DO1, EXT_DO2, EXT_DO3], di_channels: [Filtered_DI0, Filtered_DI1, Filtered_DI2, Filtered_DI3, Filtered_DI4], ai_available: true, errors: [], last_health_at: "2025-03-20T09:00:00Z"}
+
+    CurtainSensorShadow:
+      type: object
+      title: curtain-sensor Shadow
+      description: |
+        Thing: x320-curtain-01
+        カーテン開閉デバイスに内蔵された温度・湿度センサーの計測値を管理する。
+
+        ## 書込主体
+        | セクション | 書込主体 |
+        |-----------|---------|
+        | desired.config | ACT.app（収集設定変更） |
+        | reported.environment | Sensor Aggregator |
+        | reported.device | Health Reporter |
+
+        ## 更新頻度
+        - reported.environment: 30秒ごと（telemetry 受信時）
+        - reported.device: 300秒ごと（health 受信時）
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              properties:
+                config:
+                  type: object
+                  properties:
+                    interval_sec:
+                      type: integer
+                      description: センサー収集間隔（秒）
+                      default: 30
+                      example: 30
+                    unit_temperature:
+                      type: string
+                      enum: [celsius, fahrenheit]
+                      description: 温度単位。内部処理は常に ℃
+                      default: celsius
+            reported:
+              type: object
+              properties:
+                environment:
+                  type: object
+                  properties:
+                    temperature:
+                      type: object
+                      properties:
+                        value_celsius:
+                          type: number
+                          minimum: -40
+                          maximum: 85
+                          description: AD変換後の温度（℃）
+                          example: 28.4
+                        raw_value:
+                          type: integer
+                          minimum: 0
+                          maximum: 4095
+                          description: "AD変換生データ（12bit）。0=断線 / 4095=短絡の可能性あり"
+                          example: 2150
+                        read_at:
+                          type: number
+                          description: センサー読取時刻（Unix epoch 秒）。sampled_at との差で送信遅延を検知できる
+                    humidity_pct:
+                      type: number
+                      minimum: 0
+                      maximum: 100
+                      description: 相対湿度（%）
+                      example: 71.2
+                    sampled_at:
+                      type: string
+                      format: date-time
+                      description: MQTT telemetry の送信時刻（ISO 8601 / UTC）
+                device:
+                  type: object
+                  properties:
+                    online:
+                      type: boolean
+                    firmware:
+                      type: string
+                    rssi_dbm:
+                      type: integer
+                    ai_available:
+                      type: boolean
+                      description: false の場合 temperature の値は無効
+                    errors:
+                      type: array
+                      items:
+                        type: string
+                    last_health_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+      example:
+        state:
+          desired:
+            config: {interval_sec: 30, unit_temperature: celsius}
+          reported:
+            environment:
+              temperature: {value_celsius: 28.4, raw_value: 2150, read_at: 1710300000.0}
+              humidity_pct: 71.2
+              sampled_at: "2025-03-20T09:15:00Z"
+            device: {online: true, firmware: "1.4.2", rssi_dbm: -65, ai_available: true, errors: [], last_health_at: "2025-03-20T09:00:00Z"}
+
+    Co2SensorShadow:
+      type: object
+      title: co2-sensor Shadow
+      description: |
+        Thing: x320-co2-01
+        CO2センサーデバイスの計測値（CO2・温度・湿度）を管理する。
+
+        ## 書込主体
+        | セクション | 書込主体 |
+        |-----------|---------|
+        | desired.config | ACT.app |
+        | reported.environment | Sensor Aggregator |
+        | reported.device | Health Reporter |
+
+        ## 更新頻度
+        - reported.environment: 30秒ごと
+        - reported.device: 300秒ごと
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              properties:
+                config:
+                  type: object
+                  properties:
+                    interval_sec:
+                      type: integer
+                      default: 30
+                    co2_calibration_ppm:
+                      type: integer
+                      description: CO2センサー校正オフセット（ppm）
+                      default: 0
+            reported:
+              type: object
+              properties:
+                environment:
+                  type: object
+                  properties:
+                    co2_ppm:
+                      type: integer
+                      minimum: 0
+                      maximum: 10000
+                      description: CO2濃度（ppm）
+                      example: 850
+                    temperature:
+                      type: object
+                      properties:
+                        value_celsius:
+                          type: number
+                          example: 27.8
+                        raw_value:
+                          type: integer
+                          example: 2100
+                        read_at:
+                          type: number
+                    humidity_pct:
+                      type: number
+                      minimum: 0
+                      maximum: 100
+                      example: 70.5
+                    sampled_at:
+                      type: string
+                      format: date-time
+                device:
+                  type: object
+                  properties:
+                    online:
+                      type: boolean
+                    firmware:
+                      type: string
+                    rssi_dbm:
+                      type: integer
+                    errors:
+                      type: array
+                      items:
+                        type: string
+                    last_health_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+      example:
+        state:
+          desired:
+            config: {interval_sec: 30, co2_calibration_ppm: 0}
+          reported:
+            environment:
+              co2_ppm: 850
+              temperature: {value_celsius: 27.8, raw_value: 2100, read_at: 1710299990.0}
+              humidity_pct: 70.5
+              sampled_at: "2025-03-20T09:14:50Z"
+            device: {online: true, firmware: "2.1.0", rssi_dbm: -72, errors: [], last_health_at: "2025-03-20T09:00:00Z"}
+
+    ZoneEnvShadow:
+      type: object
+      title: zone-env Shadow
+      description: |
+        Thing: GGW-BARN1（棟単位の仮想Thing）
+        棟内全センサーの集約値。Event Router が制御判断に参照する。
+
+        ## 書込主体
+        | セクション | 書込主体 |
+        |-----------|---------|
+        | desired.config | ACT.app |
+        | reported.sensors | Sensor Aggregator |
+
+        ## stale 判定
+        stale_threshold_sec（デフォルト120秒）以内に telemetry が届かない場合、
+        Sensor Aggregator が該当センサーの stale を true にする。
+        Event Router は stale=true のセンサー値を制御判断から除外する。
+
+        ## 更新頻度
+        - reported.sensors: 30秒ごと（telemetry 受信時）
+        - stale マーク: 120秒無通信時
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              properties:
+                config:
+                  type: object
+                  properties:
+                    stale_threshold_sec:
+                      type: integer
+                      description: stale 判定までの秒数（全センサー共通）
+                      default: 120
+                      example: 120
+            reported:
+              type: object
+              properties:
+                sensors:
+                  type: object
+                  description: センサーキーをキーとした集約値マップ
+                  properties:
+                    temperature:
+                      type: object
+                      description: 温度集約値
+                      properties:
+                        value_celsius:
+                          type: number
+                          nullable: true
+                          example: 28.4
+                        raw_value:
+                          type: integer
+                          nullable: true
+                        read_at:
+                          type: number
+                          nullable: true
+                        source_device:
+                          type: string
+                          description: 送信元デバイスID
+                          example: x320-curtain-01
+                        source_shadow:
+                          type: string
+                          description: 送信元 Shadow 名
+                          example: curtain-sensor
+                        sampled_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        stale:
+                          type: boolean
+                          description: true=制御判断から除外
+                    humidity_pct:
+                      type: object
+                      properties:
+                        value:
+                          type: number
+                          nullable: true
+                          example: 71.2
+                        source_device:
+                          type: string
+                        source_shadow:
+                          type: string
+                        sampled_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        stale:
+                          type: boolean
+                    co2_ppm:
+                      type: object
+                      properties:
+                        value:
+                          type: integer
+                          nullable: true
+                          example: 850
+                        source_device:
+                          type: string
+                        source_shadow:
+                          type: string
+                        sampled_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        stale:
+                          type: boolean
+                updated_at:
+                  type: string
+                  format: date-time
+                  description: zone-env の最終更新時刻
+      example:
+        state:
+          desired:
+            config: {stale_threshold_sec: 120}
+          reported:
+            sensors:
+              temperature: {value_celsius: 28.4, raw_value: 2150, read_at: 1710300000.0, source_device: x320-curtain-01, source_shadow: curtain-sensor, sampled_at: "2025-03-20T09:15:00Z", stale: false}
+              humidity_pct: {value: 71.2, source_device: x320-curtain-01, source_shadow: curtain-sensor, sampled_at: "2025-03-20T09:15:00Z", stale: false}
+              co2_ppm: {value: 850, source_device: x320-co2-01, source_shadow: co2-sensor, sampled_at: "2025-03-20T09:14:50Z", stale: false}
+            updated_at: "2025-03-20T09:15:02Z"
+
+    AggregatorConfigShadow:
+      type: object
+      title: aggregator-config Shadow
+      description: |
+        Thing: GGW-BARN1
+        Sensor Aggregator のルーティング設定。どのデバイスのどのセンサーをどの zone-env に集約するかを定義する。
+
+        ## 書込主体
+        | セクション | 書込主体 |
+        |-----------|---------|
+        | desired | ACT.app（設定変更） |
+        | reported | Sensor Aggregator（適用完了後に desired と同期） |
+
+        ## ホットリロード
+        desired を変更すると delta が発生し、
+        Sensor Aggregator が GetThingShadow で最新 desired を取得して routing_table を再構築する。
+        再構築後に reported を desired と同期させることで delta を解消する。
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              required: [stale_threshold_sec, routing]
+              properties:
+                stale_threshold_sec:
+                  type: integer
+                  description: stale 判定までの秒数（全デバイス共通）
+                  default: 120
+                routing:
+                  type: array
+                  description: デバイスごとの集約ルーティング定義
+                  items:
+                    type: object
+                    required: [device_id, shadow_name, sensor_keys, zone_thing, zone_shadow]
+                    properties:
+                      device_id:
+                        type: string
+                        description: 対象デバイスID
+                        example: x320-curtain-01
+                      shadow_name:
+                        type: string
+                        description: 対象デバイスの Shadow 名
+                        example: curtain-sensor
+                      sensor_keys:
+                        type: array
+                        items:
+                          type: string
+                        description: zone-env に集約するセンサーキー
+                        example: [temperature, humidity_pct]
+                      zone_thing:
+                        type: string
+                        description: 集約先の Thing 名
+                        example: GGW-BARN1
+                      zone_shadow:
+                        type: string
+                        description: 集約先の Shadow 名
+                        example: zone-env
+            reported:
+              type: object
+              description: desired と同じ構造。desired と一致している状態が「設定適用済み」を示す
+              properties:
+                stale_threshold_sec:
+                  type: integer
+                routing:
+                  type: array
+                  items:
+                    type: object
+      example:
+        state:
+          desired:
+            stale_threshold_sec: 120
+            routing:
+              - device_id: x320-curtain-01
+                shadow_name: curtain-sensor
+                sensor_keys: [temperature, humidity_pct]
+                zone_thing: GGW-BARN1
+                zone_shadow: zone-env
+              - device_id: x320-co2-01
+                shadow_name: co2-sensor
+                sensor_keys: [co2_ppm, temperature, humidity_pct]
+                zone_thing: GGW-BARN1
+                zone_shadow: zone-env
+          reported:
+            stale_threshold_sec: 120
+            routing:
+              - device_id: x320-curtain-01
+                shadow_name: curtain-sensor
+                sensor_keys: [temperature, humidity_pct]
+                zone_thing: GGW-BARN1
+                zone_shadow: zone-env
+              - device_id: x320-co2-01
+                shadow_name: co2-sensor
+                sensor_keys: [co2_ppm, temperature, humidity_pct]
+                zone_thing: GGW-BARN1
+                zone_shadow: zone-env
+
+    HealthReporterConfigShadow:
+      type: object
+      title: health-reporter-config Shadow
+      description: |
+        Thing: GGW-BARN1
+        Health Reporter のルーティング設定。デバイスの health 受信時にどの Shadow の reported.device を更新するかを定義する。
+
+        ## 書込主体
+        | セクション | 書込主体 |
+        |-----------|---------|
+        | desired | ACT.app（設定変更） |
+        | reported | Health Reporter（適用完了後に desired と同期） |
+
+        ## ホットリロード
+        aggregator-config と同じパターン。
+        desired を変更すると delta が発生し Health Reporter が routing_table を再構築する。
+
+        ## offline 検知
+        offline_threshold_sec（デフォルト600秒）以内に health が届かない場合、
+        Health Reporter が target_shadows 全件の reported.device.online を false にする。
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              required: [offline_threshold_sec, routing]
+              properties:
+                offline_threshold_sec:
+                  type: integer
+                  description: offline 判定までの秒数
+                  default: 600
+                  example: 600
+                routing:
+                  type: array
+                  description: デバイスごとの health 報告先 Shadow リスト
+                  items:
+                    type: object
+                    required: [device_id, target_shadows]
+                    properties:
+                      device_id:
+                        type: string
+                        description: 対象デバイスID
+                        example: x320-curtain-01
+                      target_shadows:
+                        type: array
+                        description: reported.device を更新する Shadow リスト
+                        items:
+                          type: object
+                          required: [thing, shadow]
+                          properties:
+                            thing:
+                              type: string
+                              description: 対象 Thing 名
+                              example: x320-curtain-01
+                            shadow:
+                              type: string
+                              description: 対象 Shadow 名
+                              example: curtain-ctrl
+            reported:
+              type: object
+              description: desired と同じ構造。desired と一致している状態が「設定適用済み」を示す
+              properties:
+                offline_threshold_sec:
+                  type: integer
+                routing:
+                  type: array
+                  items:
+                    type: object
+      example:
+        state:
+          desired:
+            offline_threshold_sec: 600
+            routing:
+              - device_id: x320-curtain-01
+                target_shadows:
+                  - {thing: x320-curtain-01, shadow: curtain-ctrl}
+                  - {thing: x320-curtain-01, shadow: curtain-sensor}
+              - device_id: x320-co2-01
+                target_shadows:
+                  - {thing: x320-co2-01, shadow: co2-sensor}
+          reported:
+            offline_threshold_sec: 600
+            routing:
+              - device_id: x320-curtain-01
+                target_shadows:
+                  - {thing: x320-curtain-01, shadow: curtain-ctrl}
+                  - {thing: x320-curtain-01, shadow: curtain-sensor}
+              - device_id: x320-co2-01
+                target_shadows:
+                  - {thing: x320-co2-01, shadow: co2-sensor}
