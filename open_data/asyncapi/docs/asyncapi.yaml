@@ -1085,7 +1085,7 @@ channels:
 
   sensorTelemetry:
     address: "{device_id}/sensor/telemetry"
-    description: Control Logic から Sensor Aggregator への定期センサーデータ（QoS 0 / 30秒間隔）。
+    description: Control Logic から Sensor Aggregator への定期テレメトリ（QoS 0 / 30秒間隔）。温湿度センサー計測値とモーター状態を含む。
     messages:
       SensorTelemetry:
         name: SensorTelemetry
@@ -1128,16 +1128,60 @@ channels:
             sampled_at:
               type: string
               format: date-time
+            mode:
+              type: string
+              enum: [manual, auto]
+              description: 現在の動作モード
+            emergency_stop:
+              type: string
+              enum: [active, inactive]
+              description: 緊急停止ボタンの状態
+            motors:
+              type: object
+              description: モーター状態（カーテン開閉デバイスのみ）
+              properties:
+                M1:
+                  type: object
+                  properties:
+                    direction:
+                      type: string
+                      enum: [forward, reverse, stopped]
+                      description: "forward=開 / reverse=閉 / stopped=停止"
+                    limit_upper:
+                      type: string
+                      enum: [active, inactive]
+                      description: 上限リミッター状態
+                    limit_lower:
+                      type: string
+                      enum: [active, inactive]
+                      description: 下限リミッター状態
+                M2:
+                  type: object
+                  properties:
+                    direction:
+                      type: string
+                      enum: [forward, reverse, stopped]
+                    limit_upper:
+                      type: string
+                      enum: [active, inactive]
+                    limit_lower:
+                      type: string
+                      enum: [active, inactive]
         examples:
-          - name: 温度・湿度テレメトリ
+          - name: カーテン開閉デバイス（温湿度＋モーター状態）
             payload:
               device_id: x320-curtain-01
               timestamp: 1710300000.0
+              mode: auto
+              emergency_stop: inactive
               sensors:
                 temperature: {value_celsius: 28.4, raw_value: 2150, read_at: 1710299998.5}
                 humidity_pct: 71.2
+              motors:
+                M1: {direction: stopped, limit_upper: inactive, limit_lower: inactive}
+                M2: {direction: stopped, limit_upper: inactive, limit_lower: inactive}
               sampled_at: "2025-03-20T09:15:00Z"
-          - name: CO2センサーテレメトリ
+          - name: CO2センサーデバイス（CO2のみ）
             payload:
               device_id: Sensor-co2
               timestamp: 1710300000.0
@@ -1146,7 +1190,6 @@ channels:
                 temperature: {value_celsius: 27.8, raw_value: 2100, read_at: 1710299998.0}
                 humidity_pct: 70.5
               sampled_at: "2025-03-20T09:15:00Z"
-
   curtainHealth:
     address: "{device_id}/curtain/health"
     description: Control Logic から Health Reporter へのデバイス死活情報（QoS 0 / 300秒間隔）。
@@ -1262,7 +1305,10 @@ operations:
       $ref: "#/channels/sensorTelemetry"
     summary: 定期センサーデータを送信する
     description: |
-      30秒間隔で温度・湿度センサーの計測値を送信する。
+      30秒間隔で以下を含む定期テレメトリを送信する。
+      - 温度・湿度センサー計測値（内蔵センサー）
+      - モーター M1/M2 の動作状態・リミッター状態
+      - 動作モード・緊急停止ボタン状態
       Sensor Aggregator がこのデータを受け取り
       curtain-sensor Shadow と zone-env Shadow を更新する。
     bindings:
