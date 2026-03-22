@@ -2,25 +2,29 @@ asyncapi: 3.0.0
 
 info:
   title: ACT Connect IoT API
-  version: "0.3.2"
+  version: "0.3.3"
   description: |
     ACT Connect デバイス群と Greengrass アプリケーション間の MQTT / Shadow メッセージ仕様。
 
     ## Shadow 命名規則
 
-    | プレフィックス | 対象 | 例 |
-    |--------------|------|-----|
-    | `dev-` | 物理デバイス 1台に対応する Shadow。デバイスの制御・センサー値・状態をすべて 1つにまとめる | `dev-curtain`, `dev-co2` |
-    | `zone-` | 棟・エリア単位で共有する Shadow。複数デバイスの集約値や設定を管理する | `zone-env`, `zone-aggregator-cfg` |
+    | プレフィックス | 対象 | 命名パターン | 例 |
+    |--------------|------|------------|-----|
+    | `dev-` | 物理デバイス 1台に対応する Shadow。1 Edge Node に同種デバイスが複数台あっても一意に識別できる | `dev-{device_id}`（device_id = `{type}-{連番 or 設置場所}`） | `dev-curtain-01`, `dev-curtain-02`, `dev-co2-hall`, `dev-cam-entrance` |
+    | `zone-` | 棟・エリア単位で共有する Shadow。複数デバイスの集約値や設定を管理する | `zone-{目的}` | `zone-env`, `zone-aggregator-cfg` |
 
     ## Named Shadow 一覧
 
     ### デバイス固有 Shadow（`dev-` プレフィックス）
-    | Shadow 名 | Thing | 書込主体 | 内容 |
-    |-----------|-------|----------|------|
-    | **dev-curtain** | x320-curtain-01 | Event Router / Aggregator / Health Reporter | カーテン制御 + 温湿度センサーをすべて 1つに統合 |
-    | **dev-co2** | Sensor-co2 | Aggregator | CO2・温湿度計測値 |
-    | **dev-cam-{id}** | edge-ai-cam-{id} | CameraCapture / ImageAI | キャプチャ設定・保存設定・画像AI設定・動作状態をすべて統合 |
+    Shadow 名は `dev-{device_id}` の形式で、device_id は Deployment 設定で定義する。
+    同種デバイスが複数台ある場合は連番や設置場所を付けて一意にする（`curtain-01`, `curtain-02` など）。
+    全ての `dev-` Shadow は Edge Node の Thing に属する（デバイスごとに別 Thing は作らない）。
+
+    | Shadow 名（パターン） | Thing | 書込主体 | 内容 |
+    |---------------------|-------|----------|------|
+    | **dev-curtain-{n}** | x320-Edge-Node | Event Router / Aggregator / Health Reporter | カーテン制御 + 温湿度センサー（例: dev-curtain-01, dev-curtain-02） |
+    | **dev-co2-{n}** | x320-Edge-Node | Aggregator | CO2・温湿度計測値（例: dev-co2-01, dev-co2-hall） |
+    | **dev-cam-{n}** | x320-Edge-Node | CameraCapture / ImageAI | キャプチャ設定・画像AI設定・動作状態（例: dev-cam-01, dev-cam-entrance） |
 
     ### ゾーン共有 Shadow（`zone-` プレフィックス）
     | Shadow 名 | Thing | 書込主体 | 内容 |
@@ -29,12 +33,16 @@ info:
     | **zone-env** | x320-Edge-Node | Aggregator | エリア内全センサー集約値 |
 
     ## デバイス構成例
-    | デバイスID | device_type | 説明 |
-    |-----------|-------------|------|
-    | x320-Edge-Node | ─ | 棟単位の仮想 Thing（zone- Shadow の親） |
-    | x320-curtain-01 | curtain_ctrl | カーテン開閉・温湿度センサー内蔵 |
-    | Sensor-co2 | env_sensor | LoRaWAN CO2センサー |
-    | edge-ai-cam-01 | edge_ai_cam | エッジAIカメラ（RTSPキャプチャ・推論） |
+    device_id は Deployment 設定（zone-device-registry）で定義する論理識別子。
+    Shadow 名は `dev-{device_id}` となる（例: device_id=curtain-01 → Shadow 名=dev-curtain-01）。
+
+    | device_id（論理識別子） | device_type | Shadow 名 | 説明 |
+    |----------------------|-------------|----------|------|
+    | x320-Edge-Node | ─ | ─ | 棟単位の仮想 Thing（zone- Shadow の親・全 dev- Shadow の Thing） |
+    | curtain-01 | curtain_ctrl | dev-curtain-01 | カーテン開閉デバイス 1号機 |
+    | curtain-02 | curtain_ctrl | dev-curtain-02 | カーテン開閉デバイス 2号機（同種複数台の例） |
+    | co2-01 | env_sensor | dev-co2-01 | LoRaWAN CO2センサー |
+    | cam-01 | edge_ai_cam | dev-cam-01 | エッジAIカメラ 1号機 |
 
     ## QoS ポリシー
     | QoS | 対象 | 理由 |
@@ -106,8 +114,8 @@ channels:
                 desired:
                   stale_threshold_sec: 120
                   routing:
-                    x320-curtain-01:
-                      shadow_name: dev-curtain
+                    curtain-01:
+                      shadow_name: dev-curtain-01
                       input_mode: mqtt_telemetry
                       sensor_schema:
                         - {key: temperature,  path: temperature,  value_type: object}
@@ -115,8 +123,8 @@ channels:
                       zone_target:
                         thing: x320-Edge-Node
                         shadow: zone-env
-                    Sensor-co2:
-                      shadow_name: dev-co2
+                    co2-01:
+                      shadow_name: dev-co2-01
                       input_mode: mqtt_telemetry
                       sensor_schema:
                         - {key: co2_ppm,      path: co2_ppm,      value_type: integer}
@@ -131,8 +139,8 @@ channels:
                 desired:
                   stale_threshold_sec: 120
                   routing:
-                    x320-curtain-01:
-                      shadow_name: dev-curtain
+                    curtain-01:
+                      shadow_name: dev-curtain-01
                       input_mode: mqtt_telemetry
                       sensor_schema:
                         - {key: temperature,  path: temperature,  value_type: object}
@@ -140,8 +148,8 @@ channels:
                       zone_target:
                         thing: x320-Edge-Node
                         shadow: zone-env
-                    Sensor-co2:
-                      shadow_name: dev-co2
+                    co2-01:
+                      shadow_name: dev-co2-01
                       input_mode: shadow_poll
                       poll_interval_sec: 60
                       sensor_schema:
@@ -183,20 +191,20 @@ channels:
                       value_celsius: 28.4
                       raw_value: 2150
                       read_at: 1710300000.0
-                      source_device: x320-curtain-01
-                      source_shadow: dev-curtain
+                      source_device: curtain-01
+                      source_shadow: dev-curtain-01
                       sampled_at: "2025-03-20T09:15:00Z"
                       stale: false
                     humidity_pct:
                       value: 71.2
-                      source_device: x320-curtain-01
-                      source_shadow: dev-curtain
+                      source_device: curtain-01
+                      source_shadow: dev-curtain-01
                       sampled_at: "2025-03-20T09:15:00Z"
                       stale: false
                     co2_ppm:
                       value: 850
-                      source_device: Sensor-co2
-                      source_shadow: dev-co2
+                      source_device: co2-01
+                      source_shadow: dev-co2-01
                       sampled_at: "2025-03-20T09:14:50Z"
                       stale: false
                   updated_at: "2025-03-20T09:15:02Z"
@@ -207,20 +215,20 @@ channels:
                   sensors:
                     temperature:
                       value_celsius: 28.4
-                      source_device: x320-curtain-01
-                      source_shadow: dev-curtain
+                      source_device: curtain-01
+                      source_shadow: dev-curtain-01
                       sampled_at: "2025-03-20T09:15:00Z"
                       stale: false
                     co2_ppm:
                       value: null
-                      source_device: Sensor-co2
-                      source_shadow: dev-co2
+                      source_device: co2-01
+                      source_shadow: dev-co2-01
                       sampled_at: null
                       stale: true
                   updated_at: "2025-03-20T09:15:02Z"
 
   # ================================================================
-  # dev- Shadow チャンネル（Thing: x320-curtain-01）
+  # dev- Shadow チャンネル（Thing: x320-Edge-Node（全 dev- Shadow は Edge Node の Thing に属する））
   # ================================================================
 
   shadowDevCurtainUpdate:
@@ -228,7 +236,7 @@ channels:
     description: |
       dev-curtain Shadow の desired / reported を更新する。
 
-      カーテン制御デバイス（x320-curtain-01）に関するすべての情報を 1つの Shadow に統合。
+      カーテン制御デバイス（curtain-01）に関するすべての情報を 1つの Shadow に統合。
       モーター制御・スケジュール・センサー値・デバイス状態を含む。
 
       ## 書込主体
@@ -249,19 +257,22 @@ channels:
     messages:
       DevCurtainUpdate:
         name: DevCurtainUpdate
-        title: dev-curtain Shadow 更新
+        title: "dev-{device_id} Shadow（例: dev-curtain-01） 更新"
         contentType: application/json
         payload:
           $ref: "#/components/schemas/DevCurtainShadow"
 
   # ================================================================
-  # dev- Shadow チャンネル（Thing: Sensor-co2）
+  # dev- Shadow チャンネル（Thing: x320-Edge-Node（全 dev- Shadow は Edge Node の Thing に属する））
   # ================================================================
 
   shadowDevCo2Update:
     address: "$aws/things/{thing_name}/shadow/name/dev-co2/update"
     description: |
-      dev-co2 Shadow の更新。
+      dev-{device_id} Shadow の desired / reported を更新する。
+
+      全 dev- Shadow は Edge Node の Thing（x320-Edge-Node）に属する。
+      device_id は Deployment 設定で定義する論理識別子（例: co2-01, co2-hall）。
 
       ## 書込主体
       | セクション | 書込主体 |
@@ -294,11 +305,11 @@ channels:
                   device: {online: true, firmware: "2.1.0", rssi_dbm: -72, errors: [], last_health_at: null}
 
   # ================================================================
-  # dev- Shadow チャンネル（Thing: edge-ai-cam-{id}）
+  # dev- Shadow チャンネル（Thing: cam-{n}）
   # ================================================================
 
   # ================================================================
-  # dev- Shadow チャンネル（Thing: edge-ai-cam-{id}）
+  # dev- Shadow チャンネル（Thing: cam-{n}）
   # ================================================================
 
   shadowDevCamUpdate:
@@ -348,7 +359,7 @@ channels:
     messages:
       DevCamUpdate:
         name: DevCamUpdate
-        title: dev-cam Shadow 更新
+        title: "dev-{device_id} Shadow（例: dev-cam-01） 更新"
         contentType: application/json
         payload:
           $ref: "#/components/schemas/DevCamShadow"
@@ -548,7 +559,7 @@ channels:
         examples:
           - name: 人物検知
             payload:
-              device_id: edge-ai-cam-01
+              device_id: cam-01
               event_type: detection
               timestamp: 1710300000.0
               detections:
@@ -598,7 +609,7 @@ channels:
         examples:
           - name: 画像保存完了
             payload:
-              device_id: edge-ai-cam-01
+              device_id: cam-01
               file_path: "/data/capture/2025-03-20T09:15:00Z.jpg"
               file_type: jpeg
               file_size_bytes: 245760
@@ -767,7 +778,7 @@ channels:
             timestamp:      {type: number}
         examples:
           - name: M1 上限リミッター到達
-            payload: {device_id: x320-curtain-01, event_type: limiter, motor_id: M1, limiter: upper, state: active, previous_state: inactive, timestamp: 1710300060.0}
+            payload: {device_id: curtain-01, event_type: limiter, motor_id: M1, limiter: upper, state: active, previous_state: inactive, timestamp: 1710300060.0}
       EmergencyStopEvent:
         name: EmergencyStopEvent
         title: 緊急停止
@@ -783,7 +794,7 @@ channels:
             timestamp:  {type: number}
         examples:
           - name: 緊急停止押下
-            payload: {device_id: x320-curtain-01, event_type: emergency_stop, state: active, timestamp: 1710300120.0}
+            payload: {device_id: curtain-01, event_type: emergency_stop, state: active, timestamp: 1710300120.0}
       MotorStateEvent:
         name: MotorStateEvent
         title: モーター状態変化
@@ -802,9 +813,9 @@ channels:
             timestamp:          {type: number}
         examples:
           - name: 自動閾値による起動
-            payload: {device_id: x320-curtain-01, event_type: motor_state, motor_id: M1, direction: forward, previous_direction: stopped, reason: auto_threshold, timestamp: 1710300000.0}
+            payload: {device_id: curtain-01, event_type: motor_state, motor_id: M1, direction: forward, previous_direction: stopped, reason: auto_threshold, timestamp: 1710300000.0}
           - name: リミッターによる停止
-            payload: {device_id: x320-curtain-01, event_type: motor_state, motor_id: M1, direction: stopped, previous_direction: forward, reason: limiter, timestamp: 1710300060.1}
+            payload: {device_id: curtain-01, event_type: motor_state, motor_id: M1, direction: stopped, previous_direction: forward, reason: limiter, timestamp: 1710300060.1}
       ModeChangeEvent:
         name: ModeChangeEvent
         title: 動作モード変更
@@ -820,7 +831,7 @@ channels:
             timestamp:     {type: number}
         examples:
           - name: 手動→自動
-            payload: {device_id: x320-curtain-01, event_type: mode_change, mode: auto, previous_mode: manual, timestamp: 1710300000.0}
+            payload: {device_id: curtain-01, event_type: mode_change, mode: auto, previous_mode: manual, timestamp: 1710300000.0}
 
   sensorTelemetry:
     address: "{device_id}/sensor/telemetry"
@@ -865,7 +876,7 @@ channels:
         examples:
           - name: カーテン制御デバイス（温湿度＋モーター状態）
             payload:
-              device_id: x320-curtain-01
+              device_id: curtain-01
               timestamp: 1710300000.0
               mode: auto
               emergency_stop: inactive
@@ -878,7 +889,7 @@ channels:
               sampled_at: "2025-03-20T09:15:00Z"
           - name: CO2センサー
             payload:
-              device_id: Sensor-co2
+              device_id: co2-01
               timestamp: 1710300000.0
               sensors:
                 co2_ppm: 850
@@ -931,7 +942,7 @@ channels:
         examples:
           - name: カーテン制御デバイス（X320）
             payload:
-              device_id: x320-curtain-01
+              device_id: curtain-01
               timestamp: 1710300000.0
               uptime_sec: 86400
               mqtt_connected: true
@@ -943,7 +954,7 @@ channels:
               errors: []
           - name: エッジAIカメラ（extra 使用）
             payload:
-              device_id: edge-ai-cam-01
+              device_id: cam-01
               timestamp: 1710300000.0
               uptime_sec: 43200
               mqtt_connected: true
@@ -1009,7 +1020,7 @@ channels:
         examples:
           - name: 病害検知あり
             payload:
-              device_id: edge-ai-cam-01
+              device_id: cam-01
               model_id: plant-disease-v2
               model_version: "1.0.0"
               run_at: "2025-03-20T09:00:12Z"
@@ -1025,7 +1036,7 @@ channels:
               edge_node_thing: x320-Edge-Node
           - name: 異常なし
             payload:
-              device_id: edge-ai-cam-01
+              device_id: cam-01
               model_id: plant-disease-v2
               model_version: "1.0.0"
               run_at: "2025-03-20T09:00:12Z"
@@ -1135,8 +1146,8 @@ components:
             "desired": {
               "stale_threshold_sec": 120,
               "routing": {
-                "x320-curtain-01": {
-                  "shadow_name": "dev-curtain",
+                "curtain-01": {
+                  "shadow_name": "dev-curtain-01",
                   "input_mode": "mqtt_telemetry",
                   "sensor_schema": [
                     { "key": "temperature",  "path": "temperature",  "value_type": "object" },
@@ -1144,8 +1155,8 @@ components:
                   ],
                   "zone_target": { "thing": "x320-Edge-Node", "shadow": "zone-env" }
                 },
-                "Sensor-co2": {
-                  "shadow_name": "dev-co2",
+                "co2-01": {
+                  "shadow_name": "dev-co2-01",
                   "input_mode": "mqtt_telemetry",
                   "sensor_schema": [
                     { "key": "co2_ppm",      "path": "co2_ppm",      "value_type": "integer" },
@@ -1182,8 +1193,8 @@ components:
                     properties:
                       shadow_name:
                         type: string
-                        description: デバイス固有 Shadow 名（dev- プレフィックス）
-                        example: dev-curtain
+                        description: デバイス固有 Shadow 名（dev-{device_id} 形式）
+                        example: dev-curtain-01-01
                       input_mode:
                         type: string
                         enum: [mqtt_telemetry, shadow_poll]
@@ -1243,22 +1254,22 @@ components:
                   "value_celsius": 28.4,
                   "raw_value": 2150,
                   "read_at": 1710300000.0,
-                  "source_device": "x320-curtain-01",
-                  "source_shadow": "dev-curtain",
+                  "source_device": "curtain-01",
+                  "source_shadow": "dev-curtain-01",
                   "sampled_at": "2025-03-20T09:15:00Z",
                   "stale": false
                 },
                 "humidity_pct": {
                   "value": 71.2,
-                  "source_device": "x320-curtain-01",
-                  "source_shadow": "dev-curtain",
+                  "source_device": "curtain-01",
+                  "source_shadow": "dev-curtain-01",
                   "sampled_at": "2025-03-20T09:15:00Z",
                   "stale": false
                 },
                 "co2_ppm": {
                   "value": 850,
-                  "source_device": "Sensor-co2",
-                  "source_shadow": "dev-co2",
+                  "source_device": "co2-01",
+                  "source_shadow": "dev-co2-01",
                   "sampled_at": "2025-03-20T09:14:50Z",
                   "stale": false
                 }
@@ -1307,9 +1318,9 @@ components:
 
     DevCurtainShadow:
       type: object
-      title: dev-curtain Shadow
+      title: "dev-{device_id} Shadow（例: dev-curtain-01）"
       description: |
-        カーテン制御デバイス（x320-curtain-01）の全情報を 1つに統合した Shadow。
+        カーテン制御デバイス（curtain-01）の全情報を 1つに統合した Shadow。
 
         - desired.control       : モーター制御設定・スケジュール（curtain_ctrl プラグイン / ACT.app が書込）
         - desired.sensor_config : センサー収集設定（ACT.app が書込）
@@ -1555,9 +1566,9 @@ components:
 
     DevCo2Shadow:
       type: object
-      title: dev-co2 Shadow
+      title: "dev-{device_id} Shadow（例: dev-co2-01）"
       description: |
-        LoRaWAN CO2センサー（Sensor-co2）の全情報を 1つに統合した Shadow。
+        LoRaWAN CO2センサー（co2-01）の全情報を 1つに統合した Shadow。
 
         - desired.sensor_config : センサー収集設定（ACT.app が書込）
         - reported.environment  : CO2・温湿度計測値（Aggregator が書込）
@@ -1649,7 +1660,7 @@ components:
 
     DevCamShadow:
       type: object
-      title: dev-cam Shadow
+      title: "dev-{device_id} Shadow（例: dev-cam-01）"
       description: |
         カメラデバイス 1台に関するすべての情報を 1つに統合した Shadow。
 
