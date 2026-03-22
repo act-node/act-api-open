@@ -2,7 +2,7 @@ asyncapi: 3.0.0
 
 info:
   title: ACT Connect IoT API
-  version: 0.2.1
+  version: 0.2.2
   description: |
     ACT Connect デバイス群と Greengrass アプリケーション間の MQTT / Shadow メッセージ仕様。
 
@@ -11,7 +11,7 @@ info:
     | プレフィックス | 対象 | 例 |
     |--------------|------|-----|
     | `dev-` | 物理デバイス 1台に対応する Shadow。デバイスの制御・センサー値・状態をすべて 1つにまとめる | `dev-curtain`, `dev-co2` |
-    | `zone-` | 棟・エリア単位で共有する Shadow。複数デバイスの集約値や設定を管理する | `zone-env`, `zone-device-registry` |
+    | `zone-` | 棟・エリア単位で共有する Shadow。複数デバイスの集約値を管理する | `zone-env` |
 
     ## Named Shadow 一覧
 
@@ -24,7 +24,6 @@ info:
     ### ゾーン共有 Shadow（`zone-` プレフィックス）
     | Shadow 名 | Thing | 書込主体 | 内容 |
     |-----------|-------|----------|------|
-    | **zone-device-registry** | x320-Edge-Node | ACT.app | 全デバイス中央カタログ。sensor_schema / zone_target / health_targets を各エントリに統合 |
     | **zone-env** | x320-Edge-Node | Aggregator | エリア内全センサー集約値 |
 
     ## デバイス構成例
@@ -67,78 +66,6 @@ channels:
   # ================================================================
   # zone- Shadow チャンネル（Thing: x320-Edge-Node）
   # ================================================================
-
-  shadowZoneDeviceRegistryUpdate:
-    address: "$aws/things/{thing_name}/shadow/name/zone-device-registry/update"
-    description: |
-      zone-device-registry Shadow の desired を更新する。
-
-      ## 役割
-      全デバイスの中央カタログ。Event Router / Aggregator / Health Reporter が
-      30 秒ごとにポーリングし、version 変化を検知した場合にホットリロードする。
-
-      ## 読取後の動作
-      | コンポーネント | 動作 |
-      |--------------|------|
-      | Event Router | 新デバイスの event / response トピックを購読し、device_type に対応するプラグインを割り当てる |
-      | Aggregator | 新デバイスのテレメトリトピックを購読する |
-      | Health Reporter | 新デバイスのヘルストピックを購読し routing table を更新する |
-
-      ## device_type とプラグイン
-      | device_type | Event Router プラグイン |
-      |-------------|----------------------|
-      | curtain_ctrl | plugins/curtain_ctrl.py |
-      | env_sensor | なし（センサーのみ） |
-      | edge_ai_cam | plugins/edge_ai_cam.py |
-      | actuator_valve | plugins/valve_ctrl.py |
-
-      ## capabilities
-      | capability | 対象コンポーネント |
-      |-----------|-----------------|
-      | motor_control / inference / actuator | Event Router |
-      | sensor | Aggregator |
-      | health | Health Reporter |
-    messages:
-      ZoneDeviceRegistryUpdate:
-        name: ZoneDeviceRegistryUpdate
-        title: zone-device-registry desired 更新
-        contentType: application/json
-        payload:
-          $ref: "#/components/schemas/ZoneDeviceRegistryShadow"
-        examples:
-          - name: カーテンデバイスと CO2センサーを登録
-            payload:
-              state:
-                desired:
-                  devices:
-                    x320-curtain-01:
-                      device_type: curtain_ctrl
-                      thing_name: x320-curtain-01
-                      enabled: true
-                      capabilities: [motor_control, sensor, health]
-                      topics:
-                        event:     "x320-curtain-01/curtain/event"
-                        response:  "x320-curtain-01/curtain/response"
-                        command:   "x320-curtain-01/curtain/command"
-                        telemetry: "x320-curtain-01/sensor/telemetry"
-                        health:    "x320-curtain-01/health"
-                      shadows:
-                        device: dev-curtain
-                      meta: {}
-                    Sensor-co2:
-                      device_type: env_sensor
-                      thing_name: Sensor-co2
-                      enabled: true
-                      capabilities: [sensor]
-                      topics:
-                        event: null
-                        response: null
-                        command: null
-                        telemetry: "Sensor-co2/sensor/telemetry"
-                        health: null
-                      shadows:
-                        device: dev-co2
-                      meta: {protocol: lorawan}
 
   shadowZoneEnvUpdate:
     address: "$aws/things/{thing_name}/shadow/name/zone-env/update"
@@ -509,7 +436,7 @@ channels:
       Control Logic から Aggregator への定期テレメトリ（QoS 0 / 30秒間隔）。
 
       ## Aggregator の処理
-      1. zone-device-registry の sensor_schema.path に従い sensors から値を抽出
+      1. Deployment Configuration の sensor_schema.path に従い sensors から値を抽出
       2. device_id に対応する dev- Shadow の reported.environment を更新
       3. zone-env の reported.sensors を集約更新
 
@@ -524,7 +451,7 @@ channels:
           type: object
           description: |
             全デバイス共通テレメトリメッセージ。
-            Aggregator は zone-device-registry の sensor_schema.path に従い
+            Aggregator は Deployment Configuration の sensor_schema.path に従い
             sensors から値を抽出して dev- Shadow / zone-env を更新する。
           required: [device_id, timestamp, sensors, sampled_at]
           properties:
@@ -582,10 +509,10 @@ channels:
       デバイスから Health Reporter への死活情報（QoS 0 / 300秒間隔）。
 
       ## トピックパス
-      zone-device-registry の topics.health フィールドで定義する。
+      Deployment Configuration の topic_health フィールドで定義する。
 
       ## Health Reporter の処理
-      1. device_id を元に zone-device-registry の health_targets を取得
+      1. device_id を元に Deployment Configuration の health_targets を取得
       2. 共通フィールドを DeviceDocument として各 dev- Shadow の reported.device に書込む
       3. extra フィールドは DeviceDocument.extra にそのまま格納する
     messages:
@@ -698,174 +625,13 @@ components:
     # zone- Shadow スキーマ（6つのみ）
     # ================================================================
 
-    ZoneDeviceRegistryShadow:
-      type: object
-      title: zone-device-registry Shadow
-      description: |
-        全デバイスの中央カタログ。Thing: x320-Edge-Node
-
-        3コンポーネントが 30秒ごとにポーリングし version 変化でホットリロードする。
-        1物理デバイス = 1つの dev- Shadow のため、shadows.device に 1エントリのみ設定する。
-
-        ## v2.1 統合（zone-aggregator-cfg / zone-health-cfg を廃止）
-        Aggregator / Health Reporter の設定を各デバイスエントリに統合。
-        トップレベルに stale_threshold_sec / offline_threshold_sec を追加。
-
-        ## サンプル
-
-        <details>
-        <summary>Shadow 完全サンプル（クリックで展開）</summary>
-
-        ```json
-        {
-          "state": {
-            "desired": {
-              "stale_threshold_sec": 120,
-              "offline_threshold_sec": 600,
-              "devices": {
-                "x320-curtain-01": {
-                  "device_type": "curtain_ctrl",
-                  "thing_name": "x320-curtain-01",
-                  "enabled": true,
-                  "capabilities": ["motor_control", "sensor", "health"],
-                  "topics": {
-                    "event":     "x320-curtain-01/curtain/event",
-                    "response":  "x320-curtain-01/curtain/response",
-                    "command":   "x320-curtain-01/curtain/command",
-                    "telemetry": "x320-curtain-01/sensor/telemetry",
-                    "health":    "x320-curtain-01/health"
-                  },
-                  "shadows": { "device": "dev-curtain" },
-                  "sensor_schema": [
-                    { "key": "temperature",  "path": "temperature",  "value_type": "object" },
-                    { "key": "humidity_pct", "path": "humidity_pct", "value_type": "number" }
-                  ],
-                  "zone_target": { "thing": "x320-Edge-Node", "shadow": "zone-env" },
-                  "health_targets": [
-                    { "thing": "x320-curtain-01", "shadow": "dev-curtain" }
-                  ],
-                  "meta": {}
-                },
-                "Sensor-co2": {
-                  "device_type": "env_sensor",
-                  "thing_name": "Sensor-co2",
-                  "enabled": true,
-                  "capabilities": ["sensor"],
-                  "topics": {
-                    "event": null, "response": null, "command": null,
-                    "telemetry": "Sensor-co2/sensor/telemetry",
-                    "health": null
-                  },
-                  "shadows": { "device": "dev-co2" },
-                  "sensor_schema": [
-                    { "key": "co2_ppm",      "path": "co2_ppm",      "value_type": "integer" },
-                    { "key": "temperature",  "path": "temperature",  "value_type": "object" },
-                    { "key": "humidity_pct", "path": "humidity_pct", "value_type": "number" }
-                  ],
-                  "zone_target": { "thing": "x320-Edge-Node", "shadow": "zone-env" },
-                  "health_targets": [],
-                  "meta": { "protocol": "lorawan" }
-                }
-              }
-            }
-          }
-        }
-        ```
-
-        </details>
-      properties:
-        state:
-          type: object
-          properties:
-            desired:
-              type: object
-              required: [stale_threshold_sec, offline_threshold_sec, devices]
-              properties:
-                stale_threshold_sec:
-                  type: integer
-                  default: 120
-                  description: stale 判定秒数（全デバイス共通）。Aggregator が使用する
-                offline_threshold_sec:
-                  type: integer
-                  default: 600
-                  description: offline 判定秒数（全デバイス共通）。Health Reporter が使用する
-                devices:
-                  type: object
-                  additionalProperties:
-                    type: object
-                    required: [device_type, thing_name, enabled, capabilities, topics, shadows,
-                               sensor_schema, zone_target, health_targets]
-                    properties:
-                      device_type:
-                        type: string
-                        description: Event Router プラグイン識別子
-                        examples: [curtain_ctrl, env_sensor, soil_sensor, edge_ai_cam, actuator_valve]
-                      thing_name:  {type: string}
-                      enabled:     {type: boolean, default: true}
-                      capabilities:
-                        type: array
-                        items:
-                          type: string
-                          enum: [motor_control, sensor, health, inference, actuator, gateway]
-                      topics:
-                        type: object
-                        properties:
-                          event:     {type: ["string", "null"]}
-                          response:  {type: ["string", "null"]}
-                          command:   {type: ["string", "null"]}
-                          telemetry: {type: ["string", "null"]}
-                          health:    {type: ["string", "null"]}
-                      shadows:
-                        type: object
-                        description: 1物理デバイス = 1 dev- Shadow のため device キーに dev- Shadow 名を設定する
-                        required: [device]
-                        properties:
-                          device: {type: ["string", "null"], description: デバイス固有 Shadow（dev- プレフィックス）}
-                        additionalProperties: {type: ["string", "null"]}
-                      sensor_schema:
-                        type: array
-                        description: |
-                          Aggregator のフィールド抽出スキーマ。
-                          path にドット区切りパスを指定することでネスト構造にも対応する。
-                          sensor を持たないデバイスは空配列 [] を設定する。
-                        items:
-                          type: object
-                          required: [key, path, value_type]
-                          properties:
-                            key:        {type: string, description: zone-env / dev- Shadow への書込キー名}
-                            path:       {type: string, description: "msg.sensors 内パス（ドット区切り）"}
-                            value_type: {type: string, enum: [object, number, integer, string, boolean]}
-                      zone_target:
-                        type: object
-                        nullable: true
-                        description: |
-                          Aggregator の集約先 zone- Shadow。
-                          sensor を持たないデバイスは null を設定する。
-                        properties:
-                          thing:  {type: string, description: 集約先 Thing 名}
-                          shadow: {type: string, description: "集約先 Shadow 名（zone- プレフィックス）"}
-                      health_targets:
-                        type: array
-                        description: |
-                          Health Reporter が reported.device を更新する dev- Shadow リスト。
-                          health トピックを持たないデバイス（LoRaWAN など）は空配列 [] を設定する。
-                        items:
-                          type: object
-                          required: [thing, shadow]
-                          properties:
-                            thing:  {type: string}
-                            shadow: {type: string, description: dev- プレフィックスの Shadow 名}
-                      meta:
-                        type: object
-                        additionalProperties: true
-
     ZoneEnvShadow:
       type: object
       title: zone-env Shadow
       description: |
         棟内全センサーの集約値。Thing: x320-Edge-Node
 
-        sensors キーは zone-device-registry の各デバイスエントリ sensor_schema.key と同一。
+        sensors キーは各コンポーネントの Deployment Configuration sensor_schema.key と同一。
         stale=true のエントリは Event Router が制御判断から除外する。
         source_shadow には dev- Shadow 名が記録される。
 
