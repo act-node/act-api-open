@@ -2,7 +2,7 @@ asyncapi: 3.0.0
 
 info:
   title: ACT Connect IoT API
-  version: 0.2.2
+  version: "0.3.0"
   description: |
     ACT Connect デバイス群と Greengrass アプリケーション間の MQTT / Shadow メッセージ仕様。
 
@@ -11,7 +11,7 @@ info:
     | プレフィックス | 対象 | 例 |
     |--------------|------|-----|
     | `dev-` | 物理デバイス 1台に対応する Shadow。デバイスの制御・センサー値・状態をすべて 1つにまとめる | `dev-curtain`, `dev-co2` |
-    | `zone-` | 棟・エリア単位で共有する Shadow。複数デバイスの集約値を管理する | `zone-env` |
+    | `zone-` | 棟・エリア単位で共有する Shadow。複数デバイスの集約値や設定を管理する | `zone-env`, `zone-aggregator-cfg` |
 
     ## Named Shadow 一覧
 
@@ -24,6 +24,7 @@ info:
     ### ゾーン共有 Shadow（`zone-` プレフィックス）
     | Shadow 名 | Thing | 書込主体 | 内容 |
     |-----------|-------|----------|------|
+    | **zone-aggregator-cfg** | x320-Edge-Node | Setup スクリプト / ACT.app | Aggregator センサー集約ルーティング（dict 形式） |
     | **zone-env** | x320-Edge-Node | Aggregator | エリア内全センサー集約値 |
 
     ## デバイス構成例
@@ -66,6 +67,86 @@ channels:
   # ================================================================
   # zone- Shadow チャンネル（Thing: x320-Edge-Node）
   # ================================================================
+
+
+  shadowZoneAggregatorCfgUpdate:
+    address: "$aws/things/{thing_name}/shadow/name/zone-aggregator-cfg/update"
+    description: |
+      zone-aggregator-cfg Shadow の desired を更新する。
+
+      ## 役割
+      Aggregator のセンサー集約ルーティング設定。
+      routing は dict 形式（key = device_id）のため、
+      各デバイスの Setup スクリプトが既存エントリを消さずに追記できる。
+
+      ## 書込主体
+      | 操作 | 書込主体 |
+      |------|---------|
+      | 初期作成 | Aggregator（起動時に空 Shadow を作成） |
+      | エントリ追記 | 各デバイスの Setup スクリプト（Lifecycle.Run） |
+      | stale_threshold_sec 変更 | ACT.app |
+
+      ## Aggregator のホットリロード
+      Aggregator が 30秒ごとにポーリングし version 変化を検知したら
+      routing テーブルと MQTT 購読を再構築する。
+      新デバイスの Setup スクリプト実行から 30秒以内に自動反映される。
+    messages:
+      ZoneAggregatorCfgUpdate:
+        name: ZoneAggregatorCfgUpdate
+        title: zone-aggregator-cfg 更新
+        contentType: application/json
+        payload:
+          $ref: "#/components/schemas/ZoneAggregatorCfgShadow"
+        examples:
+          - name: カーテン＋CO2センサーのルーティング（Setup 後の状態）
+            payload:
+              state:
+                desired:
+                  stale_threshold_sec: 120
+                  routing:
+                    x320-curtain-01:
+                      shadow_name: dev-curtain
+                      input_mode: mqtt_telemetry
+                      sensor_schema:
+                        - {key: temperature,  path: temperature,  value_type: object}
+                        - {key: humidity_pct, path: humidity_pct, value_type: number}
+                      zone_target:
+                        thing: x320-Edge-Node
+                        shadow: zone-env
+                    Sensor-co2:
+                      shadow_name: dev-co2
+                      input_mode: mqtt_telemetry
+                      sensor_schema:
+                        - {key: co2_ppm,      path: co2_ppm,      value_type: integer}
+                        - {key: temperature,  path: temperature,  value_type: object}
+                        - {key: humidity_pct, path: humidity_pct, value_type: number}
+                      zone_target:
+                        thing: x320-Edge-Node
+                        shadow: zone-env
+          - name: ケース B（CO2が別 PC）の場合
+            payload:
+              state:
+                desired:
+                  stale_threshold_sec: 120
+                  routing:
+                    x320-curtain-01:
+                      shadow_name: dev-curtain
+                      input_mode: mqtt_telemetry
+                      sensor_schema:
+                        - {key: temperature,  path: temperature,  value_type: object}
+                        - {key: humidity_pct, path: humidity_pct, value_type: number}
+                      zone_target:
+                        thing: x320-Edge-Node
+                        shadow: zone-env
+                    Sensor-co2:
+                      shadow_name: dev-co2
+                      input_mode: shadow_poll
+                      poll_interval_sec: 60
+                      sensor_schema:
+                        - {key: co2_ppm, path: co2_ppm, value_type: integer}
+                      zone_target:
+                        thing: x320-Edge-Node
+                        shadow: zone-env
 
   shadowZoneEnvUpdate:
     address: "$aws/things/{thing_name}/shadow/name/zone-env/update"
@@ -436,7 +517,7 @@ channels:
       Control Logic から Aggregator への定期テレメトリ（QoS 0 / 30秒間隔）。
 
       ## Aggregator の処理
-      1. Deployment Configuration の sensor_schema.path に従い sensors から値を抽出
+      1. zone-aggregator-cfg の sensor_schema.path に従い sensors から値を抽出
       2. device_id に対応する dev- Shadow の reported.environment を更新
       3. zone-env の reported.sensors を集約更新
 
@@ -451,7 +532,7 @@ channels:
           type: object
           description: |
             全デバイス共通テレメトリメッセージ。
-            Aggregator は Deployment Configuration の sensor_schema.path に従い
+            Aggregator は zone-aggregator-cfg の sensor_schema.path に従い
             sensors から値を抽出して dev- Shadow / zone-env を更新する。
           required: [device_id, timestamp, sensors, sampled_at]
           properties:
@@ -512,7 +593,7 @@ channels:
       Deployment Configuration の topic_health フィールドで定義する。
 
       ## Health Reporter の処理
-      1. device_id を元に Deployment Configuration の health_targets を取得
+      1. device_id を元に Component Configuration の health_targets を取得
       2. 共通フィールドを DeviceDocument として各 dev- Shadow の reported.device に書込む
       3. extra フィールドは DeviceDocument.extra にそのまま格納する
     messages:
@@ -625,13 +706,121 @@ components:
     # zone- Shadow スキーマ（6つのみ）
     # ================================================================
 
+    ZoneAggregatorCfgShadow:
+      type: object
+      title: zone-aggregator-cfg Shadow
+      description: |
+        Aggregator のセンサー集約ルーティング設定。Thing: x320-Edge-Node
+
+        ## routing が dict 形式である理由
+        Greengrass configurationUpdate の merge は dict のキー追加には対応するが
+        array への要素追記には対応しない。
+        各デバイスの Setup スクリプトが自身のエントリだけを追記できるよう
+        routing を dict 形式（key = device_id）にしている。
+
+        ## 書込主体
+        | 操作 | 書込主体 |
+        |------|---------|
+        | 初期作成（routing: {}） | Aggregator |
+        | エントリ追記 | 各デバイスの Setup スクリプト |
+
+        ## input_mode
+        | input_mode | 説明 |
+        |------------|------|
+        | mqtt_telemetry | GG IPC Pub/Sub でテレメトリを受信（ケース A） |
+        | shadow_poll | dev- Shadow を定期 GetShadow で読取（ケース B） |
+
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "stale_threshold_sec": 120,
+              "routing": {
+                "x320-curtain-01": {
+                  "shadow_name": "dev-curtain",
+                  "input_mode": "mqtt_telemetry",
+                  "sensor_schema": [
+                    { "key": "temperature",  "path": "temperature",  "value_type": "object" },
+                    { "key": "humidity_pct", "path": "humidity_pct", "value_type": "number" }
+                  ],
+                  "zone_target": { "thing": "x320-Edge-Node", "shadow": "zone-env" }
+                },
+                "Sensor-co2": {
+                  "shadow_name": "dev-co2",
+                  "input_mode": "mqtt_telemetry",
+                  "sensor_schema": [
+                    { "key": "co2_ppm",      "path": "co2_ppm",      "value_type": "integer" },
+                    { "key": "temperature",  "path": "temperature",  "value_type": "object" },
+                    { "key": "humidity_pct", "path": "humidity_pct", "value_type": "number" }
+                  ],
+                  "zone_target": { "thing": "x320-Edge-Node", "shadow": "zone-env" }
+                }
+              }
+            }
+          }
+        }
+        ```
+
+        </details>
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              required: [stale_threshold_sec, routing]
+              properties:
+                stale_threshold_sec:
+                  type: integer
+                  default: 120
+                  description: stale 判定秒数（全デバイス共通）
+                routing:
+                  type: object
+                  description: device_id をキーとした集約ルーティング dict
+                  additionalProperties:
+                    type: object
+                    required: [shadow_name, input_mode, sensor_schema, zone_target]
+                    properties:
+                      shadow_name:
+                        type: string
+                        description: デバイス固有 Shadow 名（dev- プレフィックス）
+                        example: dev-curtain
+                      input_mode:
+                        type: string
+                        enum: [mqtt_telemetry, shadow_poll]
+                      poll_interval_sec:
+                        type: integer
+                        default: 60
+                        description: shadow_poll 時のみ使用
+                      sensor_schema:
+                        type: array
+                        items:
+                          type: object
+                          required: [key, path, value_type]
+                          properties:
+                            key:        {type: string}
+                            path:       {type: string}
+                            value_type: {type: string, enum: [object, number, integer, string, boolean]}
+                      zone_target:
+                        type: object
+                        required: [thing, shadow]
+                        properties:
+                          thing:  {type: string}
+                          shadow: {type: string}
+
+
     ZoneEnvShadow:
       type: object
       title: zone-env Shadow
       description: |
         棟内全センサーの集約値。Thing: x320-Edge-Node
 
-        sensors キーは各コンポーネントの Deployment Configuration sensor_schema.key と同一。
+        sensors キーは zone-aggregator-cfg の各エントリ sensor_schema.key と同一。
         stale=true のエントリは Event Router が制御判断から除外する。
         source_shadow には dev- Shadow 名が記録される。
 
