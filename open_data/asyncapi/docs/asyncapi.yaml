@@ -475,8 +475,6 @@ channels:
                 desired:
                   capture:
                     enabled: false
-
-        examples:
           - name: 正常動作中・AI検知あり
             payload:
               state:
