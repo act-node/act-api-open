@@ -679,7 +679,7 @@ channels:
             image_s3_key:
               type: string
               nullable: true
-              description: 検知時にS3に保存した画像のキー（upload_on_detection: true の場合）
+              description: "検知時にS3に保存した画像のキー（upload_on_detection: true の場合）"
             sampled_at:  {type: string, format: date-time}
         examples:
           - name: 人物検知
@@ -2298,7 +2298,7 @@ components:
             result_s3_key:
               type: string
               nullable: true
-              description: 詳細結果 JSON が格納された S3 キー（cloud.enabled: false の場合は null）
+              description: "詳細結果 JSON が格納された S3 キー（cloud.enabled: false の場合は null）"
             summary:
               type: object
               additionalProperties: true
