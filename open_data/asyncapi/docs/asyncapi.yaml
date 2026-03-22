@@ -2,7 +2,7 @@ asyncapi: 3.0.0
 
 info:
   title: ACT Connect IoT API
-  version: "0.3.3"
+  version: "0.3.0"
   description: |
     ACT Connect デバイス群と Greengrass アプリケーション間の MQTT / Shadow メッセージ仕様。
 
@@ -24,7 +24,8 @@ info:
     |---------------------|-------|----------|------|
     | **dev-curtain-{n}** | x320-Edge-Node | Event Router / Aggregator / Health Reporter | カーテン制御 + 温湿度センサー（例: dev-curtain-01, dev-curtain-02） |
     | **dev-co2-{n}** | x320-Edge-Node | Aggregator | CO2・温湿度計測値（例: dev-co2-01, dev-co2-hall） |
-    | **dev-cam-{n}** | x320-Edge-Node | CameraCapture / ImageAI | キャプチャ設定・画像AI設定・動作状態（例: dev-cam-01, dev-cam-entrance） |
+    | **dev-cam-{n}** | x320-Edge-Node | CameraCapture / ImageAI | キャプチャ設定・保存設定・画像AI設定・動作状態をすべて統合（DevCamShadow）（例: dev-cam-01） |
+    | ↳ desired.ai / reported.ai | ─ | ImageAI | dev-cam Shadow 内の画像AIセクション。DevImageAiShadow スキーマで定義 |
 
     ### ゾーン共有 Shadow（`zone-` プレフィックス）
     | Shadow 名 | Thing | 書込主体 | 内容 |
@@ -1783,248 +1784,429 @@ components:
           type: object
           properties:
             desired:
-              $ref: "#/components/schemas/DevCamDesired"
-            reported:
-              $ref: "#/components/schemas/DevCamReported"
-
-    DevCamDesired:
-      type: object
-      title: DevCamDesired
-      properties:
-        capture:
-          type: object
-          description: 撮影設定
-          properties:
-            enabled:
-              type: boolean
-              default: true
-              description: "false で撮影を一時停止"
-            interval_sec:
-              type: integer
-              minimum: 1
-              default: 30
-              description: 撮影間隔（秒）
-            resolution:
-              type: string
-              description: "解像度（例: 1280x720, 1920x1080）"
-              default: "1280x720"
-            format:
-              type: string
-              enum: [jpeg, png, h264]
-              default: jpeg
-            quality:
-              type: integer
-              minimum: 1
-              maximum: 100
-              default: 85
-              description: JPEG/PNG 品質（1-100）
-
-        storage:
-          type: object
-          description: 保存・転送設定
-          properties:
-            local:
-              type: object
               properties:
-                enabled:     {type: boolean, default: true}
-                path:        {type: string, default: "/data/capture"}
-                retain_days: {type: integer, minimum: 0, default: 3, description: 0=無制限}
-            cloud:
-              type: object
-              properties:
-                enabled:
-                  type: boolean
-                  default: false
-                s3_bucket:
-                  type: string
-                s3_prefix:
-                  type: string
-                  description: "S3 キーのプレフィックス（例: cam/house-a/）"
-                upload_on_detection:
-                  type: boolean
-                  default: true
-                  description: "true=AI検知時のみ転送 / false=upload_interval_sec ごとに定期転送"
-                upload_interval_sec:
-                  type: integer
-                  nullable: true
-                  description: upload_on_detection が false の場合の転送間隔（秒）
-
-        ai:
-          type: object
-          description: 画像AI分析設定
-          properties:
-            schedule:
-              type: object
-              required: [mode]
-              properties:
-                mode:
-                  type: string
-                  enum: [interval, cron, on_capture, on_demand]
-                  description: |
-                    interval   : interval_sec ごとに定期実行
-                    cron       : cron 式で指定した時刻に実行
-                    on_capture : CameraCapture 撮影完了後に即時実行
-                    on_demand  : trigger.run_now: true を検知して即時実行
-                interval_sec:
-                  type: integer
-                  minimum: 60
-                  description: mode=interval の場合の実行間隔（秒）
-                cron:
-                  type: string
-                  description: "mode=cron の場合の cron 式（5フィールド形式、例: 0 6 * * *）"
-
-            input:
-              type: object
-              description: 入力ファイル設定
-              properties:
-                source_path:
-                  type: string
-                  description: CameraCapture がファイルを保存するローカルパス
-                  example: "/data/capture"
-                file_pattern:
-                  type: string
-                  default: "*.jpg"
-                target:
+                capture:
                   type: object
+                  description: 撮影設定
                   properties:
-                    mode:
-                      type: string
-                      enum: [latest_n, all_since_last, time_range]
-                      description: |
-                        latest_n      : 最新 count 件を処理
-                        all_since_last: 前回実行以降のファイルを全件処理
-                        time_range    : from_offset_sec〜to_offset_sec の範囲を処理
-                    count:
-                      type: integer
-                      minimum: 1
-                      description: mode=latest_n の場合の件数
-                    from_offset_sec:
-                      type: integer
-                      description: mode=time_range の場合、現在時刻から何秒前から処理するか
-                    to_offset_sec:
-                      type: integer
-                      default: 0
-                      description: mode=time_range の場合、現在時刻から何秒前まで処理するか（0=現在）
-
-            model:
-              type: object
-              required: [id, version]
-              properties:
-                id:
-                  type: string
-                  description: モデル識別子（エッジ PC にデプロイ済みのモデル名）
-                  example: plant-disease-v2
-                version:
-                  type: string
-                  example: "1.0.0"
-                confidence_threshold:
-                  type: number
-                  minimum: 0
-                  maximum: 1
-                  default: 0.5
-                parameters:
-                  type: object
-                  additionalProperties: true
-                  description: モデル固有の追加パラメータ
-
-            output:
-              type: object
-              properties:
-                cloud:
-                  type: object
-                  properties:
-                    enabled:       {type: boolean, default: true}
-                    s3_bucket:     {type: string}
-                    s3_prefix:     {type: string, example: "ai-results/house-a/"}
-                    notify_actapp:
+                    enabled:
                       type: boolean
                       default: true
-                      description: 分析完了後に act-connect/results/{device_id} トピックへ通知する
-                local:
+                      description: "false で撮影を一時停止"
+                    interval_sec:
+                      type: integer
+                      minimum: 1
+                      default: 30
+                      description: 撮影間隔（秒）
+                    resolution:
+                      type: string
+                      description: "解像度（例: 1280x720, 1920x1080）"
+                      default: "1280x720"
+                    format:
+                      type: string
+                      enum: [jpeg, png, h264]
+                      default: jpeg
+                    quality:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 85
+                      description: JPEG/PNG 品質（1-100）
+
+                storage:
                   type: object
+                  description: 保存・転送設定
                   properties:
-                    enabled:     {type: boolean, default: true}
-                    path:        {type: string, default: "/data/ai-results"}
-                    retain_days: {type: integer, minimum: 0, default: 7}
+                    local:
+                      type: object
+                      properties:
+                        enabled:     {type: boolean, default: true}
+                        path:        {type: string, default: "/data/capture"}
+                        retain_days: {type: integer, minimum: 0, default: 3, description: 0=無制限}
+                    cloud:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                          default: false
+                        s3_bucket:
+                          type: string
+                        s3_prefix:
+                          type: string
+                          description: "S3 キーのプレフィックス（例: cam/house-a/）"
+                        upload_on_detection:
+                          type: boolean
+                          default: true
+                          description: "true=AI検知時のみ転送 / false=upload_interval_sec ごとに定期転送"
+                        upload_interval_sec:
+                          type: integer
+                          nullable: true
+                          description: upload_on_detection が false の場合の転送間隔（秒）
 
-            trigger:
-              type: object
-              description: "on_demand 実行指示。ImageAI が run_now: true を検知して即時実行し、完了後に false に戻す"
-              properties:
-                run_now: {type: boolean, default: false}
-                reason:  {type: string, nullable: true, description: 実行理由（ログ・監査用）}
-
-    DevCamReported:
-      type: object
-      title: DevCamReported
-      properties:
-        capture:
-          type: object
-          description: 撮影動作状態（CameraCapture が更新）
-          properties:
-            running:
-              type: boolean
-              description: "true=正常撮影中 / false=停止中（エラーまたは enabled:false）"
-            fps_actual:
-              type: number
-              description: 実測フレームレート
-            last_captured_at:
-              type: string
-              format: date-time
-              nullable: true
-            last_uploaded_at:
-              type: string
-              format: date-time
-              nullable: true
-            error:
-              type: string
-              nullable: true
-              description: "null=正常 / エラーメッセージ（例: RTSP connection timeout）"
-
-        storage:
-          type: object
-          description: ストレージ使用量（CameraCapture が更新）
-          properties:
-            local_file_count: {type: integer, minimum: 0}
-            local_size_mb:    {type: number,  minimum: 0}
-
-        ai:
-          type: object
-          description: AI処理状態・最終結果（ImageAI が更新）
-          properties:
-            status:
-              type: object
-              properties:
-                state:
-                  type: string
-                  enum: [idle, running, error]
-                  description: "idle=待機中 / running=分析中 / error=エラー停止"
-                last_run_at:
-                  type: string
-                  format: date-time
-                  nullable: true
-                last_run_duration_sec:
-                  type: number
-                  nullable: true
-                  description: 最終実行の処理時間（秒）。実行中は null
-                error:
-                  type: string
-                  nullable: true
-            last_result:
-              type: object
-              description: 最終実行の結果サマリ（分析完了後に更新）
-              properties:
-                run_at:             {type: string, format: date-time}
-                input_file_count:   {type: integer, minimum: 0}
-                processed_count:    {type: integer, minimum: 0}
-                anomaly_detected:   {type: boolean, description: 異常・検知があった場合 true}
-                detection_count:    {type: integer, minimum: 0}
-                result_s3_key:
-                  type: string
-                  nullable: true
-                  description: 詳細結果 JSON が格納された S3 キー
-                summary:
+                ai:
                   type: object
-                  additionalProperties: true
-                  description: モデル固有のサマリ情報
+                  description: 画像AI分析設定
+                  properties:
+                    schedule:
+                      type: object
+                      required: [mode]
+                      properties:
+                        mode:
+                          type: string
+                          enum: [interval, cron, on_capture, on_demand]
+                          description: |
+                            interval   : interval_sec ごとに定期実行
+                            cron       : cron 式で指定した時刻に実行
+                            on_capture : CameraCapture 撮影完了後に即時実行
+                            on_demand  : trigger.run_now: true を検知して即時実行
+                        interval_sec:
+                          type: integer
+                          minimum: 60
+                          description: mode=interval の場合の実行間隔（秒）
+                        cron:
+                          type: string
+                          description: "mode=cron の場合の cron 式（5フィールド形式、例: 0 6 * * *）"
 
+                    input:
+                      type: object
+                      description: 入力ファイル設定
+                      properties:
+                        source_path:
+                          type: string
+                          description: CameraCapture がファイルを保存するローカルパス
+                          example: "/data/capture"
+                        file_pattern:
+                          type: string
+                          default: "*.jpg"
+                        target:
+                          type: object
+                          properties:
+                            mode:
+                              type: string
+                              enum: [latest_n, all_since_last, time_range]
+                              description: |
+                                latest_n      : 最新 count 件を処理
+                                all_since_last: 前回実行以降のファイルを全件処理
+                                time_range    : from_offset_sec〜to_offset_sec の範囲を処理
+                            count:
+                              type: integer
+                              minimum: 1
+                              description: mode=latest_n の場合の件数
+                            from_offset_sec:
+                              type: integer
+                              description: mode=time_range の場合、現在時刻から何秒前から処理するか
+                            to_offset_sec:
+                              type: integer
+                              default: 0
+                              description: mode=time_range の場合、現在時刻から何秒前まで処理するか（0=現在）
+
+                    model:
+                      type: object
+                      required: [id, version]
+                      properties:
+                        id:
+                          type: string
+                          description: モデル識別子（エッジ PC にデプロイ済みのモデル名）
+                          example: plant-disease-v2
+                        version:
+                          type: string
+                          example: "1.0.0"
+                        confidence_threshold:
+                          type: number
+                          minimum: 0
+                          maximum: 1
+                          default: 0.5
+                        parameters:
+                          type: object
+                          additionalProperties: true
+                          description: モデル固有の追加パラメータ
+
+                    output:
+                      type: object
+                      properties:
+                        cloud:
+                          type: object
+                          properties:
+                            enabled:       {type: boolean, default: true}
+                            s3_bucket:     {type: string}
+                            s3_prefix:     {type: string, example: "ai-results/house-a/"}
+                            notify_actapp:
+                              type: boolean
+                              default: true
+                              description: 分析完了後に act-connect/results/{device_id} トピックへ通知する
+                        local:
+                          type: object
+                          properties:
+                            enabled:     {type: boolean, default: true}
+                            path:        {type: string, default: "/data/ai-results"}
+                            retain_days: {type: integer, minimum: 0, default: 7}
+
+                    trigger:
+                      type: object
+                      description: "on_demand 実行指示。ImageAI が run_now: true を検知して即時実行し、完了後に false に戻す"
+                      properties:
+                        run_now: {type: boolean, default: false}
+                        reason:  {type: string, nullable: true, description: 実行理由（ログ・監査用）}
+            reported:
+              properties:
+                capture:
+                  type: object
+                  description: 撮影動作状態（CameraCapture が更新）
+                  properties:
+                    running:
+                      type: boolean
+                      description: "true=正常撮影中 / false=停止中（エラーまたは enabled:false）"
+                    fps_actual:
+                      type: number
+                      description: 実測フレームレート
+                    last_captured_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    last_uploaded_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    error:
+                      type: string
+                      nullable: true
+                      description: "null=正常 / エラーメッセージ（例: RTSP connection timeout）"
+
+                storage:
+                  type: object
+                  description: ストレージ使用量（CameraCapture が更新）
+                  properties:
+                    local_file_count: {type: integer, minimum: 0}
+                    local_size_mb:    {type: number,  minimum: 0}
+
+                ai:
+                  type: object
+                  description: AI処理状態・最終結果（ImageAI が更新）
+                  properties:
+                    status:
+                      type: object
+                      properties:
+                        state:
+                          type: string
+                          enum: [idle, running, error]
+                          description: "idle=待機中 / running=分析中 / error=エラー停止"
+                        last_run_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        last_run_duration_sec:
+                          type: number
+                          nullable: true
+                          description: 最終実行の処理時間（秒）。実行中は null
+                        error:
+                          type: string
+                          nullable: true
+                    last_result:
+                      type: object
+                      description: 最終実行の結果サマリ（分析完了後に更新）
+                      properties:
+                        run_at:             {type: string, format: date-time}
+                        input_file_count:   {type: integer, minimum: 0}
+                        processed_count:    {type: integer, minimum: 0}
+                        anomaly_detected:   {type: boolean, description: 異常・検知があった場合 true}
+                        detection_count:    {type: integer, minimum: 0}
+                        result_s3_key:
+                          type: string
+                          nullable: true
+                          description: 詳細結果 JSON が格納された S3 キー
+                        summary:
+                          type: object
+                          additionalProperties: true
+                          description: モデル固有のサマリ情報
+
+    DevImageAiShadow:
+      type: object
+      title: "dev-{device_id} Shadow の ai セクション（画像AI分析設定・処理結果）"
+      description: |
+        DevCamShadow の `desired.ai` / `reported.ai` セクションの定義。
+        画像AIコンポーネント（ImageAI）が参照・更新する部分を独立して示す。
+
+        1台のカメラデバイスにつき 1つの `dev-{device_id}` Shadow が存在し、
+        その中に CameraCapture（capture/storage）と ImageAI（ai）の設定が共存する。
+
+        ## 書込主体
+        | セクション | 書込主体 |
+        |-----------|---------|
+        | desired.ai.schedule | ACT.app（実行タイミング設定） |
+        | desired.ai.input | ACT.app（入力ソース設定） |
+        | desired.ai.model | ACT.app（モデル・パラメータ設定） |
+        | desired.ai.output | ACT.app（出力先設定） |
+        | desired.ai.trigger | ACT.app（on_demand 実行指示） |
+        | reported.ai.status | ImageAI（処理状態） |
+        | reported.ai.last_result | ImageAI（最終実行結果） |
+
+        ## desired.ai.schedule.mode
+        | mode | 動作 |
+        |------|------|
+        | interval | interval_sec ごとに定期実行 |
+        | cron | cron 式で指定した時刻に実行 |
+        | on_capture | {device_id}/camera/captured トピックを受けて即時実行 |
+        | on_demand | desired.ai.trigger.run_now: true を検知して即時実行 |
+
+        ## サンプル（dev-cam-01 の ai セクションのみ）
+
+        <details>
+        <summary>ai セクション サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "ai": {
+                "schedule": { "mode": "interval", "interval_sec": 3600 },
+                "input": {
+                  "source_path": "/data/capture",
+                  "file_pattern": "*.jpg",
+                  "target": { "mode": "latest_n", "count": 10 }
+                },
+                "model": {
+                  "id": "plant-disease-v2",
+                  "version": "1.0.0",
+                  "confidence_threshold": 0.5,
+                  "parameters": {}
+                },
+                "output": {
+                  "cloud": {
+                    "enabled": true,
+                    "s3_bucket": "act-node-farm01",
+                    "s3_prefix": "ai-results/house-a/",
+                    "notify_actapp": true
+                  },
+                  "local": { "enabled": true, "path": "/data/ai-results", "retain_days": 7 }
+                },
+                "trigger": { "run_now": false, "reason": null }
+              }
+            },
+            "reported": {
+              "ai": {
+                "status": {
+                  "state": "idle",
+                  "last_run_at": "2025-03-20T09:00:12Z",
+                  "last_run_duration_sec": 8.4,
+                  "error": null
+                },
+                "last_result": {
+                  "run_at": "2025-03-20T09:00:12Z",
+                  "input_file_count": 10,
+                  "processed_count": 10,
+                  "anomaly_detected": true,
+                  "detection_count": 2,
+                  "result_s3_key": "ai-results/house-a/2025-03-20T09:00:12Z.json",
+                  "summary": {
+                    "disease_probability": 0.82,
+                    "affected_area_pct": 12.4,
+                    "recommendation": "要防除（早期対応推奨）"
+                  }
+                }
+              }
+            }
+          }
+        }
+        ```
+
+        </details>
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              type: object
+              properties:
+                ai:
+                  type: object
+                  description: 画像AI分析設定
+                  properties:
+                    schedule:
+                      type: object
+                      required: [mode]
+                      properties:
+                        mode:
+                          type: string
+                          enum: [interval, cron, on_capture, on_demand]
+                        interval_sec:
+                          type: integer
+                          minimum: 60
+                          description: mode=interval の場合の実行間隔（秒）
+                        cron:
+                          type: string
+                          description: "mode=cron の場合の cron 式（5フィールド形式、例: 0 6 * * *）"
+                    input:
+                      type: object
+                      properties:
+                        source_path:  {type: string, example: "/data/capture"}
+                        file_pattern: {type: string, default: "*.jpg"}
+                        target:
+                          type: object
+                          properties:
+                            mode:
+                              type: string
+                              enum: [latest_n, all_since_last, time_range]
+                            count:            {type: integer, minimum: 1}
+                            from_offset_sec:  {type: integer}
+                            to_offset_sec:    {type: integer, default: 0}
+                    model:
+                      type: object
+                      required: [id, version]
+                      properties:
+                        id:                   {type: string, example: plant-disease-v2}
+                        version:              {type: string, example: "1.0.0"}
+                        confidence_threshold: {type: number, minimum: 0, maximum: 1, default: 0.5}
+                        parameters:           {type: object, additionalProperties: true}
+                    output:
+                      type: object
+                      properties:
+                        cloud:
+                          type: object
+                          properties:
+                            enabled:       {type: boolean, default: true}
+                            s3_bucket:     {type: string}
+                            s3_prefix:     {type: string, example: "ai-results/house-a/"}
+                            notify_actapp:
+                              type: boolean
+                              default: true
+                              description: 分析完了後に act-connect/results/{device_id} トピックへ通知する
+                        local:
+                          type: object
+                          properties:
+                            enabled:     {type: boolean, default: true}
+                            path:        {type: string, default: "/data/ai-results"}
+                            retain_days: {type: integer, minimum: 0, default: 7}
+                    trigger:
+                      type: object
+                      description: "on_demand 実行指示。ImageAI が run_now: true を検知して即時実行し、完了後に false に戻す"
+                      properties:
+                        run_now: {type: boolean, default: false}
+                        reason:  {type: string, nullable: true}
+            reported:
+              type: object
+              properties:
+                ai:
+                  type: object
+                  description: AI処理状態・最終結果（ImageAI が更新）
+                  properties:
+                    status:
+                      type: object
+                      properties:
+                        state:
+                          type: string
+                          enum: [idle, running, error]
+                          description: "idle=待機中 / running=分析中 / error=エラー停止"
+                        last_run_at:           {type: string, format: date-time, nullable: true}
+                        last_run_duration_sec: {type: number, nullable: true}
+                        error:                 {type: string, nullable: true}
+                    last_result:
+                      type: object
+                      description: 最終実行の結果サマリ
+                      properties:
+                        run_at:             {type: string, format: date-time}
+                        input_file_count:   {type: integer, minimum: 0}
+                        processed_count:    {type: integer, minimum: 0}
+                        anomaly_detected:   {type: boolean}
+                        detection_count:    {type: integer, minimum: 0}
+                        result_s3_key:      {type: string, nullable: true}
+                        summary:            {type: object, additionalProperties: true}
