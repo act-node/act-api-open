@@ -21,6 +21,7 @@ info:
     | **dev-curtain** | x320-curtain-01 | Event Router / Aggregator / Health Reporter | カーテン制御 + 温湿度センサーをすべて 1つに統合 |
     | **dev-co2** | Sensor-co2 | Aggregator | CO2・温湿度計測値 |
     | **dev-cam-{id}** | edge-ai-cam-{id} | CameraCapture | キャプチャ設定・保存設定・推論設定・動作状態 |
+    | **dev-image-ai-{id}** | edge-ai-cam-{id} または x320-Edge-Node | ImageAI | 画像AI分析設定・実行スケジュール・処理結果 |
 
     ### ゾーン共有 Shadow（`zone-` プレフィックス）
     | Shadow 名 | Thing | 書込主体 | 内容 |
@@ -35,6 +36,7 @@ info:
     | x320-curtain-01 | curtain_ctrl | カーテン開閉・温湿度センサー内蔵 |
     | Sensor-co2 | env_sensor | LoRaWAN CO2センサー |
     | edge-ai-cam-01 | edge_ai_cam | エッジAIカメラ（RTSPキャプチャ・推論） |
+    | edge-ai-cam-01 | image_ai | 画像AI分析コンポーネント（CameraCapture の出力を分析） |
 
     ## QoS ポリシー
     | QoS | 対象 | 理由 |
@@ -437,6 +439,206 @@ channels:
                     error: "RTSP connection timeout"
 
 
+  shadowDevImageAiUpdate:
+    address: "$aws/things/{thing_name}/shadow/name/dev-image-ai-{id}/update"
+    description: |
+      dev-image-ai Shadow の desired / reported を更新する。
+
+      画像AI分析コンポーネント（ImageAI）が管理する Shadow。
+      CameraCapture が保存した画像・映像をインプットに分析を実行し、
+      結果を ACT.app クラウドへ送信する。
+
+      ## 書込主体
+      | セクション | 書込主体 |
+      |-----------|---------|
+      | desired.schedule | ACT.app（実行タイミング設定） |
+      | desired.input | ACT.app（入力ソース設定） |
+      | desired.model | ACT.app（モデル・パラメータ設定） |
+      | desired.output | ACT.app（出力先設定） |
+      | desired.trigger | ACT.app（on_demand 実行指示） |
+      | reported.status | ImageAI（実行状態・エラー） |
+      | reported.last_result | ImageAI（最終実行結果） |
+
+      ## schedule.mode の動作
+      | mode | 動作 |
+      |------|------|
+      | interval | interval_sec ごとに自前タイマーで実行 |
+      | cron | cron フィールドの式（例: "0 6 * * *"）で実行 |
+      | on_capture | CameraCapture が画像保存後に発行する {device_id}/camera/captured トピックを受信して実行 |
+      | on_demand | ACT.app が desired.trigger.run_now: true を書いたら即時実行 |
+
+      ## on_demand 実行フロー
+      1. ACT.app が desired.trigger.run_now: true を書き込む
+      2. ImageAI が Shadow Delta で検知して即時実行
+      3. 実行完了後に reported.status.state: idle に戻す
+      4. ImageAI が desired.trigger.run_now: false に更新して delta を解消
+
+      ## クラウド送信の仕組み
+      output.cloud.enabled: true の場合:
+      - 結果 JSON を S3 に保存（s3_bucket / s3_prefix で指定）
+      - output.cloud.notify_actapp: true の場合は AWS IoT Core の
+        act-connect/results/{device_id} トピックに通知メッセージを発行
+        → ACT.app が IoT Rule でこのトピックを受信して処理する
+    messages:
+      DevImageAiDesiredUpdate:
+        name: DevImageAiDesiredUpdate
+        title: dev-image-ai desired 更新（分析設定）
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            state:
+              type: object
+              properties:
+                desired:
+                  $ref: "#/components/schemas/DevImageAiDesired"
+        examples:
+          - name: 1時間ごとにバッチ分析（直近10枚）
+            payload:
+              state:
+                desired:
+                  schedule:
+                    mode: interval
+                    interval_sec: 3600
+                  input:
+                    source_device_id: edge-ai-cam-01
+                    source_path: "/data/capture"
+                    file_pattern: "*.jpg"
+                    target:
+                      mode: latest_n
+                      count: 10
+                  model:
+                    id: plant-disease-v2
+                    version: "1.0.0"
+                    confidence_threshold: 0.5
+                    parameters: {}
+                  output:
+                    cloud:
+                      enabled: true
+                      s3_bucket: act-node-farm01
+                      s3_prefix: "ai-results/house-a/"
+                      notify_actapp: true
+                    local:
+                      enabled: true
+                      path: "/data/ai-results"
+                      retain_days: 7
+          - name: 毎朝6時にバッチ分析（前日分全て）
+            payload:
+              state:
+                desired:
+                  schedule:
+                    mode: cron
+                    cron: "0 6 * * *"
+                  input:
+                    source_device_id: edge-ai-cam-01
+                    source_path: "/data/capture"
+                    file_pattern: "*.jpg"
+                    target:
+                      mode: all_since_last
+                  model:
+                    id: plant-growth-v1
+                    version: "2.1.0"
+                    confidence_threshold: 0.7
+                    parameters:
+                      crop_type: tomato
+                  output:
+                    cloud:
+                      enabled: true
+                      s3_bucket: act-node-farm01
+                      s3_prefix: "ai-results/daily/"
+                      notify_actapp: true
+                    local:
+                      enabled: false
+                      path: "/data/ai-results"
+                      retain_days: 0
+          - name: 撮影のたびにリアルタイム分析
+            payload:
+              state:
+                desired:
+                  schedule:
+                    mode: on_capture
+                  input:
+                    source_device_id: edge-ai-cam-01
+                    source_path: "/data/capture"
+                    file_pattern: "*.jpg"
+                    target:
+                      mode: latest_n
+                      count: 1
+                  model:
+                    id: pest-detection-v1
+                    version: "1.0.0"
+                    confidence_threshold: 0.65
+                    parameters: {}
+                  output:
+                    cloud:
+                      enabled: true
+                      s3_bucket: act-node-farm01
+                      s3_prefix: "ai-results/realtime/"
+                      notify_actapp: true
+                    local:
+                      enabled: true
+                      path: "/data/ai-results"
+                      retain_days: 3
+          - name: ACT.app からの即時実行指示
+            payload:
+              state:
+                desired:
+                  trigger:
+                    run_now: true
+                    reason: "manual-inspection"
+      DevImageAiReportedUpdate:
+        name: DevImageAiReportedUpdate
+        title: dev-image-ai reported 更新（処理結果）
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            state:
+              type: object
+              properties:
+                reported:
+                  $ref: "#/components/schemas/DevImageAiReported"
+        examples:
+          - name: 分析完了・異常検知あり
+            payload:
+              state:
+                reported:
+                  status:
+                    state: idle
+                    last_run_at: "2025-03-20T09:00:12Z"
+                    last_run_duration_sec: 8.4
+                    error: null
+                  last_result:
+                    run_at: "2025-03-20T09:00:12Z"
+                    input_file_count: 10
+                    processed_count: 10
+                    anomaly_detected: true
+                    detection_count: 2
+                    result_s3_key: "ai-results/house-a/2025-03-20T09:00:12Z.json"
+                    summary:
+                      disease_probability: 0.82
+                      affected_area_pct: 12.4
+                      recommendation: "要防除（早期対応推奨）"
+          - name: 処理中
+            payload:
+              state:
+                reported:
+                  status:
+                    state: running
+                    last_run_at: "2025-03-20T09:00:00Z"
+                    last_run_duration_sec: null
+                    error: null
+          - name: エラー
+            payload:
+              state:
+                reported:
+                  status:
+                    state: error
+                    last_run_at: "2025-03-20T08:00:00Z"
+                    last_run_duration_sec: null
+                    error: "Model file not found: plant-disease-v2 v1.0.0"
+
+
   # ================================================================
   # GG IPC Pub/Sub チャンネル
   # ================================================================
@@ -491,6 +693,53 @@ channels:
                   bbox: {x: 0.32, y: 0.14, w: 0.18, h: 0.52}
               image_s3_key: "cam/house-a/2025-03-20T09:15:00Z_detect.jpg"
               sampled_at: "2025-03-20T09:15:00Z"
+
+
+  cameraCaptured:
+    address: "{device_id}/camera/captured"
+    description: |
+      CameraCapture が画像・映像ファイルを保存完了した後に発行する通知（QoS 0）。
+      ImageAI が schedule.mode: on_capture の場合にこのトピックを購読して
+      即時分析を開始するトリガーとして使用する。
+
+      ## 発行タイミング
+      - ローカルへのファイル書き込み完了後に発行
+      - S3 アップロードの完了は待たない（非同期）
+
+      ## ImageAI の on_capture 動作
+      1. ImageAI が {source_device_id}/camera/captured を購読
+      2. メッセージ受信 → input.source_path から最新ファイルを取得
+      3. モデルで推論 → 結果を S3 に送信 → reported.last_result を更新
+    messages:
+      CameraCapturedEvent:
+        name: CameraCapturedEvent
+        title: 画像保存完了通知
+        contentType: application/json
+        payload:
+          type: object
+          required: [device_id, file_path, sampled_at]
+          properties:
+            device_id:   {type: string}
+            file_path:
+              type: string
+              description: ローカルファイルパス
+              example: "/data/capture/2025-03-20T09:15:00Z.jpg"
+            file_type:   {type: string, enum: [jpeg, png, h264, mp4]}
+            file_size_bytes: {type: integer}
+            sampled_at:  {type: string, format: date-time}
+            s3_key:
+              type: string
+              nullable: true
+              description: S3 アップロード済みの場合のキー（非同期のため null の場合もある）
+        examples:
+          - name: 画像保存完了
+            payload:
+              device_id: edge-ai-cam-01
+              file_path: "/data/capture/2025-03-20T09:15:00Z.jpg"
+              file_type: jpeg
+              file_size_bytes: 245760
+              sampled_at: "2025-03-20T09:15:00Z"
+              s3_key: null
 
 
   curtainCommand:
@@ -842,6 +1091,89 @@ channels:
                 memory_used_mb: 1842
                 inference_fps: 12.4
                 model_version: yolov8n-v3
+
+  imageAiResult:
+    address: "act-connect/results/{device_id}"
+    description: |
+      ImageAI が分析完了後に AWS IoT Core に発行する結果通知。
+      ACT.app は IoT Rule でこのトピックを受信して処理する。
+
+      ## 通信経路
+      ImageAI → Greengrass MQTT Bridge → AWS IoT Core → IoT Rule → ACT.app
+
+      ## ACT.app 側の受信設定（IoT Rule 例）
+      SELECT * FROM 'act-connect/results/+'
+      → Lambda / API Gateway で結果を受信
+    messages:
+      ImageAiResultNotification:
+        name: ImageAiResultNotification
+        title: 画像AI分析結果通知
+        contentType: application/json
+        payload:
+          type: object
+          required: [device_id, model_id, run_at, result_s3_key, anomaly_detected]
+          properties:
+            device_id:
+              type: string
+            model_id:
+              type: string
+            model_version:
+              type: string
+            run_at:
+              type: string
+              format: date-time
+            input_file_count:
+              type: integer
+            processed_count:
+              type: integer
+            anomaly_detected:
+              type: boolean
+              description: 異常・検知があった場合 true。ACT.app のアラート判断に使用する
+            detection_count:
+              type: integer
+              minimum: 0
+            result_s3_key:
+              type: string
+              description: 詳細結果 JSON が格納された S3 キー
+            summary:
+              type: object
+              additionalProperties: true
+              description: モデル固有のサマリ情報
+            edge_node_thing:
+              type: string
+              description: 送信元 Edge Node の Thing 名（棟の特定に使用）
+        examples:
+          - name: 病害検知あり
+            payload:
+              device_id: edge-ai-cam-01
+              model_id: plant-disease-v2
+              model_version: "1.0.0"
+              run_at: "2025-03-20T09:00:12Z"
+              input_file_count: 10
+              processed_count: 10
+              anomaly_detected: true
+              detection_count: 2
+              result_s3_key: "ai-results/house-a/2025-03-20T09:00:12Z.json"
+              summary:
+                disease_probability: 0.82
+                affected_area_pct: 12.4
+                recommendation: "要防除（早期対応推奨）"
+              edge_node_thing: x320-Edge-Node
+          - name: 異常なし
+            payload:
+              device_id: edge-ai-cam-01
+              model_id: plant-disease-v2
+              model_version: "1.0.0"
+              run_at: "2025-03-20T09:00:12Z"
+              input_file_count: 10
+              processed_count: 10
+              anomaly_detected: false
+              detection_count: 0
+              result_s3_key: "ai-results/house-a/2025-03-20T09:00:12Z.json"
+              summary:
+                disease_probability: 0.03
+              edge_node_thing: x320-Edge-Node
+
 
 operations:
 
@@ -1671,3 +2003,303 @@ components:
               minimum: 0
               description: 当日の検知回数（UTC 0:00 にリセット）
 
+    DevImageAiShadow:
+      type: object
+      title: dev-image-ai Shadow
+      description: |
+        画像AI分析コンポーネント（ImageAI）が管理する Shadow。
+        CameraCapture が保存した画像・映像を入力として分析を実行し、
+        結果を ACT.app クラウドへ送信する。
+
+        ## コンポーネントの動作フロー
+        ```
+        起動
+          ↓
+        Shadow desired を読み取り（schedule / input / model / output）
+        Shadow Delta を購読（設定変更を即時反映）
+          ↓
+        schedule.mode に応じてトリガーを待機
+          ├── interval    : interval_sec ごとにタイマー発火
+          ├── cron        : cron 式で指定した時刻に発火
+          ├── on_capture  : {source_device_id}/camera/captured を購読
+          └── on_demand   : desired.trigger.run_now: true の Delta を検知
+          ↓
+        input.source_path から対象ファイルを選択
+          ↓
+        model で推論実行
+          ↓
+        結果を S3 に保存
+        ACT.app に act-connect/results/{device_id} で通知
+        reported.last_result を更新
+        ```
+
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "schedule": {
+                "mode": "interval",
+                "interval_sec": 3600
+              },
+              "input": {
+                "source_device_id": "edge-ai-cam-01",
+                "source_path": "/data/capture",
+                "file_pattern": "*.jpg",
+                "target": {
+                  "mode": "latest_n",
+                  "count": 10
+                }
+              },
+              "model": {
+                "id": "plant-disease-v2",
+                "version": "1.0.0",
+                "confidence_threshold": 0.5,
+                "parameters": {}
+              },
+              "output": {
+                "cloud": {
+                  "enabled": true,
+                  "s3_bucket": "act-node-farm01",
+                  "s3_prefix": "ai-results/house-a/",
+                  "notify_actapp": true
+                },
+                "local": {
+                  "enabled": true,
+                  "path": "/data/ai-results",
+                  "retain_days": 7
+                }
+              },
+              "trigger": {
+                "run_now": false,
+                "reason": null
+              }
+            },
+            "reported": {
+              "status": {
+                "state": "idle",
+                "last_run_at": "2025-03-20T09:00:12Z",
+                "last_run_duration_sec": 8.4,
+                "error": null
+              },
+              "last_result": {
+                "run_at": "2025-03-20T09:00:12Z",
+                "input_file_count": 10,
+                "processed_count": 10,
+                "anomaly_detected": true,
+                "detection_count": 2,
+                "result_s3_key": "ai-results/house-a/2025-03-20T09:00:12Z.json",
+                "summary": {
+                  "disease_probability": 0.82,
+                  "affected_area_pct": 12.4,
+                  "recommendation": "要防除（早期対応推奨）"
+                }
+              }
+            }
+          }
+        }
+        ```
+
+        </details>
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              $ref: "#/components/schemas/DevImageAiDesired"
+            reported:
+              $ref: "#/components/schemas/DevImageAiReported"
+
+    DevImageAiDesired:
+      type: object
+      title: DevImageAiDesired
+      properties:
+        schedule:
+          type: object
+          description: 実行タイミング設定
+          required: [mode]
+          properties:
+            mode:
+              type: string
+              enum: [interval, cron, on_capture, on_demand]
+              description: |
+                interval    : interval_sec ごとに定期実行
+                cron        : cron 式で指定した時刻に実行
+                on_capture  : CameraCapture の撮影完了イベントを受けて実行
+                on_demand   : trigger.run_now: true を検知して即時実行
+            interval_sec:
+              type: integer
+              minimum: 60
+              description: mode=interval の場合の実行間隔（秒）
+            cron:
+              type: string
+              description: |
+                mode=cron の場合の cron 式（5フィールド形式）
+                例: "0 6 * * *" = 毎日 6:00 AM（エッジ PC のローカル時刻）
+
+        input:
+          type: object
+          description: 入力ファイル設定
+          required: [source_device_id, source_path]
+          properties:
+            source_device_id:
+              type: string
+              description: 入力元 CameraCapture のデバイス ID
+              example: edge-ai-cam-01
+            source_path:
+              type: string
+              description: CameraCapture がファイルを保存するローカルパス
+              example: "/data/capture"
+            file_pattern:
+              type: string
+              default: "*.jpg"
+              description: 対象ファイルのグロブパターン
+            target:
+              type: object
+              description: 実行時に処理するファイルの選択方法
+              properties:
+                mode:
+                  type: string
+                  enum: [latest_n, all_since_last, time_range]
+                  description: |
+                    latest_n      : 最新 count 件を処理
+                    all_since_last: 前回実行以降に追加されたファイルを全件処理
+                    time_range    : from_offset_sec 〜 to_offset_sec の範囲を処理
+                count:
+                  type: integer
+                  minimum: 1
+                  description: mode=latest_n の場合の件数
+                from_offset_sec:
+                  type: integer
+                  description: mode=time_range の場合。現在時刻から何秒前から処理するか
+                to_offset_sec:
+                  type: integer
+                  default: 0
+                  description: mode=time_range の場合。現在時刻から何秒前まで処理するか（0=現在）
+
+        model:
+          type: object
+          description: 推論モデル設定
+          required: [id, version]
+          properties:
+            id:
+              type: string
+              description: モデル識別子（エッジ PC にデプロイ済みのモデル名）
+              example: plant-disease-v2
+            version:
+              type: string
+              description: モデルバージョン
+              example: "1.0.0"
+            confidence_threshold:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0.5
+              description: この値以上の信頼度の検知のみ結果に含める
+            parameters:
+              type: object
+              additionalProperties: true
+              description: モデル固有の追加パラメータ（crop_type など）
+
+        output:
+          type: object
+          description: 結果出力設定
+          properties:
+            cloud:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  default: true
+                s3_bucket:
+                  type: string
+                  description: 結果 JSON の保存先 S3 バケット
+                s3_prefix:
+                  type: string
+                  description: S3 キーのプレフィックス
+                  example: "ai-results/house-a/"
+                notify_actapp:
+                  type: boolean
+                  default: true
+                  description: |
+                    true の場合、分析完了後に
+                    act-connect/results/{device_id} トピックに通知を発行する
+            local:
+              type: object
+              properties:
+                enabled:   {type: boolean, default: true}
+                path:      {type: string, default: "/data/ai-results"}
+                retain_days: {type: integer, minimum: 0, default: 7}
+
+        trigger:
+          type: object
+          description: |
+            on_demand 実行の指示。
+            ACT.app が run_now: true を書き込むと ImageAI が即時実行し、
+            完了後に run_now: false に戻す。
+          properties:
+            run_now:
+              type: boolean
+              default: false
+            reason:
+              type: string
+              nullable: true
+              description: 実行理由（ログ・監査用）
+
+    DevImageAiReported:
+      type: object
+      title: DevImageAiReported
+      properties:
+        status:
+          type: object
+          description: 実行状態（ImageAI が更新）
+          properties:
+            state:
+              type: string
+              enum: [idle, running, error]
+              description: "idle=待機中 / running=分析中 / error=エラー停止"
+            last_run_at:
+              type: string
+              format: date-time
+              nullable: true
+            last_run_duration_sec:
+              type: number
+              nullable: true
+              description: 最終実行の処理時間（秒）。実行中は null
+            error:
+              type: string
+              nullable: true
+              description: "null=正常 / エラーメッセージ"
+
+        last_result:
+          type: object
+          description: 最終実行の結果サマリ（分析完了後に更新）
+          properties:
+            run_at:
+              type: string
+              format: date-time
+            input_file_count:
+              type: integer
+              minimum: 0
+            processed_count:
+              type: integer
+              minimum: 0
+              description: 実際に推論を実行したファイル数（エラーで除外された分を除く）
+            anomaly_detected:
+              type: boolean
+              description: 異常・検知があった場合 true
+            detection_count:
+              type: integer
+              minimum: 0
+            result_s3_key:
+              type: string
+              nullable: true
+              description: 詳細結果 JSON が格納された S3 キー（cloud.enabled: false の場合は null）
+            summary:
+              type: object
+              additionalProperties: true
+              description: モデル固有のサマリ情報（disease_probability など）
