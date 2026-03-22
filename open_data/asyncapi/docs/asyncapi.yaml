@@ -2,7 +2,7 @@ asyncapi: 3.0.0
 
 info:
   title: ACT Connect IoT API
-  version: "0.3.4"
+  version: "0.3.0"
   description: |
     ACT Connect デバイス群と Greengrass アプリケーション間の MQTT / Shadow メッセージ仕様。
 
@@ -624,17 +624,15 @@ channels:
       ## source フィールド（発行契機）
       | source | 発行契機 |
       |--------|---------|
-      | schedule | スケジュールスロット実行 |
-      | auto_control | 温度自動制御（temp_above_c / temp_below_c 閾値超過） |
+      | force_close | force_close ゾーンへの切替・継続 |
+      | force_open  | force_open ゾーンへの切替・継続 |
+      | temperature | temperature ゾーンの温度閾値超過 / 復帰 |
       | event:limiter | リミッタースイッチ到達によるストップ |
       | manual | ACT.app からの手動指示 |
 
-      ## target_position について
-      Control Logic はこの値（0-100%）に向けてモーターを動かし、
-      到達後に reported.motors.{motor_id}.position を更新して status を idle にする。
-
-      ## skip フィールド
-      クールダウン中やすでに目標位置にいるモーターは skip: true になる。
+      ## options.start_interval_sec
+      複数モーター連続起動時の間隔（秒）。突入電流対策として
+      motor_1 → start_interval_sec 待機 → motor_2 → ... の順で起動する。
     messages:
       CurtainCommand:
         name: CurtainCommand
@@ -644,98 +642,103 @@ channels:
           type: object
           required: [command_id, issued_at, source, motors, options]
           properties:
-            command_id:  {type: string}
-            issued_at:   {type: string, format: date-time}
+            command_id: {type: string}
+            issued_at:  {type: string, format: date-time}
             source:
               type: string
-              enum: [schedule, auto_control, "event:limiter", manual]
-            slot_id:
+              enum: [force_close, force_open, temperature, "event:limiter", "event:emergency_stop", manual]
+            zone_id:
               type: string
               nullable: true
-              description: source=schedule の場合の実行スロット ID
+              description: 発行元のゾーン ID
             motors:
               type: object
-              description: motor_id をキーとしたコマンド dict（有効なモーターのみ含む）
+              description: motor_id をキーとしたコマンド dict
               additionalProperties:
                 type: object
                 properties:
                   command:
                     type: string
                     enum: [open, close, stop]
-                    description: "open=forward 方向に動かす / close=reverse / stop=停止"
                   target_position:
                     type: integer
                     minimum: 0
                     maximum: 100
-                    description: 目標開度（%）。Control Logic がこの位置まで動かす
-                  target_direction:
-                    type: string
-                    enum: [forward, reverse, stopped]
+                    nullable: true
                   skip:
                     type: boolean
                     default: false
-                    description: true=このモーターはスキップ（クールダウン中 / 既に目標位置）
+                  override:
+                    type: boolean
+                    nullable: true
+                    description: "true=desired.motors.override フラグによる手動優先"
                   reason:
                     type: string
                     nullable: true
-                    description: skip=true の場合の理由
             options:
               type: object
               properties:
-                stop_before_reverse_ms: {type: integer, default: 500}
                 cooldown_sec:           {type: integer, default: 30}
+                start_interval_sec:     {type: integer, default: 5}
+                stop_before_reverse_ms: {type: integer, default: 500}
             trigger:
               type: object
               nullable: true
+              description: source=temperature の場合に設定
               properties:
                 event_type:    {type: string}
                 temperature_c: {type: number}
         examples:
-          - name: 温度自動制御（全モーター open pos=80%）
+          - name: 温度上昇による開（daytime_auto ゾーン）
             payload:
               command_id: cmd-abc123
-              issued_at: "2025-03-20T09:15:00Z"
-              source: auto_control
-              slot_id: null
+              issued_at: "2025-03-20T10:00:01Z"
+              source: temperature
+              zone_id: daytime_auto
               motors:
-                motor_1: {command: open, target_position: 80, target_direction: forward, skip: false}
-                motor_2: {command: open, target_position: 80, target_direction: forward, skip: false}
-              options: {stop_before_reverse_ms: 500, cooldown_sec: 30}
-              trigger: {event_type: auto_control, temperature_c: 30.6}
-          - name: スケジュール実行（morning_open / pos=80%）
+                motor_1: {command: open, target_position: 80, skip: false}
+                motor_2: {command: open, target_position: 80, skip: false}
+                motor_3: {command: open, target_position: 80, skip: false}
+                motor_4: {command: open, target_position: 80, skip: false}
+              options: {cooldown_sec: 30, start_interval_sec: 5, stop_before_reverse_ms: 500}
+              trigger: {event_type: motor_state, temperature_c: 30.2}
+          - name: 夜間強制閉鎖（night_close ゾーン切替）
             payload:
               command_id: cmd-def456
-              issued_at: "2025-03-20T06:30:00Z"
-              source: schedule
-              slot_id: morning_open
+              issued_at: "2025-03-20T00:00:01Z"
+              source: force_close
+              zone_id: night_close
               motors:
-                motor_1: {command: open, target_position: 80, target_direction: forward, skip: false}
-                motor_2: {command: open, target_position: 80, target_direction: forward, skip: false}
-              options: {stop_before_reverse_ms: 500, cooldown_sec: 30}
-              trigger: null
-          - name: 半開き（noon_half / pos=50%）
+                motor_1: {command: close, target_position: 0, skip: false}
+                motor_2: {command: close, target_position: 0, skip: false}
+                motor_3: {command: close, target_position: 0, skip: false}
+                motor_4: {command: close, target_position: 0, skip: false}
+              options: {cooldown_sec: 30, start_interval_sec: 5, stop_before_reverse_ms: 500}
+          - name: motor_2 が cooldown 中でスキップ
             payload:
               command_id: cmd-ghi789
-              issued_at: "2025-03-20T12:00:00Z"
-              source: schedule
-              slot_id: noon_half
+              issued_at: "2025-03-20T10:15:00Z"
+              source: temperature
+              zone_id: daytime_auto
               motors:
-                motor_1: {command: open, target_position: 50, target_direction: forward, skip: false}
-                motor_2: {command: open, target_position: 50, target_direction: forward, skip: false}
-              options: {stop_before_reverse_ms: 500, cooldown_sec: 30}
-              trigger: null
-          - name: リミッター到達による stop（motor_2 はスキップ）
+                motor_1: {command: open, target_position: 80, skip: false}
+                motor_2: {command: open, target_position: 80, skip: true, reason: cooldown}
+                motor_3: {command: open, target_position: 80, skip: false}
+                motor_4: {command: open, target_position: 80, skip: false}
+              options: {cooldown_sec: 30, start_interval_sec: 5, stop_before_reverse_ms: 500}
+              trigger: {event_type: motor_state, temperature_c: 30.5}
+          - name: motor_1 が override（手動 close）で他は force_open
             payload:
               command_id: cmd-jkl012
-              issued_at: "2025-03-20T09:16:00Z"
-              source: "event:limiter"
-              slot_id: null
+              issued_at: "2025-03-20T09:00:01Z"
+              source: force_open
+              zone_id: daytime_auto
               motors:
-                motor_1: {command: stop, target_position: 100, target_direction: stopped, skip: false}
-                motor_2: {command: stop, target_position: 100, target_direction: stopped, skip: true, reason: already_at_limit}
-              options: {stop_before_reverse_ms: 500, cooldown_sec: 30}
-              trigger: null
-
+                motor_1: {command: close, target_position: 0, skip: false, override: true}
+                motor_2: {command: open, target_position: 80, skip: false}
+                motor_3: {command: open, target_position: 80, skip: false}
+                motor_4: {command: open, target_position: 80, skip: false}
+              options: {cooldown_sec: 30, start_interval_sec: 5, stop_before_reverse_ms: 500}
 
   curtainResponse:
     address: "{device_id}/curtain/response"
@@ -1358,29 +1361,39 @@ components:
     # ================================================================
 
 
+
     DevCurtainShadow:
       type: object
       title: "dev-{device_id} Shadow（例: dev-curtain-01）"
       description: |
         カーテン制御デバイスの全情報を 1つに統合した Shadow。
+        Thing: x320-Edge-Node
 
-        - desired.control       : スケジュール・自動制御設定（ACT.app が書込）
-        - desired.sensor_config : センサー収集設定（ACT.app が書込）
-        - reported.schedule     : スケジュール実行状態（curtain_ctrl プラグインが書込）
-        - reported.environment  : 温湿度センサー計測値（Aggregator が書込）
-        - reported.motors       : モーター現在状態・位置（curtain_ctrl が書込）
-        - reported.device       : デバイス死活情報（Health Reporter が書込）
+        ## desired 構造
+        - `desired.group.mode`        : "auto" | "manual"
+        - `desired.group.timezone`    : IANA タイムゾーン識別子
+        - `desired.group.time_zones`  : 時間帯ごとの制御モード・温度ルール
+        - `desired.group.motor`       : モーターハードウェア設定
+        - `desired.motors`            : モーターごとの手動コマンド・override フラグ
 
-        ## モーター数の柔軟化
-        motors は dict 形式（motor_1, motor_2, ...）で最大4台まで対応。
-        enabled: false のモーターはコマンド対象から除外される。
+        ## reported 構造
+        - `reported.active_zone`     : 現在のアクティブゾーン
+        - `reported.environment`     : 現在温度（zone-env から取得）
+        - `reported.schedule`        : ゾーン実行履歴・次回予告
+        - `reported.motors`          : モーターごとの現在開度・状態
+        - `reported.control`         : 緊急停止状態
+        - `reported.device`          : デバイス死活情報
 
-        ## target_position について
-        0-100% で開度を指定する。Control Logic がエンコーダーまたはリミットスイッチで
-        位置を計算しながら動作し、到達後に reported.motors.{id}.position を更新する。
+        ## time_zones の control モード
+        | control | 動作 |
+        |---------|------|
+        | force_close | target_position に強制閉鎖（全モーターが到達するまで評価ループごとに発令） |
+        | force_open  | target_position に強制開放 |
+        | temperature | ゾーン固有の rules で温度制御 |
 
-        ## スケジュール vs 自動制御の優先順位
-        スケジュールスロットが一致した場合はスロットを実行し、auto_control はスキップする。
+        ## override フラグ
+        `desired.motors.{motor_id}.override: true` の場合、そのモーターはゾーン制御を無視し
+        `desired.motors.{motor_id}.command` を優先して実行する。
 
         ## サンプル
 
@@ -1391,52 +1404,46 @@ components:
         {
           "state": {
             "desired": {
-              "control": {
+              "group": {
                 "mode": "auto",
-                "schedule": {
-                  "enabled": true,
-                  "timezone": "Asia/Tokyo",
-                  "slots": [
-                    {
-                      "id": "morning_open",
-                      "time": "06:30",
-                      "days": ["mon","tue","wed","thu","fri","sat","sun"],
-                      "command": "open",
-                      "target_position": 80
-                    },
-                    {
-                      "id": "evening_close",
-                      "time": "17:00",
-                      "days": ["mon","tue","wed","thu","fri","sat","sun"],
-                      "command": "close",
-                      "target_position": 10
-                    },
-                    {
-                      "id": "noon_half",
-                      "time": "12:00",
-                      "days": ["jun","jul","aug"],
-                      "command": "open",
-                      "target_position": 50
+                "timezone": "Asia/Tokyo",
+                "time_zones": [
+                  {
+                    "id": "night_close",
+                    "from": "00:00",
+                    "to": "08:00",
+                    "control": "force_close",
+                    "target_position": 0
+                  },
+                  {
+                    "id": "daytime_auto",
+                    "from": "08:00",
+                    "to": "18:00",
+                    "control": "temperature",
+                    "rules": {
+                      "open":  { "temp_above_c": 30.0, "target_position": 80 },
+                      "close": { "temp_below_c": 25.0, "target_position": 0  }
                     }
-                  ]
-                },
-                "auto_control": {
-                  "enabled": true,
-                  "rules": {
-                    "open":  {"temp_above_c": 28.0, "target_position": 80, "hysteresis_c": 1.0},
-                    "close": {"temp_below_c": 22.0, "target_position": 10, "hysteresis_c": 1.0}
+                  },
+                  {
+                    "id": "evening_close",
+                    "from": "18:00",
+                    "to": "24:00",
+                    "control": "force_close",
+                    "target_position": 0
                   }
-                },
-                "motors": {
-                  "motor_1": {"enabled": true},
-                  "motor_2": {"enabled": true},
-                  "motor_3": {"enabled": false},
-                  "motor_4": {"enabled": false}
-                },
-                "motor_config": {
+                ],
+                "motor": {
                   "cooldown_sec": 30,
+                  "start_interval_sec": 5,
                   "stop_before_reverse_ms": 500
                 }
+              },
+              "motors": {
+                "motor_1": { "command": null, "override": false },
+                "motor_2": { "command": null, "override": false },
+                "motor_3": { "command": null, "override": false },
+                "motor_4": { "command": null, "override": false }
               },
               "sensor_config": {
                 "interval_sec": 30,
@@ -1444,27 +1451,68 @@ components:
               }
             },
             "reported": {
-              "schedule": {
-                "last_executed_slot": "morning_open",
-                "last_executed_at": "2025-03-20T06:30:02Z",
-                "next_slot": "evening_close",
-                "next_slot_at": "2025-03-20T17:00:00Z"
+              "control": {
+                "emergency_stop": "inactive"
+              },
+              "active_zone": {
+                "id": "daytime_auto",
+                "control": "temperature",
+                "entered_at": "2025-03-20T08:00:01Z"
               },
               "environment": {
-                "temperature": {"value_celsius": 28.4, "raw_value": 2150, "read_at": 1710300000.0},
-                "humidity_pct": 71.2,
+                "temperature_c": 28.5,
+                "humidity_pct": 70.2,
                 "sampled_at": "2025-03-20T09:15:00Z"
               },
+              "schedule": {
+                "last_executed_zone": "night_close",
+                "last_executed_at": "2025-03-20T08:00:01Z",
+                "next_zone": "evening_close",
+                "next_zone_at": "2025-03-20T18:00:00Z"
+              },
               "motors": {
-                "motor_1": {"position": 80, "status": "idle", "cooldown_active": false, "last_command": "open", "last_operated_at": "2025-03-20T06:30:05Z"},
-                "motor_2": {"position": 80, "status": "idle", "cooldown_active": false, "last_command": "open", "last_operated_at": "2025-03-20T06:30:05Z"},
-                "motor_3": {"position": 0,  "status": "idle", "cooldown_active": false, "last_command": null,   "last_operated_at": null},
-                "motor_4": {"position": 0,  "status": "idle", "cooldown_active": false, "last_command": null,   "last_operated_at": null}
+                "motor_1": {
+                  "position": 80,
+                  "status": "idle",
+                  "cooldown_active": false,
+                  "cooldown_until": null,
+                  "pending_command": null,
+                  "error_code": null
+                },
+                "motor_2": {
+                  "position": 80,
+                  "status": "idle",
+                  "cooldown_active": false,
+                  "cooldown_until": null,
+                  "pending_command": null,
+                  "error_code": null
+                },
+                "motor_3": {
+                  "position": 80,
+                  "status": "idle",
+                  "cooldown_active": false,
+                  "cooldown_until": null,
+                  "pending_command": null,
+                  "error_code": null
+                },
+                "motor_4": {
+                  "position": 80,
+                  "status": "idle",
+                  "cooldown_active": false,
+                  "cooldown_until": null,
+                  "pending_command": null,
+                  "error_code": null
+                }
               },
               "device": {
                 "online": true,
                 "firmware": "1.4.2",
                 "rssi_dbm": -65,
+                "uptime_sec": 86400,
+                "mqtt_connected": true,
+                "do_channels": ["EXT_DO0","EXT_DO1","EXT_DO2","EXT_DO3"],
+                "di_channels": ["Filtered_DI0","Filtered_DI1","Filtered_DI2","Filtered_DI3"],
+                "ai_available": true,
                 "errors": [],
                 "last_health_at": "2025-03-20T09:00:00Z"
               }
@@ -1481,86 +1529,108 @@ components:
             desired:
               type: object
               properties:
-                control:
+
+                group:
                   type: object
+                  description: カーテングループ制御設定
                   properties:
                     mode:
                       type: string
                       enum: [auto, manual]
-                      description: "auto=スケジュール・自動制御で動作 / manual=手動コマンドのみ"
-
-                    schedule:
-                      type: object
-                      properties:
-                        enabled:  {type: boolean, default: true}
-                        timezone: {type: string, default: "Asia/Tokyo", description: IANA タイムゾーン識別子}
-                        slots:
-                          type: array
-                          description: スケジュールスロット一覧。時刻・曜日・月が一致したときに実行する
-                          items:
-                            type: object
-                            required: [id, time, command, target_position]
-                            properties:
-                              id:
-                                type: string
-                                description: スロット識別子（ユニーク）
-                              time:
-                                type: string
-                                description: "実行時刻（HH:MM 形式、ローカル時刻）"
-                                example: "06:30"
-                              days:
-                                type: array
-                                description: |
-                                  実行する曜日または月の略称リスト。省略時は毎日実行。
-                                  曜日: mon tue wed thu fri sat sun
-                                  月:   jan feb mar apr may jun jul aug sep oct nov dec
-                                items: {type: string}
-                                example: ["mon","tue","wed","thu","fri","sat","sun"]
-                              command:
-                                type: string
-                                enum: [open, close, stop]
-                              target_position:
-                                type: integer
-                                minimum: 0
-                                maximum: 100
-                                description: 目標開度（%）。0=全閉 / 100=全開
-
-                    auto_control:
-                      type: object
-                      description: 温度センサー値に基づく自動開閉制御。スケジュールスロット実行時はスキップされる
-                      properties:
-                        enabled: {type: boolean, default: true}
-                        rules:
-                          type: object
-                          properties:
-                            open:
-                              type: object
-                              description: この温度を超えたら開く
-                              properties:
-                                temp_above_c:     {type: number, description: 開放閾値（℃）}
-                                target_position:  {type: integer, minimum: 0, maximum: 100, default: 80}
-                                hysteresis_c:     {type: number, minimum: 0, default: 1.0, description: チャタリング防止幅（℃）}
-                            close:
-                              type: object
-                              description: この温度を下回ったら閉じる
-                              properties:
-                                temp_below_c:     {type: number, description: 閉鎖閾値（℃）}
-                                target_position:  {type: integer, minimum: 0, maximum: 100, default: 10}
-                                hysteresis_c:     {type: number, minimum: 0, default: 1.0}
-
-                    motors:
-                      type: object
-                      description: モーター有効設定（motor_1〜motor_4）
-                      additionalProperties:
+                      description: "auto=time_zones に従い自動制御 / manual=手動コマンドのみ"
+                    timezone:
+                      type: string
+                      default: "Asia/Tokyo"
+                      description: IANA タイムゾーン識別子
+                    time_zones:
+                      type: array
+                      description: |
+                        時間帯ごとの制御設定。evaluate() ループで現在時刻と照合する。
+                        from〜to の範囲は左閉右開（from <= 現在時刻 < to）。
+                        24:00 は翌 0:00 として扱う。
+                      items:
                         type: object
+                        required: [id, from, to, control]
                         properties:
-                          enabled: {type: boolean, default: true}
-
-                    motor_config:
+                          id:
+                            type: string
+                            description: ゾーン識別子（一意）
+                          from:
+                            type: string
+                            description: "開始時刻（HH:MM 形式、timezone 基準）"
+                            example: "08:00"
+                          to:
+                            type: string
+                            description: "終了時刻（HH:MM 形式）。24:00 可"
+                            example: "18:00"
+                          control:
+                            type: string
+                            enum: [force_close, force_open, temperature]
+                            description: |
+                              force_close : target_position に強制閉鎖
+                              force_open  : target_position に強制開放
+                              temperature : rules の温度閾値で制御
+                          target_position:
+                            type: integer
+                            minimum: 0
+                            maximum: 100
+                            description: "force_close / force_open の場合の目標開度（%）"
+                          rules:
+                            type: object
+                            description: control=temperature の場合のゾーン固有温度ルール
+                            properties:
+                              open:
+                                type: object
+                                properties:
+                                  temp_above_c:
+                                    type: number
+                                    description: この温度以上で開放
+                                  target_position:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 100
+                              close:
+                                type: object
+                                properties:
+                                  temp_below_c:
+                                    type: number
+                                    description: この温度以下で閉鎖
+                                  target_position:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 100
+                    motor:
                       type: object
+                      description: モーターハードウェア設定
                       properties:
-                        cooldown_sec:           {type: integer, default: 30, description: 動作後クールダウン（秒）}
-                        stop_before_reverse_ms: {type: integer, default: 500, description: 逆転前停止待機（ms）}
+                        cooldown_sec:
+                          type: integer
+                          default: 30
+                          description: 動作後冷却待機（秒）
+                        start_interval_sec:
+                          type: integer
+                          default: 5
+                          description: 複数モーター連続起動時の間隔（秒）。突入電流対策
+                        stop_before_reverse_ms:
+                          type: integer
+                          default: 500
+                          description: 逆転前停止待機（ms）
+
+                motors:
+                  type: object
+                  description: モーターごとの手動コマンド・override フラグ
+                  additionalProperties:
+                    type: object
+                    properties:
+                      command:
+                        type: string
+                        enum: [open, close, stop]
+                        nullable: true
+                        description: "override=true の場合に実行する手動コマンド"
+                      override:
+                        type: boolean
+                        default: false
+                        description: "true の場合はゾーン制御を無視してこのモーターに command を実行"
 
                 sensor_config:
                   type: object
@@ -1571,33 +1641,44 @@ components:
             reported:
               type: object
               properties:
-                schedule:
+
+                control:
                   type: object
-                  description: スケジュール実行状態（curtain_ctrl プラグインが書込）
                   properties:
-                    last_executed_slot: {type: string, nullable: true}
-                    last_executed_at:   {type: string, format: date-time, nullable: true}
-                    next_slot:          {type: string, nullable: true}
-                    next_slot_at:       {type: string, format: date-time, nullable: true}
+                    emergency_stop:
+                      type: string
+                      enum: [active, inactive]
+
+                active_zone:
+                  type: object
+                  description: 現在のアクティブゾーン（ゾーン切替時に Event Router が書込）
+                  properties:
+                    id:         {type: string, description: 現在のゾーン ID}
+                    control:    {type: string, enum: [force_close, force_open, temperature]}
+                    entered_at: {type: string, format: date-time, description: ゾーン入場時刻}
 
                 environment:
                   type: object
-                  description: 温湿度センサー計測値（Aggregator が書込）
+                  description: 現在の環境センサー値（Aggregator が書込・Event Router が温度制御時に更新）
                   properties:
-                    temperature:
-                      type: object
-                      properties:
-                        value_celsius: {type: number}
-                        raw_value:     {type: integer}
-                        read_at:       {type: number}
+                    temperature_c:
+                      type: number
+                      description: 現在温度（℃）。zone-env.sensors.temperature.value_celsius から取得
                     humidity_pct: {type: number, minimum: 0, maximum: 100}
-                    sampled_at:   {type: string, format: date-time}
+                    sampled_at:   {type: string, format: date-time, nullable: true}
+
+                schedule:
+                  type: object
+                  description: ゾーン実行履歴・次回予告（Event Router がゾーン切替時に書込）
+                  properties:
+                    last_executed_zone: {type: string, nullable: true}
+                    last_executed_at:   {type: string, format: date-time, nullable: true}
+                    next_zone:          {type: string, nullable: true}
+                    next_zone_at:       {type: string, format: date-time, nullable: true}
 
                 motors:
                   type: object
-                  description: |
-                    モーター現在状態（curtain_ctrl が response / position_reached イベントで更新）。
-                    motor_1〜motor_4 の有効なモーターのみ含む。
+                  description: モーターごとの現在状態（handle_response で更新）
                   additionalProperties:
                     type: object
                     properties:
@@ -1605,29 +1686,41 @@ components:
                         type: integer
                         minimum: 0
                         maximum: 100
-                        description: 現在の開度（%）。Control Logic が position_reached イベントで通知
+                        nullable: true
+                        description: 現在開度（%）
                       status:
                         type: string
                         enum: [idle, moving, error]
-                      cooldown_active: {type: boolean}
-                      cooldown_until:  {type: number, nullable: true}
-                      last_command:    {type: string, nullable: true, enum: [open, close, stop]}
-                      last_operated_at: {type: string, format: date-time, nullable: true}
-                      error_code:      {type: string, nullable: true}
-                      pending_command: {type: string, nullable: true}
+                      cooldown_active:
+                        type: boolean
+                        description: "true=クールダウン中（新規コマンドは pending_command に保留）"
+                      cooldown_until:
+                        type: number
+                        nullable: true
+                        description: クールダウン解除時刻（Unix epoch 秒）
+                      pending_command:
+                        type: string
+                        nullable: true
+                        description: クールダウン解除後に自動実行するコマンド
+                      error_code:
+                        type: string
+                        nullable: true
 
                 device:
                   type: object
-                  description: デバイス死活・ハードウェア情報（Health Reporter が書込）
+                  description: デバイス死活情報（Health Reporter が書込）
                   properties:
                     online:         {type: boolean}
                     firmware:       {type: string}
                     rssi_dbm:       {type: integer}
                     uptime_sec:     {type: integer, nullable: true}
-                    mqtt_connected: {type: boolean, nullable: true}
+                    mqtt_connected: {type: boolean}
                     errors:         {type: array, items: {type: string}}
                     last_health_at: {type: string, format: date-time, nullable: true}
-
+                    do_channels:    {type: array, items: {type: string}}
+                    di_channels:    {type: array, items: {type: string}}
+                    ai_available:   {type: boolean}
+                    extra:          {type: object, additionalProperties: true}
 
     DevCo2Shadow:
       type: object
