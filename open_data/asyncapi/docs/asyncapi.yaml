@@ -20,6 +20,7 @@ info:
     |-----------|-------|----------|------|
     | **dev-curtain** | x320-curtain-01 | Event Router / Aggregator / Health Reporter | カーテン制御 + 温湿度センサーをすべて 1つに統合 |
     | **dev-co2** | Sensor-co2 | Aggregator | CO2・温湿度計測値 |
+    | **dev-cam-{id}** | edge-ai-cam-{id} | CameraCapture | キャプチャ設定・保存設定・推論設定・動作状態 |
 
     ### ゾーン共有 Shadow（`zone-` プレフィックス）
     | Shadow 名 | Thing | 書込主体 | 内容 |
@@ -33,6 +34,7 @@ info:
     | x320-Edge-Node | ─ | 棟単位の仮想 Thing（zone- Shadow の親） |
     | x320-curtain-01 | curtain_ctrl | カーテン開閉・温湿度センサー内蔵 |
     | Sensor-co2 | env_sensor | LoRaWAN CO2センサー |
+    | edge-ai-cam-01 | edge_ai_cam | エッジAIカメラ（RTSPキャプチャ・推論） |
 
     ## QoS ポリシー
     | QoS | 対象 | 理由 |
@@ -292,8 +294,204 @@ channels:
                   device: {online: true, firmware: "2.1.0", rssi_dbm: -72, errors: [], last_health_at: null}
 
   # ================================================================
+  # dev- Shadow チャンネル（Thing: edge-ai-cam-{id}）
+  # ================================================================
+
+  shadowDevCamUpdate:
+    address: "$aws/things/{thing_name}/shadow/name/dev-cam-{id}/update"
+    description: |
+      dev-cam Shadow の desired / reported を更新する。
+
+      カメラキャプチャコンポーネント（CameraCapture）が管理する Shadow。
+      1台のカメラデバイス = 1つの dev-cam Shadow。
+      ID は実機の識別子を末尾に付ける（例: dev-cam-01, dev-cam-house-a）。
+
+      ## 書込主体
+      | セクション | 書込主体 |
+      |-----------|---------|
+      | desired.capture | ACT.app（撮影設定変更） |
+      | desired.storage | ACT.app（保存・転送設定変更） |
+      | desired.inference | ACT.app（推論設定変更） |
+      | reported.status | CameraCapture（定期更新） |
+      | reported.storage | CameraCapture（定期更新） |
+      | reported.inference | CameraCapture（検知時更新） |
+
+      ## Delta によるホットリロード
+      CameraCapture は Shadow Delta を購読する。
+      ACT.app が desired を変更すると再起動なしで即時反映される。
+      - capture.interval_sec 変更 → 次のループから新しい間隔で撮影
+      - capture.enabled: false → 撮影を一時停止
+      - inference.enabled 変更 → 推論の有無を切り替え
+    messages:
+      DevCamDesiredUpdate:
+        name: DevCamDesiredUpdate
+        title: dev-cam desired 更新（撮影・保存・推論設定）
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            state:
+              type: object
+              properties:
+                desired:
+                  $ref: "#/components/schemas/DevCamDesired"
+        examples:
+          - name: 30秒間隔・S3転送・推論なし
+            payload:
+              state:
+                desired:
+                  capture:
+                    enabled: true
+                    interval_sec: 30
+                    resolution: "1280x720"
+                    format: jpeg
+                    quality: 85
+                  storage:
+                    local:
+                      enabled: true
+                      path: "/data/capture"
+                      retain_days: 3
+                    cloud:
+                      enabled: true
+                      s3_bucket: act-node-farm01
+                      s3_prefix: "cam/house-a/"
+                      upload_on_detection: false
+                      upload_interval_sec: 300
+                  inference:
+                    enabled: false
+                    model: yolov8n
+                    confidence_threshold: 0.6
+                    target_classes: ["person", "animal"]
+                    publish_event_on_detection: true
+          - name: 検知時のみ転送・推論あり
+            payload:
+              state:
+                desired:
+                  capture:
+                    enabled: true
+                    interval_sec: 10
+                    resolution: "1920x1080"
+                    format: jpeg
+                    quality: 90
+                  storage:
+                    local:
+                      enabled: true
+                      path: "/data/capture"
+                      retain_days: 1
+                    cloud:
+                      enabled: true
+                      s3_bucket: act-node-farm01
+                      s3_prefix: "cam/house-b/"
+                      upload_on_detection: true
+                      upload_interval_sec: null
+                  inference:
+                    enabled: true
+                    model: yolov8n
+                    confidence_threshold: 0.6
+                    target_classes: ["person", "animal"]
+                    publish_event_on_detection: true
+          - name: 撮影を一時停止
+            payload:
+              state:
+                desired:
+                  capture:
+                    enabled: false
+      DevCamReportedUpdate:
+        name: DevCamReportedUpdate
+        title: dev-cam reported 更新（動作状態・推論結果）
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            state:
+              type: object
+              properties:
+                reported:
+                  $ref: "#/components/schemas/DevCamReported"
+        examples:
+          - name: 正常動作中
+            payload:
+              state:
+                reported:
+                  status:
+                    running: true
+                    fps_actual: 1.0
+                    last_captured_at: "2025-03-20T09:15:00Z"
+                    last_uploaded_at: "2025-03-20T09:15:02Z"
+                    error: null
+                  storage:
+                    local_file_count: 86
+                    local_size_mb: 412
+                  inference:
+                    last_detection_at: "2025-03-20T09:12:00Z"
+                    detection_count_today: 3
+          - name: カメラ接続エラー
+            payload:
+              state:
+                reported:
+                  status:
+                    running: false
+                    fps_actual: 0.0
+                    last_captured_at: "2025-03-20T09:10:00Z"
+                    last_uploaded_at: "2025-03-20T09:10:01Z"
+                    error: "RTSP connection timeout"
+
+
+  # ================================================================
   # GG IPC Pub/Sub チャンネル
   # ================================================================
+
+  cameraAiEvent:
+    address: "{device_id}/ai/event"
+    description: |
+      CameraCapture から Event Router の edge_ai_cam プラグインへの検知通知（QoS 1）。
+      inference.publish_event_on_detection: true の場合に送信される。
+      Event Router はこのイベントを受け取り、カーテン開閉などの制御判断に利用できる。
+    messages:
+      CameraDetectionEvent:
+        name: CameraDetectionEvent
+        title: 物体検知イベント
+        contentType: application/json
+        payload:
+          type: object
+          required: [device_id, event_type, timestamp, detections]
+          properties:
+            device_id:   {type: string}
+            event_type:  {type: string, enum: [detection]}
+            timestamp:   {type: number}
+            detections:
+              type: array
+              items:
+                type: object
+                properties:
+                  class:       {type: string, description: 検知クラス名}
+                  confidence:  {type: number, minimum: 0, maximum: 1}
+                  bbox:
+                    type: object
+                    description: バウンディングボックス（画像座標、0〜1正規化）
+                    properties:
+                      x: {type: number}
+                      y: {type: number}
+                      w: {type: number}
+                      h: {type: number}
+            image_s3_key:
+              type: string
+              nullable: true
+              description: 検知時にS3に保存した画像のキー（upload_on_detection: true の場合）
+            sampled_at:  {type: string, format: date-time}
+        examples:
+          - name: 人物検知
+            payload:
+              device_id: edge-ai-cam-01
+              event_type: detection
+              timestamp: 1710300000.0
+              detections:
+                - class: person
+                  confidence: 0.87
+                  bbox: {x: 0.32, y: 0.14, w: 0.18, h: 0.52}
+              image_s3_key: "cam/house-a/2025-03-20T09:15:00Z_detect.jpg"
+              sampled_at: "2025-03-20T09:15:00Z"
+
 
   curtainCommand:
     address: "{device_id}/curtain/command"
@@ -1251,3 +1449,225 @@ components:
                     mqtt_connected: {type: boolean, nullable: true}
                     errors:         {type: array, items: {type: string}}
                     last_health_at: {type: string, format: date-time, nullable: true}
+
+    DevCamShadow:
+      type: object
+      title: dev-cam Shadow
+      description: |
+        カメラキャプチャコンポーネント（CameraCapture）が管理する Shadow。
+        1台のカメラデバイス = 1つの dev-cam Shadow。
+
+        - desired.capture    : 撮影設定（ACT.app が書込）
+        - desired.storage    : 保存・転送設定（ACT.app が書込）
+        - desired.inference  : 推論設定（ACT.app が書込）
+        - reported.status    : 動作状態（CameraCapture が書込）
+        - reported.storage   : ストレージ使用量（CameraCapture が書込）
+        - reported.inference : 最終検知情報（CameraCapture が書込）
+
+        ## Delta によるホットリロード
+        CameraCapture は Shadow Delta を購読する。
+        desired 変更時に再起動なしで即時反映される。
+
+        ## サンプル
+
+        <details>
+        <summary>Shadow 完全サンプル（クリックで展開）</summary>
+
+        ```json
+        {
+          "state": {
+            "desired": {
+              "capture": {
+                "enabled": true,
+                "interval_sec": 30,
+                "resolution": "1280x720",
+                "format": "jpeg",
+                "quality": 85
+              },
+              "storage": {
+                "local": {
+                  "enabled": true,
+                  "path": "/data/capture",
+                  "retain_days": 3
+                },
+                "cloud": {
+                  "enabled": true,
+                  "s3_bucket": "act-node-farm01",
+                  "s3_prefix": "cam/house-a/",
+                  "upload_on_detection": true,
+                  "upload_interval_sec": null
+                }
+              },
+              "inference": {
+                "enabled": true,
+                "model": "yolov8n",
+                "confidence_threshold": 0.6,
+                "target_classes": ["person", "animal"],
+                "publish_event_on_detection": true
+              }
+            },
+            "reported": {
+              "status": {
+                "running": true,
+                "fps_actual": 1.0,
+                "last_captured_at": "2025-03-20T09:15:00Z",
+                "last_uploaded_at": "2025-03-20T09:15:02Z",
+                "error": null
+              },
+              "storage": {
+                "local_file_count": 86,
+                "local_size_mb": 412
+              },
+              "inference": {
+                "last_detection_at": "2025-03-20T09:12:00Z",
+                "detection_count_today": 3
+              }
+            }
+          }
+        }
+        ```
+
+        </details>
+      properties:
+        state:
+          type: object
+          properties:
+            desired:
+              $ref: "#/components/schemas/DevCamDesired"
+            reported:
+              $ref: "#/components/schemas/DevCamReported"
+
+    DevCamDesired:
+      type: object
+      title: DevCamDesired
+      properties:
+        capture:
+          type: object
+          description: 撮影設定
+          properties:
+            enabled:
+              type: boolean
+              default: true
+              description: false で撮影を一時停止
+            interval_sec:
+              type: integer
+              minimum: 1
+              default: 30
+              description: 撮影間隔（秒）
+            resolution:
+              type: string
+              description: "解像度（例: 1280x720, 1920x1080）"
+              default: "1280x720"
+            format:
+              type: string
+              enum: [jpeg, png, h264]
+              default: jpeg
+            quality:
+              type: integer
+              minimum: 1
+              maximum: 100
+              default: 85
+              description: JPEG/PNG 品質（1-100）。h264 の場合は無視される
+
+        storage:
+          type: object
+          description: 保存・転送設定
+          properties:
+            local:
+              type: object
+              properties:
+                enabled:     {type: boolean, default: true}
+                path:        {type: string, default: "/data/capture"}
+                retain_days: {type: integer, minimum: 0, default: 3, description: 0=無制限}
+            cloud:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  default: false
+                s3_bucket:
+                  type: string
+                s3_prefix:
+                  type: string
+                  description: "S3 キーのプレフィックス（例: cam/house-a/）"
+                upload_on_detection:
+                  type: boolean
+                  default: true
+                  description: "true=検知時のみ転送 / false=upload_interval_sec ごとに定期転送"
+                upload_interval_sec:
+                  type: integer
+                  nullable: true
+                  description: upload_on_detection=false の場合の転送間隔（秒）
+
+        inference:
+          type: object
+          description: エッジAI推論設定
+          properties:
+            enabled:
+              type: boolean
+              default: false
+            model:
+              type: string
+              description: 使用するモデル識別子
+              example: yolov8n
+            confidence_threshold:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0.6
+            target_classes:
+              type: array
+              items: {type: string}
+              description: 検知対象クラス名のリスト。空の場合は全クラスを対象にする
+            publish_event_on_detection:
+              type: boolean
+              default: true
+              description: 検知時に {device_id}/ai/event トピックを GG IPC に発行する
+
+    DevCamReported:
+      type: object
+      title: DevCamReported
+      properties:
+        status:
+          type: object
+          description: 動作状態（CameraCapture が定期更新）
+          properties:
+            running:
+              type: boolean
+              description: true=正常撮影中 / false=停止中（エラーまたは enabled:false）
+            fps_actual:
+              type: number
+              description: 実測フレームレート（interval_sec の逆数より低い場合は処理遅延あり）
+            last_captured_at:
+              type: string
+              format: date-time
+              nullable: true
+            last_uploaded_at:
+              type: string
+              format: date-time
+              nullable: true
+            error:
+              type: string
+              nullable: true
+              description: "null=正常 / エラーメッセージ（例: RTSP connection timeout）"
+
+        storage:
+          type: object
+          description: ストレージ使用量（CameraCapture が定期更新）
+          properties:
+            local_file_count: {type: integer, minimum: 0}
+            local_size_mb:    {type: number,  minimum: 0}
+
+        inference:
+          type: object
+          description: 推論結果サマリ（inference.enabled:true の場合のみ更新）
+          properties:
+            last_detection_at:
+              type: string
+              format: date-time
+              nullable: true
+            detection_count_today:
+              type: integer
+              minimum: 0
+              description: 当日の検知回数（UTC 0:00 にリセット）
+
